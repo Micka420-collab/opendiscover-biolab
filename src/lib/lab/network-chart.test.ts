@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { computeCircularLayout, networkGraphSpec } from './network-chart';
+import {
+  computeCircularLayout,
+  metabolicNetworkSpec,
+  networkGraphSpec,
+  scaleLayout,
+} from './network-chart';
 
 describe('computeCircularLayout — exact trigonometry, hand-verified', () => {
   it('places 2 nodes at opposite poles (0,-1) and (0,1)', () => {
@@ -108,5 +113,114 @@ describe('networkGraphSpec — valid Vega-Lite structure with correct data', () 
     const spec = networkGraphSpec(['a', 'b'], []);
     expect(spec.$schema).toContain('vega-lite');
     expect(spec.width).toBe('container');
+  });
+});
+
+describe('scaleLayout', () => {
+  it('multiplies both coordinates by the radius, preserving the name', () => {
+    const base = computeCircularLayout(['a', 'b']); // (0,-1), (0,1)
+    const scaled = scaleLayout(base, 1.5);
+    expect(scaled[0]).toEqual({ name: 'a', x: expect.closeTo(0, 9), y: expect.closeTo(-1.5, 9) });
+    expect(scaled[1]).toEqual({ name: 'b', x: expect.closeTo(0, 9), y: expect.closeTo(1.5, 9) });
+  });
+
+  it('preserves the unit circle up to the scale factor (radius r after scaling)', () => {
+    const base = computeCircularLayout(['a', 'b', 'c']);
+    for (const r of [0.7, 1.5, 3]) {
+      for (const p of scaleLayout(base, r)) {
+        expect(Math.sqrt(p.x ** 2 + p.y ** 2)).toBeCloseTo(r, 9);
+      }
+    }
+  });
+});
+
+describe('metabolicNetworkSpec — bipartite metabolite/reaction network', () => {
+  // The exact FBA exampleModel structure (src/lib/sim/systems/fba.ts):
+  // metabolites=['glc_c','pyr_c'], reactions=['EX_glc','GLYC','BIOMASS'],
+  // stoichiometry rows glc_c=[1,-1,0], pyr_c=[0,2,-1] -- see that file's own
+  // extensive documentation of this textbook uptake -> glycolysis -> biomass
+  // chain. Edges hand-derived directly from those coefficients:
+  //   EX_glc -> glc_c   (coefficient +1, product)
+  //   glc_c  -> GLYC    (coefficient -1, substrate)
+  //   GLYC   -> pyr_c   (coefficient +2, product)
+  //   pyr_c  -> BIOMASS (coefficient -1, substrate)
+  const metabolites = ['glc_c', 'pyr_c'];
+  const reactions = ['EX_glc', 'GLYC', 'BIOMASS'];
+  const edges = [
+    { metabolite: 'glc_c', reaction: 'EX_glc', coefficient: 1 },
+    { metabolite: 'glc_c', reaction: 'GLYC', coefficient: -1 },
+    { metabolite: 'pyr_c', reaction: 'GLYC', coefficient: 2 },
+    { metabolite: 'pyr_c', reaction: 'BIOMASS', coefficient: -1 },
+  ];
+
+  it('has 4 layers: edges, metabolite points, reaction points, labels', () => {
+    const spec = metabolicNetworkSpec(metabolites, reactions, edges);
+    const layer = spec.layer as Array<{ mark: { type: string; shape?: string } }>;
+    expect(layer).toHaveLength(4);
+    expect(layer[0].mark.type).toBe('rule');
+    expect(layer[1].mark.type).toBe('point');
+    expect(layer[2].mark.type).toBe('point');
+    expect(layer[3].mark.type).toBe('text');
+  });
+
+  it('places metabolites on the outer ring (radius 1.5) and reactions on the inner ring (radius 0.7)', () => {
+    const spec = metabolicNetworkSpec(metabolites, reactions, edges);
+    const layer = spec.layer as Array<{
+      data: { values: { name: string; x: number; y: number }[] };
+    }>;
+    const metaboliteNodes = layer[1].data.values;
+    const reactionNodes = layer[2].data.values;
+    // glc_c is the first metabolite -> angle -pi/2 -> (0, -1.5); pyr_c -> (0, 1.5).
+    expect(metaboliteNodes.find((n) => n.name === 'glc_c')?.y).toBeCloseTo(-1.5, 9);
+    expect(metaboliteNodes.find((n) => n.name === 'pyr_c')?.y).toBeCloseTo(1.5, 9);
+    // EX_glc is the first reaction -> (0, -0.7).
+    expect(reactionNodes.find((n) => n.name === 'EX_glc')?.y).toBeCloseTo(-0.7, 9);
+    for (const n of metaboliteNodes) expect(Math.sqrt(n.x ** 2 + n.y ** 2)).toBeCloseTo(1.5, 9);
+    for (const n of reactionNodes) expect(Math.sqrt(n.x ** 2 + n.y ** 2)).toBeCloseTo(0.7, 9);
+  });
+
+  it('directs substrate edges metabolite->reaction and product edges reaction->metabolite', () => {
+    const spec = metabolicNetworkSpec(metabolites, reactions, edges);
+    const layer = spec.layer as Array<{
+      data: {
+        values: {
+          metabolite: string;
+          reaction: string;
+          role: string;
+          x: number;
+          y: number;
+          x2: number;
+          y2: number;
+        }[];
+      };
+    }>;
+    const rows = layer[0].data.values;
+    expect(rows).toHaveLength(4);
+
+    const byPair = new Map(rows.map((r) => [`${r.metabolite}|${r.reaction}`, r]));
+    // EX_glc -> glc_c is a PRODUCT (coeff +1): edge starts at the reaction (EX_glc, y=-0.7)
+    // and ends at the metabolite (glc_c, y=-1.5).
+    const exGlcRow = byPair.get('glc_c|EX_glc');
+    expect(exGlcRow?.role).toBe('product');
+    expect(exGlcRow?.y).toBeCloseTo(-0.7, 9); // starts at the reaction
+    expect(exGlcRow?.y2).toBeCloseTo(-1.5, 9); // ends at the metabolite
+
+    // glc_c -> GLYC is a SUBSTRATE (coeff -1): edge starts at the metabolite.
+    const glycRow = byPair.get('glc_c|GLYC');
+    expect(glycRow?.role).toBe('substrate');
+    expect(glycRow?.y).toBeCloseTo(-1.5, 9); // starts at the metabolite (glc_c)
+  });
+
+  it('every edge role is either substrate or product, matching the coefficient sign', () => {
+    const spec = metabolicNetworkSpec(metabolites, reactions, edges);
+    const layer = spec.layer as Array<{
+      data: { values: { metabolite: string; reaction: string; role: string }[] };
+    }>;
+    for (const row of layer[0].data.values) {
+      const edge = edges.find(
+        (e) => e.metabolite === row.metabolite && e.reaction === row.reaction,
+      );
+      expect(row.role).toBe(edge && edge.coefficient < 0 ? 'substrate' : 'product');
+    }
   });
 });

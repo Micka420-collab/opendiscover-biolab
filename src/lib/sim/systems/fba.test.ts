@@ -327,6 +327,29 @@ describe('spec (EngineSpec contract)', () => {
     const obj = result.metrics.find((m) => m.key === 'objectiveValue');
     expect(obj?.value).toBeCloseTo(20, 9);
   });
+
+  it('detail exposes the metabolite list and the bipartite stoichiometry edge list', () => {
+    const result = spec.run({});
+    expect(result.detail?.metabolites).toEqual(['glc_c', 'pyr_c']);
+    // Hand-derived directly from exampleModel's own documented stoichiometry
+    // matrix: row glc_c=[1,-1,0] (produced by EX_glc, consumed by GLYC), row
+    // pyr_c=[0,2,-1] (2 produced by GLYC, 1 consumed by BIOMASS) -- exactly
+    // the linear chain EX_glc -> glc_c -> GLYC -> pyr_c -> BIOMASS.
+    const edges = result.detail?.stoichiometryEdges ?? [];
+    expect(edges).toHaveLength(4);
+    const byPair = new Map(edges.map((e) => [`${e.metabolite}|${e.reaction}`, e.coefficient]));
+    expect(byPair.get('glc_c|EX_glc')).toBe(1);
+    expect(byPair.get('glc_c|GLYC')).toBe(-1);
+    expect(byPair.get('pyr_c|GLYC')).toBe(2);
+    expect(byPair.get('pyr_c|BIOMASS')).toBe(-1);
+  });
+
+  it('stoichiometryEdgeList never emits a zero-coefficient edge', () => {
+    const result = spec.run({});
+    for (const e of result.detail?.stoichiometryEdges ?? []) {
+      expect(e.coefficient).not.toBe(0);
+    }
+  });
 });
 
 // Keep the `Relation` type import meaningful (compile-time usage).

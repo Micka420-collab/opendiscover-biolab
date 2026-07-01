@@ -487,6 +487,13 @@ const paramsSchema = z.object({
 
 export type FbaParams = z.infer<typeof paramsSchema>;
 
+export interface StoichiometryEdge {
+  metabolite: string;
+  reaction: string;
+  /** Stoichiometric coefficient: negative = consumed (substrate), positive = produced. */
+  coefficient: number;
+}
+
 export interface FbaDetail {
   status: FbaSolution['status'];
   /** Flux value keyed by reaction id. */
@@ -496,6 +503,22 @@ export interface FbaDetail {
   reactions: string[];
   /** Steady-state residual S·v (should be ~0 for every metabolite). */
   massBalanceResidual: number[];
+  metabolites: string[];
+  /** The bipartite metabolite<->reaction participation graph (for visualization). */
+  stoichiometryEdges: StoichiometryEdge[];
+}
+
+/** Flatten a model's stoichiometric matrix into a named (metabolite, reaction) edge list. */
+export function stoichiometryEdgeList(model: MetabolicModel): StoichiometryEdge[] {
+  const edges: StoichiometryEdge[] = [];
+  model.metabolites.forEach((metabolite, i) => {
+    const row = model.stoichiometry[i] ?? [];
+    model.reactions.forEach((reaction, j) => {
+      const coefficient = row[j] ?? 0;
+      if (coefficient !== 0) edges.push({ metabolite, reaction, coefficient });
+    });
+  });
+  return edges;
 }
 
 export const spec: EngineSpec<FbaParams, FbaDetail> = {
@@ -569,6 +592,8 @@ export const spec: EngineSpec<FbaParams, FbaDetail> = {
         fluxVector: sol.fluxes,
         reactions: model.reactions,
         massBalanceResidual: residual,
+        metabolites: model.metabolites,
+        stoichiometryEdges: stoichiometryEdgeList(model),
       },
       provenance: provenance(spec.slug, spec.version, parsed as Record<string, unknown>),
     };

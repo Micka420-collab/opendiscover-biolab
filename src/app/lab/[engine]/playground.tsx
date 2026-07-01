@@ -5,7 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { seriesToVegaLiteSpec } from '@/lib/lab/charts';
-import { type GraphEdge, networkGraphSpec } from '@/lib/lab/network-chart';
+import {
+  type GraphEdge,
+  type StoichiometryEdge,
+  metabolicNetworkSpec,
+  networkGraphSpec,
+} from '@/lib/lab/network-chart';
 import type { Metric, ParamField, SimResult } from '@/lib/sim';
 import { useMemo, useState } from 'react';
 
@@ -24,6 +29,36 @@ function extractNetwork(detail: unknown): { genes: string[]; edges: GraphEdge[] 
     ((e as GraphEdge).sign === 1 || (e as GraphEdge).sign === -1);
   if (!d.edges.every(validEdge)) return null;
   return { genes: d.genes as string[], edges: d.edges as GraphEdge[] };
+}
+
+/** Detects the bipartite `{ metabolites, reactions, stoichiometryEdges }` shape
+ * `fba` exposes in `detail`, without assuming every engine has it. */
+function extractMetabolicNetwork(
+  detail: unknown,
+): { metabolites: string[]; reactions: string[]; edges: StoichiometryEdge[] } | null {
+  if (!detail || typeof detail !== 'object') return null;
+  const d = detail as Record<string, unknown>;
+  if (
+    !Array.isArray(d.metabolites) ||
+    !Array.isArray(d.reactions) ||
+    !Array.isArray(d.stoichiometryEdges)
+  ) {
+    return null;
+  }
+  if (!d.metabolites.every((m) => typeof m === 'string')) return null;
+  if (!d.reactions.every((r) => typeof r === 'string')) return null;
+  const validEdge = (e: unknown): e is StoichiometryEdge =>
+    typeof e === 'object' &&
+    e !== null &&
+    typeof (e as StoichiometryEdge).metabolite === 'string' &&
+    typeof (e as StoichiometryEdge).reaction === 'string' &&
+    typeof (e as StoichiometryEdge).coefficient === 'number';
+  if (!d.stoichiometryEdges.every(validEdge)) return null;
+  return {
+    metabolites: d.metabolites as string[],
+    reactions: d.reactions as string[],
+    edges: d.stoichiometryEdges as StoichiometryEdge[],
+  };
 }
 
 interface EngineView {
@@ -248,6 +283,21 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
     () => (network ? networkGraphSpec(network.genes, network.edges) : null),
     [network],
   );
+  const metabolicNetwork = useMemo(
+    () => extractMetabolicNetwork(state.result.detail),
+    [state.result.detail],
+  );
+  const metabolicSpec = useMemo(
+    () =>
+      metabolicNetwork
+        ? metabolicNetworkSpec(
+            metabolicNetwork.metabolites,
+            metabolicNetwork.reactions,
+            metabolicNetwork.edges,
+          )
+        : null,
+    [metabolicNetwork],
+  );
 
   return (
     <Card>
@@ -279,6 +329,15 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
           <div>
             <div className="text-xs text-muted-foreground mb-2">Regulatory network topology</div>
             <VegaLiteEmbed spec={networkSpec} />
+          </div>
+        )}
+
+        {metabolicSpec && (
+          <div>
+            <div className="text-xs text-muted-foreground mb-2">
+              Metabolic network (● metabolites, ■ reactions)
+            </div>
+            <VegaLiteEmbed spec={metabolicSpec} />
           </div>
         )}
 
