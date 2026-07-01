@@ -16,7 +16,13 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 ### Next (priority order)
 - [x] **Breeding / genetic-crossing engine** — `sim/genetics/breeding.ts`: generalised Punnett
       distributions, complete/incomplete/codominant dominance (3:1, 9:3:3:1, 1:2:1), two-locus
-      linkage + recombination, seeded offspring sampling. 11 tests vs classical ratios.
+      linkage + recombination, seeded offspring sampling. 19 tests vs classical ratios.
+      **Rare mutations**: an optional `mutationRate` perturbs only the sampled offspring
+      (theoretical distribution/ratio stays the exact unmutated Mendelian calculation, honestly
+      documented). Verified with a fully deterministic edge case — an AA×AA cross (guaranteed 100%
+      AA pre-mutation) at mutationRate=1 forces every sampled offspring to "aa", checked both in
+      vitest and live against the running dev server — plus a Monte-Carlo statistical check
+      (empirical rate ≈ 1−(1−rate)² for the two independent per-allele rolls).
 - [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
       offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
       Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 9 tests).

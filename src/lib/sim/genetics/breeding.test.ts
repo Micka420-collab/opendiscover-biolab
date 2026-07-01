@@ -204,3 +204,102 @@ describe('breeding — offspring sampling', () => {
     expect(a.detail?.sampledOffspring).not.toEqual(b.detail?.sampledOffspring);
   });
 });
+
+describe('breeding — mutationRate (illustrative, sampled offspring only)', () => {
+  it('defaults to 0: every sampled offspring has an empty mutatedLoci list', () => {
+    const r = spec.run({
+      genes: [geneA],
+      parentA: { A: ['A', 'a'] },
+      parentB: { A: ['A', 'a'] },
+      offspringCount: 20,
+      seed: 'no-mutation',
+    });
+    for (const o of r.detail?.sampledOffspring ?? []) {
+      expect(o.mutatedLoci).toEqual([]);
+    }
+  });
+
+  it('mutationRate=1 on a guaranteed-homozygous cross (AA x AA) forces every offspring to "aa", deterministically', () => {
+    // AA x AA can ONLY ever draw "AA" from the Punnett square (both parents
+    // contribute exclusively 'A' gametes) -- so with mutationRate=1, every
+    // sampled offspring's genotype is a fully certain, verifiable outcome:
+    // both allele copies flip A->a, giving "aa" every single time.
+    const r = spec.run({
+      genes: [geneA],
+      parentA: { A: ['A', 'A'] },
+      parentB: { A: ['A', 'A'] },
+      offspringCount: 15,
+      mutationRate: 1,
+      seed: 'guaranteed-flip',
+    });
+    const offspring = r.detail?.sampledOffspring ?? [];
+    expect(offspring).toHaveLength(15);
+    for (const o of offspring) {
+      expect(o.genotype).toBe('aa');
+      expect(o.phenotype).toBe('Wrinkled');
+      expect(o.mutatedLoci).toEqual(['A']);
+    }
+  });
+
+  it('does not change phenotypeDistribution / genotypeDistribution / phenotypicRatio', () => {
+    // Mutation only perturbs the SAMPLED individuals; the theoretical
+    // Mendelian calculation for the cross itself must stay exact.
+    const params = {
+      genes: [geneA],
+      parentA: { A: ['A', 'a'] } as Record<string, [string, string]>,
+      parentB: { A: ['A', 'a'] } as Record<string, [string, string]>,
+      offspringCount: 10,
+      seed: 'theory-unaffected',
+    };
+    const noMutation = spec.run({ ...params, mutationRate: 0 });
+    const withMutation = spec.run({ ...params, mutationRate: 0.8 });
+    expect(withMutation.detail?.phenotypeDistribution).toEqual(
+      noMutation.detail?.phenotypeDistribution,
+    );
+    expect(withMutation.detail?.genotypeDistribution).toEqual(
+      noMutation.detail?.genotypeDistribution,
+    );
+    expect(withMutation.detail?.phenotypicRatio).toBe(noMutation.detail?.phenotypicRatio);
+  });
+
+  it('empirical mutation rate matches 1-(1-rate)^2 (two independent per-allele rolls per locus)', () => {
+    const rate = 0.3;
+    const r = spec.run({
+      genes: [geneA],
+      parentA: { A: ['A', 'a'] },
+      parentB: { A: ['A', 'a'] },
+      offspringCount: 1000,
+      mutationRate: rate,
+      seed: 'stat-check',
+    });
+    const offspring = r.detail?.sampledOffspring ?? [];
+    const mutatedFraction =
+      offspring.filter((o) => o.mutatedLoci.length > 0).length / offspring.length;
+    const expected = 1 - (1 - rate) ** 2; // P(at least one of 2 independent rolls mutates) = 0.51
+    expect(Math.abs(mutatedFraction - expected)).toBeLessThan(0.05);
+  });
+
+  it('mutated genotype labels stay canonically ordered (e.g. always "Aa", never "aA")', () => {
+    const r = spec.run({
+      genes: [geneA],
+      parentA: { A: ['A', 'a'] },
+      parentB: { A: ['A', 'a'] },
+      offspringCount: 200,
+      mutationRate: 1,
+      seed: 'canonical-check',
+    });
+    for (const o of r.detail?.sampledOffspring ?? []) {
+      expect(['AA', 'Aa', 'aa']).toContain(o.genotype);
+    }
+  });
+
+  it('is deterministic: identical params (including mutationRate + seed) give byte-identical results', () => {
+    const params = {
+      ...spec.example,
+      offspringCount: 20,
+      mutationRate: 0.4,
+      seed: 'mut-determinism',
+    };
+    expect(spec.run(params)).toEqual(spec.run(params));
+  });
+});

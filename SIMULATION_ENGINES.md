@@ -755,6 +755,7 @@ Cross two diploid parents across independent gene loci and get the full offsprin
 | `parentA` | json | **required** |  |  |
 | `parentB` | json | **required** |  |  |
 | `offspringCount` | integer | `12` | ≥ 0, ≤ 1000 |  |
+| `mutationRate` | number | `0` | ≥ 0, ≤ 1 |  |
 | `seed` | json | `breeding` |  |  |
 
 **Example**

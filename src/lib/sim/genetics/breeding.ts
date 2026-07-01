@@ -64,6 +64,16 @@ export const breedingParams = z.object({
   parentB: genotypeSchema,
   /** How many concrete offspring to sample (seeded). */
   offspringCount: z.number().int().min(0).max(1000).default(12),
+  /**
+   * Per-allele point-mutation probability applied to the SAMPLED offspring
+   * only (0 = off, the default). A mutated allele copy is replaced by a
+   * uniformly random *different* allele at that locus. This does NOT alter
+   * `phenotypeDistribution` / `genotypeDistribution` / `phenotypicRatio`,
+   * which remain the exact classical Mendelian calculation for the cross as
+   * specified — mutation is an illustrative property of the individuals
+   * actually drawn, not a change to the underlying cross's theory.
+   */
+  mutationRate: z.number().min(0).max(1).default(0),
   /** RNG seed for the offspring sample. */
   seed: z.union([z.string(), z.number()]).default('breeding'),
 });
@@ -75,7 +85,44 @@ export interface BreedingDetail {
   phenotypeDistribution: { phenotype: string; probability: number }[];
   genotypeDistribution: { genotype: string; probability: number }[];
   phenotypicRatio: string;
-  sampledOffspring: { genotype: string; phenotype: string }[];
+  sampledOffspring: { genotype: string; phenotype: string; mutatedLoci: string[] }[];
+}
+
+/**
+ * With probability `rate`, replace `current` with a uniformly random
+ * *different* allele symbol at this locus (a simple point-mutation model).
+ * If the locus has only one allele defined, there is nothing to mutate to.
+ */
+function maybeMutateAllele(
+  current: string,
+  gene: Gene,
+  rate: number,
+  rng: ReturnType<typeof createRng>,
+): string {
+  if (rate <= 0 || !rng.bernoulli(rate)) return current;
+  const others = gene.alleles.map((a) => a.symbol).filter((s) => s !== current);
+  return others.length > 0 ? rng.pick(others) : current;
+}
+
+/** Apply independent per-allele mutation across every locus of a genotype. */
+function mutateGenotype(
+  genotype: Record<string, [string, string]>,
+  genes: Gene[],
+  rate: number,
+  rng: ReturnType<typeof createRng>,
+): { genotype: Record<string, [string, string]>; mutatedLoci: string[] } {
+  const result: Record<string, [string, string]> = {};
+  const mutatedLoci: string[] = [];
+  for (const gene of genes) {
+    const [a, b] = genotype[gene.symbol];
+    const newA = maybeMutateAllele(a, gene, rate, rng);
+    const newB = maybeMutateAllele(b, gene, rate, rng);
+    // Re-canonicalize order (e.g. always "Aa", never "aA") so a mutated
+    // genotype label is indistinguishable in style from an unmutated one.
+    result[gene.symbol] = orderPair(gene, newA, newB);
+    if (newA !== a || newB !== b) mutatedLoci.push(gene.symbol);
+  }
+  return { genotype: result, mutatedLoci };
 }
 
 // ---------------------------------------------------------------------------
@@ -216,13 +263,15 @@ function run(rawParams: BreedingParams): SimResult<BreedingDetail> {
 
   const phenotypicRatio = ratioString(phenotypeDistribution.map((d) => d.probability));
 
-  // Seeded offspring sample, drawn from the genotype distribution.
+  // Seeded offspring sample, drawn from the genotype distribution. An optional
+  // mutationRate perturbs only the sampled individuals (see BreedingDetail doc).
   const rng = createRng(p.seed);
   const genos = combos.map((c) => c.genotype);
   const weights = combos.map((c) => c.probability);
   const sampledOffspring = Array.from({ length: p.offspringCount }, () => {
-    const g = rng.weightedPick(genos, weights);
-    return { genotype: genotypeLabel(g), phenotype: phenotypeLabel(g) };
+    const drawn = rng.weightedPick(genos, weights);
+    const { genotype: g, mutatedLoci } = mutateGenotype(drawn, p.genes, p.mutationRate, rng);
+    return { genotype: genotypeLabel(g), phenotype: phenotypeLabel(g), mutatedLoci };
   });
 
   const top = phenotypeDistribution[0];
