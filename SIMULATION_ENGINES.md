@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **19 deterministic simulation engines** across
+The OpenDiscover BioLab ships **20 deterministic simulation engines** across
 8 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -17,7 +17,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 ## Catalog
 
-- **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr)
+- **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`fba`](#fba)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
@@ -170,6 +170,43 @@ Designs SpCas9 (5'-NGG-3') or Cas12a (5'-TTTV-3') guide RNAs against a target DN
 ```
 
 _Run it: `POST /api/lab/run { "engine": "crispr", "params": … }` or interactively at `/lab/crispr`._
+
+---
+
+### `alignment` — Pairwise Sequence Alignment
+
+Optimal pairwise alignment of two DNA / RNA / protein sequences by dynamic programming: Needleman–Wunsch (global, end-to-end) or Smith–Waterman (local, best-scoring substring). Linear gap penalty with a configurable match/mismatch scheme; reports the aligned strings, score, percent identity, matches and gaps.
+
+**References**
+- Needleman SB, Wunsch CD (1970). J. Mol. Biol. 48:443 — global alignment.
+- Smith TF, Waterman MS (1981). J. Mol. Biol. 147:195 — local alignment.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `seqA` | string | **required** |  |  |
+| `seqB` | string | **required** |  |  |
+| `mode` | enum(global \| local) | `global` |  |  |
+| `match` | number | `2` |  |  |
+| `mismatch` | number | `-1` |  |  |
+| `gap` | number | `-2` |  |  |
+| `ignoreCase` | boolean | `true` |  |  |
+
+**Example**
+
+```json
+{
+  "seqA": "GATTACAGTC",
+  "seqB": "GCATGCAGTC",
+  "mode": "global",
+  "match": 2,
+  "mismatch": -1,
+  "gap": -2
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "alignment", "params": … }` or interactively at `/lab/alignment`._
 
 
 ## 🧬 Protein biophysics

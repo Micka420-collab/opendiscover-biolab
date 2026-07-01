@@ -40,6 +40,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `pcr` | In-silico PCR, amplicon prediction, primer design, dimer/hairpin checks |
 | | `cloning` | Restriction digest (12+ enzymes), fragment/overhang prediction, Gibson assembly |
 | | `crispr` | Guide RNA design, PAM finding (SpCas9/Cas12a), on-target & off-target scoring |
+| | `alignment` | Pairwise alignment — Needleman–Wunsch (global) & Smith–Waterman (local) |
 | 🧬 Protein biophysics | `properties` | MW, theoretical pI, GRAVY, instability index, extinction coefficient |
 | | `secondary-structure` | Chou–Fasman helix/sheet/coil prediction |
 | | `hp-folding` | HP lattice-model folding via seeded Monte-Carlo energy minimization |

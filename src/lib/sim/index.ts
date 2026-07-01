@@ -18,6 +18,7 @@ import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as compartmental } from './epi/compartmental';
 import { spec as breeding } from './genetics/breeding';
+import { spec as alignment } from './molbio/alignment';
 import { cloningSpec as cloning } from './molbio/cloning';
 import { spec as crispr } from './molbio/crispr';
 import { spec as pcr } from './molbio/pcr';
@@ -41,6 +42,7 @@ export const engines: AnyEngine[] = [
   pcr,
   cloning,
   crispr,
+  alignment,
   proteinProperties,
   secondaryStructure,
   hpFolding,

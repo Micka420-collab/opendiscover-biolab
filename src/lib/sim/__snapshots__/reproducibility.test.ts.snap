@@ -14,6 +14,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "C9H8O4 MW 180.2 Da, logP 0.51, HBD 1, HBA 4; Lipinski 0 violations (drug-like); QED 0.648; 3/3 rule sets pass.",
   },
+  "alignment": {
+    "metrics": {
+      "alignmentLength": 10,
+      "gaps": 0,
+      "identity": 0.7,
+      "matches": 7,
+      "score": 11,
+    },
+    "summary": "Global (Needleman–Wunsch) alignment: score 11, 70.0% identity over 10 columns (7 matches, 0 gaps).",
+  },
   "bioreactor": {
     "metrics": {
       "criticalDilutionRate": 0.380952,
