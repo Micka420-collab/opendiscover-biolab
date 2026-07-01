@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **23 deterministic simulation engines** across
+The OpenDiscover BioLab ships **24 deterministic simulation engines** across
 9 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -20,7 +20,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
-- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`fba`](#fba)
+- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
@@ -500,6 +500,43 @@ Exact stochastic simulation of the chemical master equation via Gillespie’s di
 ```
 
 _Run it: `POST /api/lab/run { "engine": "gillespie", "params": … }` or interactively at `/lab/gillespie`._
+
+---
+
+### `branching-growth` — Branching Process Cell Population Growth
+
+Simulates a proliferating cell lineage as a Galton-Watson branching process: each cell, per generation, independently dies, stays quiescent, or divides into two. Reports the exact theoretical mean-population growth rate and extinction probability (from the offspring generating function) alongside Monte-Carlo statistics from many stochastic replicates. Models population-level growth/extinction dynamics only — no spatial structure, cell positions, or contact inhibition.
+
+**References**
+- Galton F, Watson HW (1875). J. Anthropol. Inst. 4:138 — extinction of family names.
+- Athreya KB, Ney PE. Branching Processes (1972) — the extinction-probability theorem.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `initialCells` | integer | `20` | ≥ 1, ≤ 1000 |  |
+| `deathProb` | number | `0.2` | ≥ 0, ≤ 1 |  |
+| `divideProb` | number | `0.4` | ≥ 0, ≤ 1 |  |
+| `generations` | integer | `20` | ≥ 1, ≤ 200 |  |
+| `replicates` | integer | `300` | ≥ 1, ≤ 2000 |  |
+| `maxPopulationCap` | integer | `200000` | ≥ 10 |  |
+| `seed` | json | `branching-growth` |  |  |
+
+**Example**
+
+```json
+{
+  "initialCells": 20,
+  "deathProb": 0.2,
+  "divideProb": 0.4,
+  "generations": 20,
+  "replicates": 300,
+  "seed": "clone-1"
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "branching-growth", "params": … }` or interactively at `/lab/branching-growth`._
 
 ---
 

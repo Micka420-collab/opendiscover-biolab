@@ -36,6 +36,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Chemostat steady state: X*=4.75 g/L, S*=0.500 g/L, productivity 0.950 g/L/h.",
   },
+  "branching-growth": {
+    "metrics": {
+      "extinctionProbabilityEmpirical": 0,
+      "extinctionProbabilityTheory": 0.5,
+      "finalMeanPopulation": 760.173,
+      "meanOffspring": 1.2,
+    },
+    "summary": "supercritical branching process (mean offspring m=1.200): theoretical extinction probability 0.500, observed 0.000 across 300 replicates.",
+  },
   "breeding": {
     "metrics": {
       "genotypeClasses": 9,

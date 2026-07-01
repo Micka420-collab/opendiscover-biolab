@@ -32,6 +32,7 @@ import { spec as massSpec } from './protein/mass-spec';
 import { spec as proteinProperties } from './protein/properties';
 import { spec as secondaryStructure } from './protein/secondary-structure';
 import { spec as rnaFold } from './structural/rna-fold';
+import { spec as branchingGrowth } from './systems/branching-growth';
 import { spec as fba } from './systems/fba';
 import { spec as gillespie } from './systems/gillespie';
 import { spec as grn } from './systems/grn';
@@ -54,6 +55,7 @@ export const engines: AnyEngine[] = [
   enzymeKinetics,
   grn,
   gillespie,
+  branchingGrowth,
   fba,
   wrightFisher,
   phylogenetics,

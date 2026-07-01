@@ -46,8 +46,12 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       prediction; residue masses derived from CODATA atomic masses rather than a copied table,
       cross-checked both algebraically — b_i + y_(n-i) = M + 2·proton — and against the standard
       literature figures), `docking` (geometric rigid-body pose ranking via Lennard-Jones scoring;
-      LJ minimum/root and Rodrigues-rotation orthogonality verified by hand-derivation, not memory).
-      Next: thermodynamic RNA (Zuker), agent-based tissue growth, metabolic pathway explorer
+      LJ minimum/root and Rodrigues-rotation orthogonality verified by hand-derivation, not memory),
+      `branching-growth` (Galton-Watson cell-population growth/extinction; the extinction-probability
+      theorem verified on 3 hand-solved edge cases before being trusted for the general formula).
+      Next: metabolic pathway explorer. Thermodynamic RNA (Zuker) deprioritized — its real nearest-
+      neighbour free-energy tables (Turner parameters) are too extensive to safely hand-verify
+      rather than risk copying a misremembered figure; revisit only with a citable primary source.
 - [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,

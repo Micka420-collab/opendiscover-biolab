@@ -49,6 +49,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `grn` | Gene regulatory networks: repressilator, toggle switch, feed-forward loops |
 | | `gillespie` | Exact stochastic simulation (SSA) of the chemical master equation |
 | | `fba` | Flux balance analysis via a built-in linear-programming solver |
+| | `branching-growth` | Galton-Watson branching process: cell-population growth & extinction probability |
 | 🌱 Population genetics | `wright-fisher` | Genetic drift, selection, mutation, fixation probability |
 | | `phylogenetics` | Distance models (JC/K2P), Neighbor-Joining & UPGMA trees, Newick output |
 | | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes (loci always unlinked; `recombinantGametes` is a standalone helper, not wired into the cross) |
