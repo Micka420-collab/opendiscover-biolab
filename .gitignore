@@ -1,0 +1,36 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# builds
+.next
+.vercel
+dist
+out
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+cookies.txt
+*.pem
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# testing
+coverage
+.nyc_output
+playwright-report
+test-results
+
+# misc
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+prisma/migrations/.dev.db

@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: opendiscover
+      POSTGRES_USER: opendiscover
+      POSTGRES_PASSWORD: opendiscover
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U opendiscover']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://opendiscover:opendiscover@db:5432/opendiscover
+      UPSTASH_REDIS_REST_URL: redis://redis:6379
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:
