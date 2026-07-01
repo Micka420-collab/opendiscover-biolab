@@ -38,7 +38,8 @@ export type SimDomain =
   | 'bioprocess'
   | 'epidemiology'
   | 'drug-discovery'
-  | 'structural';
+  | 'structural'
+  | 'neuroscience';
 
 /** The canonical result shape returned by every engine. */
 export interface SimResult<TDetail = unknown> {

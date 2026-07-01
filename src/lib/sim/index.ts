@@ -23,6 +23,7 @@ import { cloningSpec as cloning } from './molbio/cloning';
 import { spec as crispr } from './molbio/crispr';
 import { spec as pcr } from './molbio/pcr';
 import { spec as sequence } from './molbio/sequence';
+import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
 import { spec as phylogenetics } from './popgen/phylogenetics';
 import { spec as wrightFisher } from './popgen/wright-fisher';
 import { spec as hpFolding } from './protein/hp-folding';
@@ -46,6 +47,7 @@ export const engines: AnyEngine[] = [
   proteinProperties,
   secondaryStructure,
   hpFolding,
+  hodgkinHuxley,
   enzymeKinetics,
   grn,
   gillespie,
