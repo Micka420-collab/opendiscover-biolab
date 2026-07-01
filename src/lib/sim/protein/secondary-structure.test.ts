@@ -55,23 +55,31 @@ describe('Chou-Fasman propensity table', () => {
 });
 
 describe('helix nucleation & extension', () => {
-  it('predicts a poly-alanine stretch as (almost) entirely helix', () => {
+  it('predicts a poly-alanine stretch as exactly 100% helix (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('AAAAAAAAAAAAAAA'); // 15 residues
-    expect(pred.helixFraction).toBeGreaterThan(0.9);
+    // Ala P(alpha)=1.42 nucleates and extends across the whole run with no
+    // breaker to stop it, so this is exact given CHOU_FASMAN, not merely ">0.9".
+    expect(pred.helixFraction).toBe(1);
     expect(pred.sheetFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
     expect(pred.assignmentString).toMatch(/^H+$/);
   });
 
-  it('predicts a poly-glutamate stretch as (almost) entirely helix', () => {
+  it('predicts a poly-glutamate stretch as exactly 100% helix (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('EEEEEEEEEEEEEEE');
-    expect(pred.helixFraction).toBeGreaterThan(0.9);
+    // Glu P(alpha)=1.51, P(beta)=0.37: an unambiguous, fully-deterministic helix call.
+    expect(pred.helixFraction).toBe(1);
     expect(pred.sheetFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
   });
 
-  it('predicts a mixed Ala/Glu helix former block as mostly helix', () => {
+  it('predicts a mixed Ala/Glu helix former block as exactly 100% helix (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('AAAAAEEEEEAAAAA');
-    expect(pred.helixFraction).toBeGreaterThan(0.8);
-    expect(pred.sheetFraction).toBeLessThan(0.1);
+    // Both Ala and Glu are strong helix formers / sheet breakers, so the whole
+    // 15-residue run resolves to helix with no residue left as sheet or coil.
+    expect(pred.helixFraction).toBe(1);
+    expect(pred.sheetFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
   });
 
   it('findHelix requires ≥4 of 6 formers to nucleate (no helix in a breaker-rich window)', () => {
@@ -83,24 +91,30 @@ describe('helix nucleation & extension', () => {
 });
 
 describe('sheet nucleation & extension', () => {
-  it('predicts a poly-valine stretch as leaning β-sheet, not helix', () => {
+  it('predicts a poly-valine stretch as exactly 100% sheet, not helix (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('VVVVVVVVVVVVVVV');
-    expect(pred.sheetFraction).toBeGreaterThan(0.9);
     // Val P(α)=1.06 would nucleate a helix, but overlap resolution favours the
-    // much stronger sheet propensity (P(β)=1.70).
+    // much stronger sheet propensity (P(β)=1.70), resolving the whole run to
+    // sheet deterministically — not merely ">0.9".
+    expect(pred.sheetFraction).toBe(1);
     expect(pred.helixFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
   });
 
-  it('predicts a poly-isoleucine stretch as leaning β-sheet', () => {
+  it('predicts a poly-isoleucine stretch as exactly 100% sheet (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('IIIIIIIIIIIIIII');
-    expect(pred.sheetFraction).toBeGreaterThan(0.9);
+    expect(pred.sheetFraction).toBe(1);
     expect(pred.helixFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
   });
 
-  it('predicts a mixed Val/Ile stretch as mostly sheet', () => {
+  it('predicts a mixed Val/Ile stretch as exactly 100% sheet (deterministic Chou-Fasman table)', () => {
     const pred = predictSecondaryStructure('VVVVVIIIIIVVVVV');
-    expect(pred.sheetFraction).toBeGreaterThan(0.8);
-    expect(pred.helixFraction).toBeLessThan(0.1);
+    // Both Val and Ile are strong sheet formers / helix breakers relative to
+    // each other's propensities, so the whole run resolves fully to sheet.
+    expect(pred.sheetFraction).toBe(1);
+    expect(pred.helixFraction).toBe(0);
+    expect(pred.coilFraction).toBe(0);
   });
 
   it('findSheet requires ≥3 of 5 formers to nucleate', () => {
@@ -146,6 +160,31 @@ describe('β-turn prediction', () => {
 
   it('reports no β-turn in a pure helix former stretch', () => {
     expect(findBetaTurns('AAAAAAAAAA')).toHaveLength(0);
+  });
+
+  it('is an independent overlay: a detected turn does not force residues to coil', () => {
+    // The module's own shipped `spec.example` sequence. The NPGK turn
+    // (start=9) sits astride the helix/sheet overlap-resolution boundary:
+    // residues 9-10 are independently resolved to helix, 11-12 to sheet.
+    // Per the module docstring, detecting a turn must NOT reassign these
+    // residues to coil, so coilFraction stays exactly 0 even though a
+    // β-turn was found.
+    const seq = 'AAAAAAAAANPGKVVVVVVVVV';
+    const pred = predictSecondaryStructure(seq);
+    const turn = pred.turns.find((t) => t.residues === 'NPGK');
+    expect(turn).toBeDefined();
+    expect(turn!.start).toBe(9);
+
+    expect(pred.perResidue[9]!.turn).toBe(true);
+    expect(pred.perResidue[9]!.assignment).toBe('H');
+    expect(pred.perResidue[10]!.turn).toBe(true);
+    expect(pred.perResidue[10]!.assignment).toBe('H');
+    expect(pred.perResidue[11]!.turn).toBe(true);
+    expect(pred.perResidue[11]!.assignment).toBe('E');
+    expect(pred.perResidue[12]!.turn).toBe(true);
+    expect(pred.perResidue[12]!.assignment).toBe('E');
+
+    expect(pred.coilFraction).toBe(0);
   });
 });
 

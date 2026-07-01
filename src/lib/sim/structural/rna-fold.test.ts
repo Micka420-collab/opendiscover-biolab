@@ -58,7 +58,12 @@ describe('base-pairing rules', () => {
     expect(canPair('A', 'C')).toBe(false);
   });
 
-  it('ranks pair energies by hydrogen-bond count (GC < AU < GU < 0)', () => {
+  it('ranks pair energies as a coarse empirical proxy (GC < AU < GU < 0)', () => {
+    // NOTE: this ordering is NOT hydrogen-bond count. G·U wobble forms 2 H-bonds,
+    // the same as A·U (not 1) — see Varani & McClain, "The G·U wobble base
+    // pair", RNA 2000, 6(9):1237–1257. The −1 kcal/mol value is a placeholder
+    // reflecting that G·U stacks are typically less stabilising than A·U on
+    // average in real nearest-neighbour (Turner) parameters.
     expect(pairEnergy('G', 'C')).toBe(-3);
     expect(pairEnergy('A', 'U')).toBe(-2);
     expect(pairEnergy('G', 'U')).toBe(-1);

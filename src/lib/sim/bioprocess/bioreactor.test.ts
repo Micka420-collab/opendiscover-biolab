@@ -53,6 +53,35 @@ describe('chemostat analytic steady state', () => {
     expect(ss.xStar).toBe(0);
     expect(ss.sStar).toBe(10); // residual = feed when nothing grows
   });
+
+  it('D=0 is a singular case: reports the batch-invariant limit, not Yxs*(Sin-S*)', () => {
+    // At D=0 the feed term D*(Sin-S) and outflow D*X vanish identically, so
+    // the CSTR degenerates exactly to the closed batch equations and
+    // X + Yxs*S is a conserved invariant (Bailey & Ollis, 2nd ed., ch. 6;
+    // Doran, 2nd ed., ch. 10). The feed at Sin never enters the vessel, so
+    // the true long-run limit is x0 + Yxs*s0, *not* Yxs*(Sin-S*).
+    const muMax = 0.4;
+    const ks = 0.5;
+    const yxs = 0.5;
+    const sin = 10;
+    const x0 = 0.5;
+    const s0 = 5;
+    const ss = chemostatSteadyState(muMax, ks, yxs, sin, 0, x0, s0);
+    expect(ss.washout).toBe(false);
+    expect(ss.applicable).toBe(false);
+    expect(ss.sStar).toBe(0);
+    expect(ss.xStar).toBeCloseTo(x0 + yxs * s0, 12); // = 3, not Yxs*(Sin-S*) = 5
+    expect(ss.xStar).not.toBeCloseTo(yxs * sin, 1);
+    expect(ss.productivity).toBe(0);
+  });
+
+  it('D>0, however small, keeps the closed form applicable and eventually correct', () => {
+    const ss = chemostatSteadyState(0.4, 0.5, 0.5, 10, 0.001);
+    expect(ss.applicable).toBe(true);
+    expect(ss.washout).toBe(false);
+    // S* = Ks*D/(muMax-D) = 0.5*0.001/0.399 ~ 0.001253
+    expect(ss.sStar).toBeCloseTo(0.0012531, 6);
+  });
 });
 
 describe('chemostat simulation converges to analytic steady state', () => {
@@ -95,6 +124,35 @@ describe('chemostat simulation converges to analytic steady state', () => {
     const m = Object.fromEntries(res.metrics.map((x) => [x.key, x.value]));
     expect(m.simulatedSubstrate).toBeCloseTo(0.5, 2);
     expect(m.simulatedBiomass).toBeCloseTo(4.75, 2);
+  });
+});
+
+describe('chemostat at D=0 converges to the batch invariant, not the feed formula', () => {
+  it('simulatedBiomass -> x0+Yxs*s0 over a long horizon, and steadyStateBiomass matches it', () => {
+    // Same parameters the audit used to empirically confirm the bug:
+    // muMax=0.4, ks=0.5, yxs=0.5, sin=10, d=0, x0=0.5, s0=5.
+    // X + Yxs*S is an exact conserved invariant at D=0, so the long-run
+    // limit is x0+Yxs*s0 = 0.5+0.5*5 = 3, never Yxs*Sin = 5, for any tEnd.
+    const res = run({
+      mode: 'chemostat',
+      muMax: 0.4,
+      ks: 0.5,
+      yxs: 0.5,
+      sin: 10,
+      d: 0,
+      x0: 0.5,
+      s0: 5,
+      tEnd: 5000,
+      outputPoints: 400,
+    });
+    const m = Object.fromEntries(res.metrics.map((x) => [x.key, x.value]));
+    const batchLimit = 0.5 + 0.5 * 5; // = 3
+    expect(m.simulatedBiomass).toBeCloseTo(batchLimit, 2);
+    expect(m.simulatedBiomass).not.toBeCloseTo(0.5 * 10, 0); // != Yxs*Sin = 5
+    // The reported "analytic" steady state must now agree with the true
+    // long-run simulated limit instead of the old, unattainable Yxs*Sin.
+    expect(m.steadyStateBiomass).toBeCloseTo(batchLimit, 6);
+    expect(m.steadyStateSubstrate).toBeCloseTo(0, 12);
   });
 });
 

@@ -61,6 +61,40 @@ describe('hill equation', () => {
     const high = 10; // = 2K
     expect(hill(high, 10, 5, 4)).toBeGreaterThan(hill(high, 10, 5, 1));
   });
+
+  // Regression coverage: `hill()` used to silently drop I/Ki entirely (a
+  // complete no-op for any inhibitor combined with mode: 'hill'). It now
+  // supports the Hill-Langmuir generalisation of competitive inhibition:
+  //   v = Vmax·[S]^n / ((α·K)^n + [S]^n),  α = 1 + I/Ki
+  // (Cornish-Bowden, Fundamentals of Enzyme Kinetics, 4th ed., ch. 3;
+  // Segel, Enzyme Kinetics, 1975 — applied to the Hill isotherm.)
+  describe('optional competitive-style inhibitor (I, Ki)', () => {
+    const Vmax = 10;
+    const K = 5;
+    const I = 4;
+    const Ki = 2; // ⇒ α = 1 + I/Ki = 3
+
+    it('with n = 1 reduces exactly to the classical competitive rate law', () => {
+      for (const s of [0.5, 5, 15, 50]) {
+        expect(hill(s, Vmax, K, 1, I, Ki)).toBeCloseTo(competitive(s, Vmax, K, I, Ki), 12);
+      }
+    });
+
+    it('widens the apparent K by α (v = Vmax/2 at S = α·K) but leaves Vmax unchanged, for any n', () => {
+      for (const n of [1, 2, 4]) {
+        expect(hill(15, Vmax, K, n, I, Ki)).toBeCloseTo(Vmax / 2, 10); // S = α·K = 15
+        expect(hill(1e9, Vmax, K, n, I, Ki)).toBeCloseTo(Vmax, 4); // asymptote unaffected
+      }
+    });
+
+    it('with no inhibitor (I = 0) matches the plain 4-arg Hill equation for any n', () => {
+      for (const n of [1, 2, 4]) {
+        for (const s of [1, 5, 25, 100]) {
+          expect(hill(s, Vmax, K, n, 0, Ki)).toBeCloseTo(hill(s, Vmax, K, n), 12);
+        }
+      }
+    });
+  });
 });
 
 describe('reversible inhibition rate laws', () => {
@@ -109,6 +143,39 @@ describe('competitive inhibitor raises the [S] needed for half-Vmax', () => {
 
     // Apparent Vmax (asymptote) is unchanged by a competitive inhibitor.
     expect(apparentVmax({ ...inhibited, hillN: 1 })).toBeCloseTo(10, 12);
+  });
+});
+
+describe('hill mode inhibitor is no longer a silent no-op end-to-end', () => {
+  it('velocity(), apparentKm() and apparentVmax() all reflect inhibitor/ki under mode: "hill"', () => {
+    const clean = { vmax: 10, km: 5, mode: 'hill' as const, inhibitor: 0, ki: 2, hillN: 2 };
+    const inhibited = { vmax: 10, km: 5, mode: 'hill' as const, inhibitor: 4, ki: 2, hillN: 2 }; // α = 3
+
+    expect(apparentKm(clean)).toBeCloseTo(5, 12);
+    expect(apparentKm(inhibited)).toBeCloseTo(15, 12); // α·K = 3·5
+    expect(apparentVmax(inhibited)).toBeCloseTo(10, 12); // Vmax unaffected (competitive-style)
+
+    // The velocity dispatcher must actually consume inhibitor/ki for hill mode.
+    expect(velocity(7, inhibited)).toBeCloseTo(hill(7, 10, 5, 2, 4, 2), 12);
+    expect(velocity(7, inhibited)).not.toBeCloseTo(velocity(7, clean), 3);
+  });
+});
+
+describe('inhibitionFactor edge cases (via the public rate-law functions)', () => {
+  // Ki <= 0 with an active inhibitor (I > 0) is a degenerate/invalid input that
+  // is unreachable via spec.run() (zod enforces ki > 0), but competitive(),
+  // noncompetitive() and uncompetitive() are exported and directly callable.
+  // As Ki -> 0+ binding becomes infinitely tight, so alpha = 1 + I/Ki -> +Infinity
+  // (essentially total inhibition, v -> 0) — not alpha = 1 ("no inhibition"),
+  // which was the previous (physically backwards) behaviour.
+  it('an active inhibitor with degenerate Ki <= 0 drives velocity to 0, not plain MM', () => {
+    expect(competitive(10, 10, 5, 4, 0)).toBe(0);
+    expect(noncompetitive(10, 10, 5, 4, -1)).toBe(0);
+    expect(uncompetitive(10, 10, 5, 4, 0)).toBe(0);
+  });
+
+  it('with no inhibitor present (I <= 0), a degenerate Ki still yields plain MM', () => {
+    expect(competitive(10, 10, 5, 0, 0)).toBeCloseTo(michaelisMenten(10, 10, 5), 12);
   });
 });
 
@@ -183,6 +250,13 @@ describe('engine run() contract', () => {
   it('velocity dispatcher matches the individual rate laws', () => {
     const m = { vmax: 10, km: 5, mode: 'uncompetitive' as const, inhibitor: 4, ki: 2, hillN: 1 };
     expect(velocity(7, m)).toBeCloseTo(uncompetitive(7, 10, 5, 4, 2), 12);
+  });
+});
+
+describe('spec.references', () => {
+  it('cites Hill (1910) alongside Michaelis-Menten, since "hill" is a first-class mode', () => {
+    expect(spec.references).toBeDefined();
+    expect(spec.references!.some((r) => r.includes('Hill AV (1910)'))).toBe(true);
   });
 });
 

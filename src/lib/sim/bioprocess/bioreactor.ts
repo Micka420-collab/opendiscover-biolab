@@ -31,13 +31,23 @@
  *     dP/dt = alpha*mu*X + beta*X - (F/V)*P
  *     dV/dt = F
  *
- * Analytic chemostat steady state (mu = D at a non-trivial steady state):
+ * Analytic chemostat steady state (mu = D at a non-trivial steady state), for
+ * D > 0:
  *     S* = Ks*D / (muMax - D)
  *     X* = Yxs*(Sin - S*)
  *     Productivity = D * X*
  * Washout occurs when D >= D_crit = muMax*Sin/(Ks+Sin) (>= muMax is a looser,
  * always-sufficient bound): the culture cannot grow fast enough to replace the
  * cells swept out, so X -> 0 and S -> Sin.
+ *
+ * D = 0 is a singular special case, *not* a small-D limit of the formula
+ * above: the feed term D*(Sin-S) and the outflow D*X both vanish identically,
+ * so the feed at Sin never actually enters the vessel and the CSTR balances
+ * degenerate exactly to the closed batch equations. X + Yxs*S is then an
+ * exact conserved invariant, so the true long-run limit is the batch value
+ * x0 + Yxs*s0 (set by the initial charge), never the feed-based Yxs*(Sin-S*)
+ * (Bailey & Ollis, 2nd ed., ch. 6; Doran, 2nd ed., ch. 10). `chemostatSteadyState`
+ * special-cases D = 0 accordingly and flags the result `applicable: false`.
  *
  * Assumptions: single limiting substrate, constant yield Yxs, no maintenance /
  * endogenous decay, perfectly mixed reactor, no inhibition, isothermal. These
@@ -143,12 +153,29 @@ export interface ChemostatSteadyState {
   washout: boolean;
   /** Critical dilution rate (1/h). */
   dCrit: number;
+  /**
+   * False only for the D = 0 singular case: the closed-form feed-based
+   * S*, X* formulas do not apply because the reactor degenerates to a closed
+   * batch system (see module docstring). `sStar`/`xStar` then report the
+   * true batch-invariant long-run limit (S* -> 0, X* = x0 + Yxs*s0) instead.
+   * Always true for D > 0 (including washout).
+   */
+  applicable: boolean;
 }
 
 /**
  * Analytic chemostat steady state. At a non-trivial steady state mu = D, giving
  * S* = Ks*D/(muMax-D) and X* = Yxs*(Sin-S*). If D exceeds the critical dilution
  * rate the only stable state is washout (X* = 0, S* = Sin).
+ *
+ * D = 0 is handled as a special, singular case rather than plugged into the
+ * formula above: at D = 0 the feed and outflow terms vanish identically, so
+ * the CSTR is exactly a closed batch system and X + Yxs*S is a conserved
+ * invariant. The true long-run limit is then the batch value x0 + Yxs*s0 (the
+ * feed at Sin never enters the vessel), not Yxs*(Sin-S*). `x0`/`s0` (the
+ * initial conditions actually passed to the simulation) default to 0 for
+ * backward compatibility but should be supplied by callers that care about
+ * the D = 0 case (as `runChemostat` does).
  */
 export function chemostatSteadyState(
   muMax: number,
@@ -156,14 +183,23 @@ export function chemostatSteadyState(
   yxs: number,
   sin: number,
   d: number,
+  x0 = 0,
+  s0 = 0,
 ): ChemostatSteadyState {
   const dCrit = criticalDilutionRate(muMax, ks, sin);
   if (d >= dCrit || d >= muMax) {
-    return { sStar: sin, xStar: 0, productivity: 0, washout: true, dCrit };
+    return { sStar: sin, xStar: 0, productivity: 0, washout: true, dCrit, applicable: true };
+  }
+  if (d === 0) {
+    // Singular point: feed never enters the vessel (see docstring above).
+    // Long-run limit is the batch invariant, with substrate asymptotically
+    // exhausted (S* -> 0) since muMax, x0 + Yxs*s0 > 0 drive S to 0 in batch.
+    const xStar = x0 + yxs * s0;
+    return { sStar: 0, xStar, productivity: 0, washout: false, dCrit, applicable: false };
   }
   const sStar = (ks * d) / (muMax - d);
   const xStar = yxs * (sin - sStar);
-  return { sStar, xStar, productivity: d * xStar, washout: false, dCrit };
+  return { sStar, xStar, productivity: d * xStar, washout: false, dCrit, applicable: true };
 }
 
 /** Batch state derivative for y = [X, S, P]. */
@@ -332,7 +368,7 @@ function runBatch(p: BioreactorParams): SimResult {
 }
 
 function runChemostat(p: BioreactorParams): SimResult {
-  const ss = chemostatSteadyState(p.muMax, p.ks, p.yxs, p.sin, p.d);
+  const ss = chemostatSteadyState(p.muMax, p.ks, p.yxs, p.sin, p.d, p.x0, p.s0);
   const traj = simulateChemostat(p);
   const t = traj.t;
   const X = col(traj, 0);
@@ -348,14 +384,18 @@ function runChemostat(p: BioreactorParams): SimResult {
       label: 'Steady-state biomass X*',
       value: ss.xStar,
       unit: 'g/L',
-      note: 'analytic Yxs*(Sin - S*)',
+      note: ss.applicable
+        ? 'analytic Yxs*(Sin - S*)'
+        : 'D=0: not a CSTR steady state — feed never enters the vessel, so this is the batch-invariant limit x0+Yxs*s0',
     },
     {
       key: 'steadyStateSubstrate',
       label: 'Steady-state substrate S*',
       value: ss.sStar,
       unit: 'g/L',
-      note: 'analytic Ks*D/(muMax - D)',
+      note: ss.applicable
+        ? 'analytic Ks*D/(muMax - D)'
+        : 'D=0: not a CSTR steady state — batch limit, substrate asymptotically exhausted',
     },
     {
       key: 'productivity',
@@ -394,7 +434,9 @@ function runChemostat(p: BioreactorParams): SimResult {
     engine: 'bioreactor',
     summary: ss.washout
       ? `Chemostat washout: D=${p.d} 1/h >= D_crit=${ss.dCrit.toFixed(3)} 1/h, biomass -> 0.`
-      : `Chemostat steady state: X*=${ss.xStar.toFixed(2)} g/L, S*=${ss.sStar.toFixed(3)} g/L, productivity ${ss.productivity.toFixed(3)} g/L/h.`,
+      : !ss.applicable
+        ? `D=0 (no feed/outflow): reactor behaves as a closed batch system, biomass -> x0+Yxs*s0 = ${ss.xStar.toFixed(2)} g/L (not a CSTR steady state).`
+        : `Chemostat steady state: X*=${ss.xStar.toFixed(2)} g/L, S*=${ss.sStar.toFixed(3)} g/L, productivity ${ss.productivity.toFixed(3)} g/L/h.`,
     metrics,
     series,
     detail: { mode: 'chemostat', ...ss },
@@ -477,7 +519,7 @@ export const spec: EngineSpec<BioreactorParams> = {
   domain: 'bioprocess',
   version: '1.0.0',
   description:
-    'Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors. Integrates the biomass/substrate/product balances with adaptive RK45 and reports analytic chemostat steady states (S* = Ks*D/(muMax-D), X* = Yxs*(Sin-S*)), washout thresholds, and mass-balance-consistent batch trajectories.',
+    'Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors. Integrates the biomass/substrate/product balances with adaptive RK45 and reports analytic chemostat steady states (S* = Ks*D/(muMax-D), X* = Yxs*(Sin-S*)) for D > 0, washout thresholds, and mass-balance-consistent batch trajectories. At the schema-permitted edge case D = 0 the CSTR degenerates to a closed batch system, so the reported steady state falls back to the batch-invariant limit instead of the feed-based formula.',
   references: [
     'Monod, J. (1949) The growth of bacterial cultures. Annu. Rev. Microbiol. 3:371-394.',
     'Bailey, J.E. & Ollis, D.F. (1986) Biochemical Engineering Fundamentals, 2nd ed.',

@@ -21,7 +21,8 @@
  *      counts, implicit hydrogens via a simple valence model, molecular weight,
  *      hydrogen-bond donors (N-H + O-H) and acceptors (N + O), aromatic rings
  *      (lower-case atoms + ring closures), rotatable bonds (acyclic single bonds
- *      between two non-terminal heavy atoms) and a crude atom-contribution logP.
+ *      between two non-terminal heavy atoms, excluding amide C(=O)-N bonds per
+ *      Veber et al. 2002) and a crude atom-contribution logP.
  *
  * Everything here is a pure, deterministic function of its input — no clock, no
  * network, no randomness — so a run can be replayed byte-for-byte.
@@ -34,6 +35,11 @@
  *   - The logP is an intentionally *crude* additive atom-contribution estimate,
  *     good enough to rank lipophilic vs. polar molecules but not a substitute for
  *     a trained model (XLOGP3, Crippen cLogP, ...).
+ *   - The TPSA estimator is a documented heuristic fragment classifier (Ertl
+ *     2000 contributions keyed off element / aromaticity / H-count / double-bond
+ *     presence), not the reference implementation — it covers ethers, esters,
+ *     amines, carbonyls, aromatics and hydroxyls correctly, but unusual/rare
+ *     environments (e.g. exotic N/O valence states) fall back to a default.
  *   - Our QED uses the published Bickerton asymmetric-double-sigmoid desirability
  *     functions and "mean" weights, but omits the eighth (structural-ALERTS)
  *     term because enumerating alerts requires SMARTS matching. It is therefore
@@ -474,8 +480,21 @@ export function smilesToDescriptors(smiles: string): EstimatedDescriptors {
     if (a1.aromatic && a2.aromatic) aromaticRings += 1;
   }
 
+  // Identify carbonyl carbons (C=O) so amide C-N bonds can be excluded below.
+  const isCarbonylCarbon = new Array(n).fill(false);
+  for (const b of bonds) {
+    if (b.order !== 2) continue;
+    const a1 = atoms[b.a] as ParsedAtom;
+    const a2 = atoms[b.b] as ParsedAtom;
+    if (a1.element === 'C' && a2.element === 'O') isCarbonylCarbon[b.a] = true;
+    if (a2.element === 'C' && a1.element === 'O') isCarbonylCarbon[b.b] = true;
+  }
+
   // Rotatable bonds: acyclic single bonds between two non-terminal heavy atoms,
-  // excluding bonds adjacent to a triple bond.
+  // excluding bonds adjacent to a triple bond and excluding amide C(=O)-N bonds
+  // (Veber et al. 2002 explicitly exclude amide bonds from the rotatable-bond
+  // count because of their high rotational-energy barrier / partial
+  // double-bond character).
   const acyclic = acyclicFlags(n, bonds);
   let rotatableBonds = 0;
   bonds.forEach((b, idx) => {
@@ -483,6 +502,12 @@ export function smilesToDescriptors(smiles: string): EstimatedDescriptors {
     if (!acyclic[idx]) return;
     if (heavyDegree[b.a] < 2 || heavyDegree[b.b] < 2) return;
     if (hasTripleAtom[b.a] || hasTripleAtom[b.b]) return;
+    const atomA = atoms[b.a] as ParsedAtom;
+    const atomB = atoms[b.b] as ParsedAtom;
+    const isAmideBond =
+      (atomA.element === 'N' && isCarbonylCarbon[b.b]) ||
+      (atomB.element === 'N' && isCarbonylCarbon[b.a]);
+    if (isAmideBond) return;
     rotatableBonds += 1;
   });
 
@@ -505,21 +530,37 @@ export function smilesToDescriptors(smiles: string): EstimatedDescriptors {
 
 /**
  * Ertl-style topological polar surface area (TPSA). We classify each N/O atom by
- * element, aromaticity, hydrogen count and whether it bears a double bond, and
- * sum the corresponding Ertl (2000) fragment contributions. This covers the
- * common environments; unusual ones fall back to a sensible default.
+ * element, aromaticity, hydrogen count and whether it bears an actual double
+ * bond (checked against the real per-bond orders, not merely the total bond
+ * order sum — see below), and sum the corresponding Ertl (2000) fragment
+ * contributions. This covers the common environments; unusual ones fall back
+ * to a sensible default.
+ *
+ * Note: an atom's *summed* bond order alone cannot distinguish a double bond
+ * (e.g. a carbonyl =O, order 2) from two ordinary single bonds to different
+ * heavy atoms (e.g. an ether O, 1+1=2) — both sum to >= 2. We therefore look
+ * directly at the parsed bonds for an incident bond with order === 2, so
+ * ethers, esters and tertiary amines are correctly distinguished from
+ * carbonyls/imines.
  */
 export function estimateTPSA(
   atoms: ParsedAtom[],
-  _bonds: ParsedBond[],
-  bondOrderSum: number[],
+  bonds: ParsedBond[],
+  _bondOrderSum: number[],
   hydrogensOn: number[],
 ): number {
+  const hasDoubleBond = new Array(atoms.length).fill(false);
+  for (const b of bonds) {
+    if (b.order === 2) {
+      hasDoubleBond[b.a] = true;
+      hasDoubleBond[b.b] = true;
+    }
+  }
   let tpsa = 0;
   for (let idx = 0; idx < atoms.length; idx++) {
     const atom = atoms[idx] as ParsedAtom;
     const h = hydrogensOn[idx] ?? 0;
-    const hasDouble = (bondOrderSum[idx] ?? 0) - h >= 2 && !atom.aromatic;
+    const hasDouble = hasDoubleBond[idx] && !atom.aromatic;
     if (atom.element === 'O') {
       if (atom.aromatic)
         tpsa += 13.14; // aromatic o (furan)

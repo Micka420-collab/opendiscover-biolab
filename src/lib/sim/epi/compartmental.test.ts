@@ -177,6 +177,103 @@ describe('epidemic peak prevalence (SIR closed form)', () => {
     const peak = res.metrics.find((m) => m.key === 'peakInfected')!.value;
     expect(peak).toBeGreaterThan(i0);
   });
+
+  it('returns the initial seed (not the closed form) when the EFFECTIVE R0·s0 ≤ 1, ' +
+    'even though the raw R0 > 1 (pre-existing immunity keeps the trajectory sub-critical)', () => {
+    // R0=2, s0=0.3 ⇒ R0·s0=0.6 < 1: S never reaches the threshold N/R0, so I declines
+    // monotonically from t=0 and the true peak is just i0. Verified by direct RK4
+    // integration of the SIR ODE (dI/dt < 0 for all t when R0·s0 ≤ 1), which gives a
+    // peak equal to i0 to machine precision — not the ~0.0555 the old (R0-only) guard
+    // returned for these inputs.
+    const R0 = 2;
+    const s0 = 0.3;
+    const i0 = 0.0001;
+    expect(R0 * s0).toBeLessThan(1);
+    expect(peakInfectedFractionSIR(R0, s0, i0)).toBe(i0);
+  });
+
+  it('the integrated trajectory confirms I declines monotonically when R0·s0 ≤ 1 ' +
+    '(cross-check for the closed-form guard above)', () => {
+    // Same regime as above: R0 = β/γ = 0.6/0.2 = 3, but i0 is set so s0 = 0.3,
+    // giving an effective reproduction number R0·s0 = 0.9 ≤ 1.
+    const N = 1e6;
+    const i0 = 0.7 * N; // s0 = (N - i0)/N = 0.3
+    const traj = simulate('SIR', { beta: 0.6, gamma: 0.2, sigma: 0.2, mu: 0 }, N, i0, 100, 400);
+    for (let i = 1; i < traj.I.length; i++) {
+      expect(traj.I[i]).toBeLessThanOrEqual(traj.I[i - 1] + 1e-6);
+    }
+    const { peakInfected } = findPeak(traj);
+    expect(peakInfected).toBeCloseTo(i0, -2); // peak ≈ the initial seed, not the closed form
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SEIR peak: dI/dt = 0 at σE = γI, which LAGS the S = N/R0 crossing — the
+// closed-form / S=N/R0 mechanism only holds for the direct-transmission models
+// (SIR, SIRD), not SEIR.
+// ---------------------------------------------------------------------------
+
+describe('epidemic peak mechanism differs between SIR/SIRD and SEIR', () => {
+  it('SIR/SIRD peakInfected metric note cites S = N/R₀', () => {
+    const sir = spec.run({
+      model: 'SIR',
+      beta: 0.5,
+      gamma: 0.2,
+      population: 1e6,
+      i0: 10,
+      tMax: 160,
+    });
+    const sird = spec.run({
+      model: 'SIRD',
+      beta: 0.5,
+      gamma: 0.2,
+      mu: 0.05,
+      population: 1e6,
+      i0: 10,
+      tMax: 160,
+    });
+    expect(sir.metrics.find((m) => m.key === 'peakInfected')!.note).toContain('S = N/R₀');
+    expect(sird.metrics.find((m) => m.key === 'peakInfected')!.note).toContain('S = N/R₀');
+  });
+
+  it('SEIR peakInfected metric note does NOT assert the SIR-only S = N/R₀ peak condition', () => {
+    const seir = spec.run({
+      model: 'SEIR',
+      beta: 0.6,
+      gamma: 0.2,
+      sigma: 0.25,
+      population: 1e6,
+      i0: 10,
+      tMax: 160,
+    });
+    const note = seir.metrics.find((m) => m.key === 'peakInfected')!.note!;
+    expect(note).toContain('σE = γI');
+    expect(note).not.toBe('Maximum simultaneous prevalence (dI/dt = 0 at S = N/R₀)');
+  });
+
+  it('SEIR: the true I-peak lags the time S crosses N/R0 by roughly the latent period 1/σ', () => {
+    // β=0.6, γ=0.2, σ=0.25 ⇒ R0=3, N/R0 = 333,333 for N=1e6.
+    // Verified numerically (direct RK4/45 integration): S crosses N/R0 at t≈71.2,
+    // but the actual I-peak occurs later at t≈73.4 — a lag of ~2.2, on the order of
+    // the mean latent period 1/σ = 4. The two events are NOT simultaneous for SEIR.
+    const N = 1e6;
+    const traj = simulate('SEIR', { beta: 0.6, gamma: 0.2, sigma: 0.25, mu: 0 }, N, 10, 160, 4000);
+    const threshold = N / 3;
+    let crossingIdx = -1;
+    for (let i = 1; i < traj.S.length; i++) {
+      if (traj.S[i - 1] > threshold && traj.S[i] <= threshold) {
+        crossingIdx = i;
+        break;
+      }
+    }
+    expect(crossingIdx).toBeGreaterThan(0);
+    const crossingTime = traj.t[crossingIdx];
+    const { peakDay } = findPeak(traj);
+    // The I-peak must occur strictly after S crosses N/R0, with a lag comparable to
+    // the latent period (a fraction of 1/σ = 4), not at the same instant.
+    expect(peakDay).toBeGreaterThan(crossingTime + 0.5);
+    expect(peakDay - crossingTime).toBeLessThan(4 * (1 / 0.25));
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -258,6 +355,19 @@ describe('sub-threshold dynamics (R0 < 1)', () => {
       tMax: 100,
     });
     expect(res.metrics.find((m) => m.key === 'r0')!.value).toBeCloseTo(0.5, 12);
+    expect(res.summary).toContain('no epidemic');
+  });
+
+  it('the summary uses the EFFECTIVE R0·s0 (not raw R0) to decide "epidemic" vs not: ' +
+    'a large initial removed/immune fraction keeps R0 > 1 sub-critical', () => {
+    // β=0.6, γ=0.2 ⇒ raw R0 = 3 > 1, but i0 is 70% of the population, so
+    // s0 = 0.3 and the effective reproduction number R0·s0 = 0.9 ≤ 1: the run is
+    // already sub-critical (I only declines), so the summary must say "no epidemic"
+    // even though raw R0 > 1.
+    const N = 1e6;
+    const i0 = 0.7 * N;
+    const res = spec.run({ model: 'SIR', beta: 0.6, gamma: 0.2, population: N, i0, tMax: 100 });
+    expect(res.metrics.find((m) => m.key === 'r0')!.value).toBeCloseTo(3, 12);
     expect(res.summary).toContain('no epidemic');
   });
 });

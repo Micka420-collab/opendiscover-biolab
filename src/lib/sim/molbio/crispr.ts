@@ -26,20 +26,33 @@
  *   protospacer window in FORWARD-strand coordinates of the searched sequence.
  *   `strand:'+'`  → protospacer == sequence.slice(pos, pos+20)
  *   `strand:'-'`  → protospacer == revComp(sequence.slice(pos, pos+20))
- *   The protospacer string is always written 5'->3' with its PAM-proximal
- *   ("seed") base last, on the strand the guide binds.
+ *   The protospacer string is always written 5'->3' on the strand the guide
+ *   binds, but WHICH END is PAM-proximal ("seed") is enzyme-dependent, per the
+ *   PAM biology above: for SpCas9 (PAM 3' of the spacer) the seed is the LAST
+ *   base of the protospacer string; for Cas12a (PAM 5' of the spacer) the seed
+ *   is the FIRST base. `onTargetScore` and `cfdScore` both take the enzyme so
+ *   they can check/weight the correct end.
  *
  * Scoring models (documented heuristics, not fitted regressions)
  * -------------------------------------------------------------
  *   onTargetScore : logistic of an additive model with a GC-content optimum
  *     (activity falls off for very GC-poor or GC-rich spacers), a PAM-proximal
- *     nucleotide preference, and a poly-T (U6 Pol-III terminator) penalty —
- *     the dominant, reproducible trends reported by Doench et al. 2014 and
- *     Wang et al. 2014. Normalised to (0,1).
+ *     nucleotide preference (checked at the seed end appropriate to the given
+ *     enzyme — see Coordinate convention above), and a poly-T (U6 Pol-III
+ *     terminator) penalty — the dominant, reproducible trends reported by
+ *     Doench et al. 2014 and Wang et al. 2014 for SpCas9, applied here as a
+ *     qualitative proxy for Cas12a too (no Cas12a-specific on-target model is
+ *     fitted). Normalised to (0,1).
  *   cfdScore      : product over mismatched positions of a per-position factor
  *     in (0,1]. Mismatches at the PAM-proximal seed are strongly penalising;
  *     PAM-distal mismatches are largely tolerated — the qualitative behaviour
- *     of the CFD matrix of Doench et al. 2016. A perfect match scores 1.0.
+ *     of the CFD matrix of Doench et al. 2016 (derived for SpCas9; applied here
+ *     as a qualitative proxy for Cas12a, whose seed sits at the opposite end of
+ *     the protospacer — see Zetsche et al. 2015 and Kim et al. 2016 for Cas12a
+ *     off-target seed behaviour). The model is purely positional — unlike the
+ *     real CFD matrix it does not distinguish which base is substituted for
+ *     which (e.g. rG:dT wobble vs. rG:dA), only where the mismatch falls. A
+ *     perfect match scores 1.0.
  *   specificity   : MIT/Hsu-style aggregate  1 / (1 + Σ CFD_offtarget),
  *     i.e. 1.0 for a truly unique guide and decreasing as off-targets accrue.
  *
@@ -53,7 +66,10 @@
  *  - Wang, Wei, Sabatini, Lander (2014) Science 343:80 (sgRNA design trends).
  *  - Doench, Fusi, Sullender et al. (2016) Nat. Biotechnol. 34:184 (CFD off-target).
  *  - Hsu, Scott, Weinstein et al. (2013) Nat. Biotechnol. 31:827 (MIT specificity).
- *  - Zetsche, Gootenberg, Abudayyeh et al. (2015) Cell 163:759 (Cas12a / Cpf1).
+ *  - Zetsche, Gootenberg, Abudayyeh et al. (2015) Cell 163:759 (Cas12a / Cpf1 PAM).
+ *  - Kim, Kim, Hur et al. (2016) Nat. Biotechnol. 34:863 (Cas12a/Cpf1 genome-wide
+ *    specificity; PAM-proximal seed sensitivity used to orient cfdScore/onTargetScore
+ *    for Cas12a below).
  */
 
 import { z } from 'zod';
@@ -252,7 +268,7 @@ const OT = {
   intercept: 1.0,
   gcOpt: 0.55, // GC fraction of peak predicted activity
   gcAlpha: 8.0, // curvature of the GC penalty
-  proxG: 0.3, // bonus: G at the PAM-proximal position (last spacer base)
+  proxG: 0.3, // bonus: G at the PAM-proximal position
   proxT: 0.3, // penalty: T at the PAM-proximal position
   ttttPenalty: 0.6, // penalty: contains TTTT (U6 Pol-III terminator)
 } as const;
@@ -262,22 +278,35 @@ function logistic(x: number): number {
 }
 
 /**
+ * The PAM-proximal ("seed") base of a protospacer depends on which side of the
+ * spacer the enzyme's PAM sits on (see the header's PAM-biology note):
+ *   SpCas9 : PAM is 3' of the spacer  → PAM-proximal base is the LAST base.
+ *   Cas12a : PAM is 5' of the spacer  → PAM-proximal base is the FIRST base.
+ */
+function pamProximalBase(p: string, enzyme: Enzyme): string {
+  return enzyme === 'SpCas9' ? p[p.length - 1] : p[0];
+}
+
+/**
  * Predicted on-target activity of a 20-nt protospacer, normalised to (0,1).
+ * `enzyme` selects which end of the spacer is treated as PAM-proximal for the
+ * nucleotide-preference term (see `pamProximalBase`); it defaults to SpCas9,
+ * the convention this heuristic's cited literature was measured on.
  *
  * additive score = intercept
  *                - gcAlpha·(GC - gcOpt)²           (GC-content optimum)
- *                + proxG·[last == G] - proxT·[last == T]   (PAM-proximal base)
+ *                + proxG·[proximal == G] - proxT·[proximal == T]  (PAM-proximal base)
  *                - ttttPenalty·[contains 'TTTT']   (Pol-III terminator)
  * then squashed through a logistic. Higher = more active.
  */
-export function onTargetScore(protospacer: string): number {
+export function onTargetScore(protospacer: string, enzyme: Enzyme = 'SpCas9'): number {
   const p = protospacer.toUpperCase();
   const gc = gcContent(p);
   let raw = OT.intercept - OT.gcAlpha * (gc - OT.gcOpt) ** 2;
 
-  const last = p[p.length - 1];
-  if (last === 'G') raw += OT.proxG;
-  else if (last === 'T') raw -= OT.proxT;
+  const proximal = pamProximalBase(p, enzyme);
+  if (proximal === 'G') raw += OT.proxG;
+  else if (proximal === 'T') raw -= OT.proxT;
 
   if (p.includes('TTTT')) raw -= OT.ttttPenalty;
 
@@ -288,33 +317,44 @@ export function onTargetScore(protospacer: string): number {
 // Off-target search (CFD-like)
 // ---------------------------------------------------------------------------
 
-/** CFD position-factor endpoints: tolerant at the 5' distal end, harsh at seed. */
-const CFD_MAX_TOL = 0.9; // factor for a mismatch at the 5'-most (distal) position
+/** CFD position-factor endpoints: tolerant at the distal end, harsh at the seed. */
+const CFD_MAX_TOL = 0.9; // factor for a mismatch at the PAM-distal position
 const CFD_MIN_TOL = 0.05; // factor for a mismatch at the PAM-proximal seed base
 
 /**
- * Per-position mismatch factor for a spacer of length `n`. Index 0 is the
- * 5'-distal end (mismatch barely reduces activity → factor ≈ CFD_MAX_TOL);
- * index n-1 is the PAM-proximal seed (mismatch nearly abolishes activity →
- * factor ≈ CFD_MIN_TOL). Linear interpolation between the two endpoints.
+ * Per-position mismatch factor for a spacer of length `n`, given which index is
+ * the PAM-proximal seed for the enzyme in play. `seedIndex` is `n-1` for SpCas9
+ * (PAM 3' of the spacer → seed at the last base) and `0` for Cas12a (PAM 5' of
+ * the spacer → seed at the first base; Zetsche et al. 2015, Kim et al. 2016).
+ * A mismatch AT the seed index scores ≈ CFD_MIN_TOL; a mismatch at the
+ * opposite (PAM-distal) end scores ≈ CFD_MAX_TOL; linear interpolation between.
  */
-function mismatchFactor(i: number, n: number): number {
+function mismatchFactor(i: number, n: number, seedIndex: number): number {
   if (n <= 1) return CFD_MIN_TOL;
-  const frac = i / (n - 1); // 0 at distal, 1 at seed
+  // Distance from the distal end, expressed on the same 0(distal)..1(seed)
+  // scale regardless of whether the seed is at index 0 or index n-1.
+  const frac = seedIndex === 0 ? (n - 1 - i) / (n - 1) : i / (n - 1);
   return CFD_MAX_TOL - (CFD_MAX_TOL - CFD_MIN_TOL) * frac;
 }
 
 /**
  * CFD-like cutting likelihood between a guide and an equal-length genomic
- * 20-mer (both oriented 5'->3', PAM-proximal base last). Product of the
+ * 20-mer (both oriented 5'->3' on the strand the guide binds). Product of the
  * per-position factors at every mismatched position; 1.0 for a perfect match.
+ *
+ * `enzyme` selects which end of the spacer is the PAM-proximal seed (see
+ * `mismatchFactor`); it defaults to SpCas9, matching the CFD matrix's original
+ * (Doench et al. 2016) orientation. Note this model is purely positional: it
+ * does not distinguish which base is substituted for which, only where the
+ * mismatch falls — a simplification of the real CFD matrix.
  */
-export function cfdScore(guide: string, site: string): number {
+export function cfdScore(guide: string, site: string, enzyme: Enzyme = 'SpCas9'): number {
   if (guide.length !== site.length) throw new Error('cfdScore: length mismatch');
   const n = guide.length;
+  const seedIndex = enzyme === 'SpCas9' ? n - 1 : 0;
   let cfd = 1;
   for (let i = 0; i < n; i++) {
-    if (guide[i] !== site[i]) cfd *= mismatchFactor(i, n);
+    if (guide[i] !== site[i]) cfd *= mismatchFactor(i, n, seedIndex);
   }
   return cfd;
 }
@@ -329,6 +369,12 @@ export interface OffTargetOpts {
    */
   onTargetPosition?: number;
   onTargetStrand?: Strand;
+  /**
+   * Which enzyme's PAM orientation to use when CFD-scoring mismatches (i.e.
+   * which end of the protospacer is the PAM-proximal seed). Defaults to
+   * SpCas9; pass 'Cas12a' when the guide was designed against a TTTV PAM.
+   */
+  enzyme?: Enzyme;
 }
 
 /**
@@ -345,6 +391,7 @@ export function offTargetSearch(
   const gen = genome.toUpperCase();
   const n = g.length;
   const maxMismatch = opts.maxMismatch ?? 3;
+  const enzyme = opts.enzyme ?? 'SpCas9';
   const sites: OffTargetSite[] = [];
 
   const isExcluded = (pos: number, strand: Strand, mm: number): boolean =>
@@ -356,14 +403,19 @@ export function offTargetSearch(
     // Forward strand: the guide binds this window directly.
     const mmF = hammingDistance(g, window);
     if (mmF <= maxMismatch && !isExcluded(s, '+', mmF)) {
-      sites.push({ position: s, strand: '+', mismatches: mmF, cfd: cfdScore(g, window) });
+      sites.push({ position: s, strand: '+', mismatches: mmF, cfd: cfdScore(g, window, enzyme) });
     }
 
     // Reverse strand: the guide binds the reverse complement of this window.
     const rcWindow = revComp(window);
     const mmR = hammingDistance(g, rcWindow);
     if (mmR <= maxMismatch && !isExcluded(s, '-', mmR)) {
-      sites.push({ position: s, strand: '-', mismatches: mmR, cfd: cfdScore(g, rcWindow) });
+      sites.push({
+        position: s,
+        strand: '-',
+        mismatches: mmR,
+        cfd: cfdScore(g, rcWindow, enzyme),
+      });
     }
   }
 
@@ -416,13 +468,14 @@ export function designGuides(
       maxMismatch,
       onTargetPosition: selfSearch ? pam.protospacerStart : undefined,
       onTargetStrand: selfSearch ? pam.strand : undefined,
+      enzyme,
     });
     guides.push({
       protospacer,
       pam: pam.pam,
       strand: pam.strand,
       position: pam.protospacerStart,
-      onTarget: onTargetScore(protospacer),
+      onTarget: onTargetScore(protospacer, enzyme),
       offTargetCount: ot.offTargetCount,
       specificity: ot.specificity,
     });
@@ -523,6 +576,7 @@ export const spec: EngineSpec<CrisprParams, CrisprDetail> = {
     'Doench et al. (2016) Nat. Biotechnol. 34:184 — CFD off-target model.',
     'Hsu et al. (2013) Nat. Biotechnol. 31:827 — MIT specificity score.',
     'Zetsche et al. (2015) Cell 163:759 — Cas12a/Cpf1 TTTV PAM.',
+    'Kim et al. (2016) Nat. Biotechnol. 34:863 — Cas12a/Cpf1 PAM-proximal seed specificity.',
   ],
   // Single cast: zod's transform/default effects make the schema's input type
   // differ from its output type, which the invariant EngineSpec generic rejects.

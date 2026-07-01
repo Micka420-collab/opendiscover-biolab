@@ -78,9 +78,13 @@ export function canPair(a: string, b: string, allowWobble = true): boolean {
 }
 
 /**
- * Coarse per-pair "energy" proxy in kcal/mol (negative = stabilising), scaling
- * with hydrogen-bond count: G·C (3 H-bonds) = −3, A·U (2) = −2, G·U wobble = −1.
- * Unknown/disallowed combinations contribute 0.
+ * Coarse per-pair "energy" proxy in kcal/mol (negative = stabilising):
+ * G·C = −3, A·U = −2, G·U wobble = −1. This is NOT derived from hydrogen-bond
+ * count — G·U wobble forms 2 H-bonds, the same as A·U, not 1 (Varani & McClain,
+ * "The G·U wobble base pair", RNA 2000, 6(9):1237–1257). The ordering here is a
+ * coarse empirical placeholder reflecting that G·U stacks are, on average, less
+ * stabilising than A·U in real nearest-neighbour (Turner) parameters, not a
+ * consequence of hydrogen bonding. Unknown/disallowed combinations contribute 0.
  */
 export function pairEnergy(a: string, b: string): number {
   if ((a === 'G' && b === 'C') || (a === 'C' && b === 'G')) return -3;

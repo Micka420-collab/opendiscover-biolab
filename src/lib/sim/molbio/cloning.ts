@@ -214,7 +214,17 @@ export interface Fragment {
   index: number;
   /** Top-strand start coordinate (inclusive). */
   start: number;
-  /** Top-strand end coordinate (exclusive). */
+  /**
+   * Top-strand end coordinate (exclusive), satisfying `end - start === length`
+   * and therefore always `end >= start`. For a linear digest, or a circular
+   * fragment that does not cross the origin, `end` is a plain index into the
+   * sequence (0..n). For the one circular fragment per digest that wraps the
+   * origin, `end` is reported as `start + length` and so can exceed the
+   * sequence length `n` — it is a coordinate on the circle "unrolled" past the
+   * origin, not a direct index. Do not `sequence.slice(start, end)` on a
+   * wrapping fragment; use the fragment's own `.sequence` field (or take
+   * `end % n`) instead.
+   */
   end: number;
   /** Length in base pairs (top-strand span between cuts). */
   length: number;
@@ -301,10 +311,16 @@ export function digest(
     const cur = cuts[k];
     const next = cuts[(k + 1) % cuts.length];
     const start = cur.cutPosition;
-    const end = next.cutPosition;
-    const raw = (end - start + n) % n;
+    const nextPos = next.cutPosition;
+    const raw = (nextPos - start + n) % n;
     const length = raw === 0 ? n : raw; // single-cut circle -> full length
-    const fragSeq = end > start ? seq.slice(start, end) : seq.slice(start) + seq.slice(0, end);
+    // Report end = start + length so end >= start always holds, even for the
+    // wrap-around fragment (where nextPos <= start on the raw coordinate
+    // line). The wrap-aware sequence slice below still uses the true modular
+    // nextPos, independent of how `end` is reported.
+    const end = start + length;
+    const fragSeq =
+      nextPos > start ? seq.slice(start, nextPos) : seq.slice(start) + seq.slice(0, nextPos);
     fragments.push({
       index: k,
       start,

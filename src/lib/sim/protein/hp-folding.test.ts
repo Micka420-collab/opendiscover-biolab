@@ -118,6 +118,28 @@ describe('Monte-Carlo folding reaches known ground states', () => {
     expect(r.acceptanceRate).toBeGreaterThanOrEqual(0);
     expect(r.acceptanceRate).toBeLessThanOrEqual(1);
   });
+
+  it('does not throw on a degenerate 1-residue chain (no bonds, no contacts possible)', () => {
+    // A single residue has no partner for the end-move, and no internal residue
+    // for corner-flip/pivot; the proposal-selection logic must skip all moves
+    // rather than dereference an out-of-bounds neighbour.
+    const r = foldHP({ sequence: 'H', steps: 50, temperature: 2.0, seed: 42 });
+    expect(r.bestEnergy).toBe(0);
+    expect(r.hhContacts).toBe(0);
+    expect(r.bestCoords).toEqual([[0, 0]]);
+  });
+
+  it('never yields a negative-zero hhContacts for a zero-contact fold', () => {
+    // All-P sequences can never form an H–H contact, so the true optimum is
+    // exactly 0 (not attainable as a *negative* value). hhContacts mirrors the
+    // -0 -> 0 normalisation `energy()` documents; without it, `-bestE` on a
+    // best energy of (normalised) +0 would silently produce IEEE -0.
+    const r = foldHP({ sequence: 'PPPPPP', steps: 200, temperature: 2.0, seed: 1 });
+    expect(r.bestEnergy).toBe(0);
+    expect(r.hhContacts).toBe(0);
+    expect(Object.is(r.hhContacts, 0)).toBe(true);
+    expect(Object.is(r.hhContacts, -0)).toBe(false);
+  });
 });
 
 describe('determinism (same seed -> identical result)', () => {
@@ -139,6 +161,13 @@ describe('determinism (same seed -> identical result)', () => {
     const s2 = foldHP({ sequence: 'HHPPHH', steps: 5000, temperature: 2.0, seed: 2 });
     expect(isSelfAvoiding(s1.bestCoords)).toBe(true);
     expect(isSelfAvoiding(s2.bestCoords)).toBe(true);
+    // The whole point of a seeded PRNG is that distinct seeds explore distinct
+    // trajectories; assert the runs actually diverge so a regression that made
+    // `foldHP` ignore `seed` (e.g. always constructing the RNG identically)
+    // would be caught rather than silently passing via two individually-valid
+    // but coincidentally-identical conformations.
+    expect(JSON.stringify(s1.bestCoords)).not.toBe(JSON.stringify(s2.bestCoords));
+    expect(s1.acceptanceRate).not.toBe(s2.acceptanceRate);
   });
 });
 

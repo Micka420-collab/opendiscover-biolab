@@ -22,7 +22,8 @@
  *   - Michaelis L, Menten ML (1913). Die Kinetik der Invertinwirkung.
  *   - Cornish-Bowden A. "Fundamentals of Enzyme Kinetics", 4th ed. (2012).
  *   - Segel IH. "Enzyme Kinetics" (1975) — inhibition rate laws.
- *   - Hill AV (1910). The possible effects of the aggregation of haemoglobin.
+ *   - Hill AV (1910). The possible effects of the aggregation of the molecules
+ *     of haemoglobin on its dissociation curves. J. Physiol. 40:iv-vii.
  */
 
 import { z } from 'zod';
@@ -82,16 +83,36 @@ export function uncompetitive(S: number, Vmax: number, Km: number, I: number, Ki
  * half-saturation constant K (the [S] giving half Vmax).
  *   v = Vmax·[S]^n / (K^n + [S]^n)
  * With n = 1 this is algebraically identical to Michaelis–Menten with Km = K.
+ *
+ * Optional competitive-style reversible inhibition (I, Ki) is modeled as the
+ * direct Hill-Langmuir generalisation of `competitive()`: the inhibitor
+ * competes for the same binding sites, so it inflates the apparent K by
+ * α = 1 + I/Ki while leaving Vmax unchanged, exactly as in the n = 1 case.
+ *   v = Vmax·[S]^n / ((α·K)^n + [S]^n)
+ * I and Ki default to 0/1 (α = 1, no inhibition) so existing 4-arg callers
+ * are unaffected.
  */
-export function hill(S: number, Vmax: number, K: number, n: number): number {
+export function hill(S: number, Vmax: number, K: number, n: number, I = 0, Ki = 1): number {
   if (S <= 0) return 0;
+  const alpha = inhibitionFactor(I, Ki);
   const sn = S ** n;
-  return (Vmax * sn) / (K ** n + sn);
+  const kn = (K * alpha) ** n;
+  return (Vmax * sn) / (kn + sn);
 }
 
-/** Reversible-inhibition scaling factor α = 1 + I/Ki (α ≥ 1). */
+/**
+ * Reversible-inhibition scaling factor α = 1 + I/Ki (α ≥ 1).
+ * With no inhibitor present (I ≤ 0) α is always 1, regardless of Ki. With an
+ * inhibitor present but a degenerate/invalid Ki ≤ 0 (infinitely tight
+ * binding in the limit Ki → 0⁺), α correctly diverges to +∞ (≈ total
+ * inhibition) rather than silently reporting "no inhibition". This branch is
+ * unreachable via `spec.run()`, whose zod schema enforces `ki > 0`, but the
+ * rate-law functions are also exported and callable directly with arbitrary
+ * Ki.
+ */
 function inhibitionFactor(I: number, Ki: number): number {
-  if (I <= 0 || !Number.isFinite(Ki) || Ki <= 0) return 1;
+  if (I <= 0) return 1;
+  if (!Number.isFinite(Ki) || Ki <= 0) return Number.POSITIVE_INFINITY;
   return 1 + I / Ki;
 }
 
@@ -121,7 +142,7 @@ export function velocity(S: number, m: Model): number {
     case 'uncompetitive':
       return uncompetitive(s, m.vmax, m.km, m.inhibitor, m.ki);
     case 'hill':
-      return hill(s, m.vmax, m.km, m.hillN);
+      return hill(s, m.vmax, m.km, m.hillN, m.inhibitor, m.ki);
     default:
       return michaelisMenten(s, m.vmax, m.km);
   }
@@ -129,8 +150,9 @@ export function velocity(S: number, m: Model): number {
 
 /**
  * Apparent (observed) Vmax — the velocity the model asymptotes to as [S] → ∞.
- * Competitive & Hill keep the true Vmax; noncompetitive & uncompetitive lose a
- * factor α to the inhibitor.
+ * Competitive & Hill keep the true Vmax (Hill's inhibitor/Ki are modeled as a
+ * competitive-style widening of K, per `hill()`); noncompetitive &
+ * uncompetitive lose a factor α to the inhibitor.
  */
 export function apparentVmax(m: Model): number {
   const alpha = inhibitionFactor(m.inhibitor, m.ki);
@@ -141,17 +163,19 @@ export function apparentVmax(m: Model): number {
 /**
  * Apparent half-saturation constant — the [S] at which v reaches half of the
  * apparent Vmax. This is what a competitive inhibitor pushes UP (harder to
- * half-saturate) and an uncompetitive inhibitor pushes DOWN.
+ * half-saturate) and an uncompetitive inhibitor pushes DOWN. Hill mode uses
+ * the same competitive-style widening as `hill()`.
  */
 export function apparentKm(m: Model): number {
   const alpha = inhibitionFactor(m.inhibitor, m.ki);
   switch (m.mode) {
     case 'competitive':
-      return m.km * alpha; // α·Km
+    case 'hill':
+      return m.km * alpha; // α·K
     case 'uncompetitive':
       return m.km / alpha; // Km/α
     default:
-      return m.km; // MM, noncompetitive, Hill (K)
+      return m.km; // MM, noncompetitive
   }
 }
 
@@ -412,6 +436,8 @@ export const spec: EngineSpec<EnzymeKineticsParams, EnzymeKineticsDetail> = {
     'Michaelis L, Menten ML (1913). Biochem. Z. 49:333.',
     'Cornish-Bowden A. Fundamentals of Enzyme Kinetics, 4th ed. (2012).',
     'Segel IH. Enzyme Kinetics (1975).',
+    'Hill AV (1910). The possible effects of the aggregation of the molecules ' +
+      'of haemoglobin on its dissociation curves. J. Physiol. 40:iv-vii.',
   ],
   paramsSchema: enzymeKineticsParams,
   run,

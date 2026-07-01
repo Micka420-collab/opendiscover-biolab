@@ -228,8 +228,11 @@ export function nnTm(seq: string, opts: NnTmOptions = {}): number {
 export type TmMethod = 'wallace' | 'gc' | 'nn' | 'auto';
 
 /**
- * Unified Tm entry point. `auto` selects Wallace for short oligos (< 14 nt) and
- * the GC formula otherwise — a common heuristic.
+ * Unified Tm entry point. `auto` follows the same validity ranges documented
+ * at the top of this file: Wallace for very short oligos (< 14 nt), the
+ * Marmur–Doty GC formula in its ~14–50 nt window, and nearest-neighbour
+ * thermodynamics (the modern gold standard) beyond 50 nt, where the GC
+ * formula is no longer a good approximation.
  */
 export function primerTm(seq: string, method: TmMethod = 'auto', opts: NnTmOptions = {}): number {
   const s = normalizeSeq(seq);
@@ -241,7 +244,9 @@ export function primerTm(seq: string, method: TmMethod = 'auto', opts: NnTmOptio
     case 'nn':
       return nnTm(s, opts);
     default:
-      return s.length < 14 ? wallaceTm(s) : gcTm(s);
+      if (s.length < 14) return wallaceTm(s);
+      if (s.length <= 50) return gcTm(s);
+      return nnTm(s, opts);
   }
 }
 
@@ -470,7 +475,10 @@ export interface DesignOptions {
   tmTarget?: number;
   /** Tm method used while designing. Default 'gc'. */
   tmMethod?: TmMethod;
-  /** Length search window. */
+  /**
+   * Length search window. Defaults to [length-4, length+6] (floored at 4 nt so
+   * the window always contains lengths near `length`, even for small values).
+   */
   minLength?: number;
   maxLength?: number;
 }
@@ -543,8 +551,17 @@ export function designPrimers(target: string, opts: DesignOptions = {}): PrimerP
   const t = normalizeSeq(target);
   const tmTarget = opts.tmTarget ?? 58;
   const method = opts.tmMethod ?? 'gc';
-  const minLen = opts.minLength ?? Math.max(15, (opts.length ?? 20) - 4);
-  const maxLen = opts.maxLength ?? (opts.length ?? 20) + 6;
+  const length = opts.length ?? 20;
+  // The window is meant to bracket the *requested* length (-4/+6 nt), so the
+  // floor must be derived from `length` itself rather than a fixed constant —
+  // a hardcoded 15 nt floor would exceed maxLen (and make the search below
+  // throw) for any requested length under 9, and would silently override
+  // any requested length under 19 up to 15+ nt. ABSOLUTE_FLOOR (4 nt) is
+  // only a sanity backstop (nnThermo needs >= 2 nt), never the effective
+  // minimum for realistic primer lengths.
+  const ABSOLUTE_FLOOR = 4;
+  const minLen = opts.minLength ?? Math.max(ABSOLUTE_FLOOR, length - 4);
+  const maxLen = opts.maxLength ?? length + 6;
   if (t.length < maxLen) {
     throw new Error(
       `designPrimers: target (${t.length} nt) shorter than max primer length (${maxLen})`,

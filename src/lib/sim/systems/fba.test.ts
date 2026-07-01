@@ -29,6 +29,57 @@ describe('simplex — textbook LPs', () => {
     expect(res.value).toBeCloseTo(400, 9);
     expect(res.x[0]).toBeCloseTo(4, 9);
     expect(res.x[1]).toBeCloseTo(8, 9);
+    // Reaching vertex (4,8) from the origin under Bland's rule takes at least
+    // two pivots; `iterations` must reflect real pivot work, not be hardcoded.
+    expect(res.iterations).toBeGreaterThanOrEqual(2);
+  });
+
+  it('reports zero iterations for an LP that is already optimal at the origin', () => {
+    // maximise -x - y  s.t.  x + y <= 1,  x,y >= 0 -> optimum is (0,0) with no
+    // pivots needed at all (every reduced cost is already <= 0 at the start).
+    const res = simplex([-1, -1], [[1, 1]], [1], ['<=']);
+    expect(res.status).toBe('optimal');
+    expect(res.value).toBeCloseTo(0, 9);
+    expect(res.iterations).toBe(0);
+  });
+
+  it('reports iteration_limit (never a false "optimal") when the pivot cap is hit', () => {
+    // Same 40x+30y LP as above, whose true optimum (4,8)=400 needs >= 2 pivots.
+    // Capping maxIter at 1 must NOT silently return "optimal" with the
+    // intermediate, sub-optimal tableau (x=(8,0), value=320) — that would
+    // contradict the module's own claim of returning the analytic optimum.
+    const res = simplex(
+      [40, 30],
+      [
+        [1, 1],
+        [2, 1],
+      ],
+      [12, 16],
+      ['<=', '<='],
+      { maxIter: 1 },
+    );
+    expect(res.status).toBe('iteration_limit');
+    expect(res.status).not.toBe('optimal');
+    expect(res.iterations).toBe(1);
+  });
+
+  it('derives the infeasibility threshold from eps instead of an independent hardcoded constant', () => {
+    // x >= 10 and x <= 9.95 conflict by exactly d = 0.05 (exact in rational
+    // arithmetic, no floating dust). With the default eps (1e-9) the
+    // infeasibility tolerance (eps * 1e2 = 1e-7) is far below d, so this is
+    // correctly reported infeasible.
+    const strict = simplex([1], [[1], [1]], [10, 9.95], ['>=', '<=']);
+    expect(strict.status).toBe('infeasible');
+
+    // A caller who explicitly loosens eps to 1e-3 (e.g. FbaParams.tolerance)
+    // gets a correspondingly loosened infeasibility tolerance (1e-3 * 1e2 =
+    // 0.1 > d = 0.05), so the same conflict is now within tolerance. Before
+    // the fix this case still returned 'infeasible' because the check used a
+    // hardcoded 1e-7 regardless of the caller's eps, which was inconsistent
+    // with the one exposed tolerance knob.
+    const loose = simplex([1], [[1], [1]], [10, 9.95], ['>=', '<='], { eps: 1e-3 });
+    expect(loose.status).toBe('optimal');
+    expect(loose.x[0]).toBeCloseTo(9.95, 6);
   });
 
   it('handles >= constraints via two-phase (minimisation encoded as max of negation)', () => {

@@ -41,17 +41,38 @@
  *   repressilator   – 3-gene ring of repressors (Elowitz & Leibler, Nature 2000).
  *                     With sufficient cooperativity the symmetric fixed point is
  *                     unstable and the system settles onto a limit cycle: each
- *                     protein oscillates. The linear-stability (secant) condition
- *                     for an N-repressor ring is |f'(p*)| > sec(π/N); for N = 3
- *                     this is |f'(p*)| > 2, which our defaults satisfy.
+ *                     protein oscillates. Linearizing the symmetric ring gives a
+ *                     circulant Jacobian with eigenvalues λ_k = −γ − m·e^{i·2πk/N}
+ *                     (k = 0..N−1), where m = |f'(p*)|. This sec(π/N) instability
+ *                     condition is specific to rings with an ODD number of
+ *                     repressive edges N (a net negative-feedback loop): no k
+ *                     lands exactly on angle π, so the least-stable mode is the
+ *                     complex pair closest to it, giving a Hopf (oscillation)
+ *                     threshold of m/γ > sec(π/N); for N = 3 this is m/γ > 2,
+ *                     which our defaults satisfy (Thron 1991; Mallet-Paret &
+ *                     Smith 1990). This formula does NOT apply to rings with an
+ *                     EVEN number of repressive edges — see `toggleSwitch` below,
+ *                     which is structurally the same kind of ring with N = 2.
  *   toggleSwitch    – 2 genes with mutual repression (Gardner, Cantor & Collins,
- *                     Nature 2000). For Hill coefficient ≥ 2 and strong enough
- *                     production the symmetric state is a saddle and the system is
- *                     bistable: it relaxes to (high A, low B) or (low A, high B)
- *                     depending on which protein starts higher.
- *   feedForwardLoop – coherent type-1 FFL (Alon, Nature Reviews Genetics 2007):
- *                     X activates Y, and X AND Y activate Z. Acts as a
- *                     sign-sensitive delay / persistence detector for the input.
+ *                     Nature 2000); structurally a 2-repressor ring (even N = 2).
+ *                     There k = N/2 lands exactly on angle π, giving a REAL
+ *                     eigenvalue λ = −γ + m rather than a complex pair, so the
+ *                     instability threshold is simply m/γ > 1 (sec(π/2) is
+ *                     undefined since cos 90° = 0) — a saddle/pitchfork
+ *                     bifurcation, not a Hopf bifurcation. For Hill coefficient
+ *                     ≥ 2 and strong enough production the symmetric state is a
+ *                     saddle and the system is bistable: it relaxes to (high A,
+ *                     low B) or (low A, high B) depending on which protein
+ *                     starts higher.
+ *   feedForwardLoop – coherent type-1 FFL (Alon, Nature Reviews Genetics 2007).
+ *                     X activates Y, and X AND Y activate Z. This topology is
+ *                     the textbook sign-sensitive delay / persistence detector
+ *                     (Mangan & Alon, PNAS 2003) when X receives a transient
+ *                     pulsed input. This preset, however, gives X no regulators
+ *                     (constitutively ON per the rule above) and no time-varying
+ *                     input, so it can only rise monotonically to steady ON; it
+ *                     demonstrates the turn-on delay of Z relative to X/Y, not
+ *                     the pulse-filtering behaviour itself.
  *
  * The module also exposes oscillation detection (mean-crossing counting and
  * period estimation) and steady-state detection so downstream code can classify
@@ -71,6 +92,12 @@
  *    in Escherichia coli." Nature 403:339–342 (2000).
  *  - Alon U. "Network motifs: theory and experimental approaches." Nat Rev Genet
  *    8:450–461 (2007).
+ *  - Thron CD. "The secant condition for instability in biochemical feedback
+ *    control models." Bull Math Biol 53(3):383–401 (1991).
+ *  - Mallet-Paret J, Smith HL. "The Poincaré-Bendixson theorem for monotone
+ *    cyclic feedback systems." J Dyn Diff Eq 2:367–421 (1990).
+ *  - Mangan S, Alon U. "Structure and function of the feed-forward loop network
+ *    motif." Proc Natl Acad Sci USA 100:11980–11985 (2003).
  */
 
 import { z } from 'zod';
@@ -252,8 +279,9 @@ function edge(from: string, to: string, sign: 1 | -1, o: Partial<EdgeCfg> = {}):
 export function buildPreset(name: NonNullable<GrnParams['preset']>): PresetSpec {
   switch (name) {
     case 'repressilator': {
-      // 3-gene ring of repressors: g0 ⊣ g1 ⊣ g2 ⊣ g0.
-      // n = 4, β/K = 30 puts |f'(p*)| well above the secant threshold of 2,
+      // 3-gene ring of repressors: g0 ⊣ g1 ⊣ g2 ⊣ g0. N = 3 is odd, so the
+      // sec(π/N) Hopf condition applies (see module docstring): n = 4, β/K = 30
+      // puts |f'(p*)|/γ ≈ 3.2 well above the secant threshold of 2 (γ = 1 here),
       // giving robust, large-amplitude oscillations; a small basal leak keeps
       // troughs comfortably positive.
       const params = { basal: 0.3, beta: 30, degradation: 1 };
@@ -273,7 +301,10 @@ export function buildPreset(name: NonNullable<GrnParams['preset']>): PresetSpec 
       };
     }
     case 'toggleSwitch': {
-      // Two genes repressing each other. n = 3, strong β ⇒ bistable.
+      // Two genes repressing each other: an N = 2 (even) repressor ring, so the
+      // instability threshold is the real-eigenvalue condition |f'(p*)|/γ > 1
+      // (not the odd-N sec(π/N) Hopf condition — see module docstring). n = 3,
+      // strong β ⇒ |f'(p*)|/γ ≈ 2.5 > 1 ⇒ bistable.
       const params = { basal: 0.05, beta: 12, degradation: 1 };
       const genes = [gene('A', params), gene('B', params)];
       const edges = [edge('B', 'A', -1, { K: 1, n: 3 }), edge('A', 'B', -1, { K: 1, n: 3 })];
@@ -638,6 +669,9 @@ export const spec: EngineSpec<GrnParams, GrnDetail> = {
     'Elowitz MB, Leibler S. A synthetic oscillatory network of transcriptional regulators. Nature 403:335-338 (2000).',
     'Gardner TS, Cantor CR, Collins JJ. Construction of a genetic toggle switch in Escherichia coli. Nature 403:339-342 (2000).',
     'Alon U. Network motifs: theory and experimental approaches. Nat Rev Genet 8:450-461 (2007).',
+    'Thron CD. The secant condition for instability in biochemical feedback control models. Bull Math Biol 53(3):383-401 (1991).',
+    'Mallet-Paret J, Smith HL. The Poincare-Bendixson theorem for monotone cyclic feedback systems. J Dyn Diff Eq 2:367-421 (1990).',
+    'Mangan S, Alon U. Structure and function of the feed-forward loop network motif. Proc Natl Acad Sci USA 100:11980-11985 (2003).',
   ],
   paramsSchema: paramsSchema as unknown as z.ZodType<GrnParams>,
   run,

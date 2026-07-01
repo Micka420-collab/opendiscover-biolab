@@ -256,8 +256,9 @@ export function foldHP(opts: {
     if (n >= 3 && roll < 0.45) {
       // Corner flip on a random internal residue.
       proposal = cornerFlip(coords, rng.int(1, n - 2));
-    } else if (roll < 0.7) {
-      // End move on a random terminus.
+    } else if (n >= 2 && roll < 0.7) {
+      // End move on a random terminus. Requires >= 2 residues so `endMove`'s
+      // partner lookup (coords[1] / coords[length - 2]) is always in bounds.
       proposal = endMove(coords, rng.next() < 0.5 ? 0 : n - 1, rng.int(0, 3));
     } else if (n >= 3) {
       // Pivot about a random interior residue with a random rotation.
@@ -289,7 +290,10 @@ export function foldHP(opts: {
 
   return {
     bestEnergy: bestE,
-    hhContacts: -bestE,
+    // Mirror the -0 -> 0 normalisation `energy()` already applies (bestE <= 0
+    // always, and a zero-contact best conformation must report a plain 0, not
+    // IEEE -0, so `Object.is`/`toBe` comparisons behave for downstream tests).
+    hhContacts: bestE === 0 ? 0 : -bestE,
     bestCoords,
     acceptanceRate: opts.steps > 0 ? accepted / opts.steps : 0,
     trajectory: traj,

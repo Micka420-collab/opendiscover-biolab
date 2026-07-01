@@ -44,6 +44,29 @@ describe('Gillespie SSA — invariants', () => {
     }
   });
 
+  it('never lets a reaction fire when its reactants are absent (swept across many seeds)', () => {
+    // Regression coverage for a documented edge case (see the engine's
+    // "Assumptions / limitations" docstring): reaction selection is delegated
+    // to rng.weightedPick (core/prng.ts), whose `r <= 0` early-return could in
+    // principle select a zero-propensity reaction if the PRNG's `next()` ever
+    // emitted exactly 0 (a legal but ~1-in-2^32 mulberry32 output). That has
+    // never been observed empirically, so we sweep many independent seeds as
+    // a practical check of the invariant without claiming to close off the
+    // theoretical corner case, which lives in the shared PRNG, not here.
+    const model = {
+      species: { X: 8 },
+      reactions: [{ reactants: { X: 1 }, products: {}, rate: 1 }],
+    };
+    for (let seed = 0; seed < 200; seed++) {
+      const traj = simulateSSA(model, { tMax: 100, seed });
+      const x = speciesColumn(traj, 'X');
+      for (let i = 1; i < x.length; i++) {
+        expect(x[i]).toBeLessThanOrEqual(x[i - 1] as number);
+        expect(x[i]).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
   it('halts in an absorbing (zero-propensity) state', () => {
     // With no birth channel, X drains to 0 and the total propensity vanishes.
     const model = {

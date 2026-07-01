@@ -126,6 +126,36 @@ describe('onTargetScore — documented GC / feature trends', () => {
     const withoutTTTT = onTargetScore('ACGTATATACGTACGTACGCA'.slice(0, 20));
     expect(withTTTT).toBeLessThan(withoutTTTT);
   });
+
+  it('checks the LAST base (3prime, PAM-proximal for SpCas9) by default', () => {
+    // Same 20 bases except the very last one: G bonus vs T penalty.
+    const gLast = onTargetScore('ACGTACGTACGTACGTACGG');
+    const tLast = onTargetScore('ACGTACGTACGTACGTACGT');
+    expect(gLast).toBeGreaterThan(tLast);
+  });
+
+  it("checks the FIRST base for Cas12a — its PAM (5'-TTTV-3') precedes the spacer, " +
+    'so the first base is PAM-proximal, not the last (Zetsche et al. 2015)', () => {
+    // Only the first base differs (G vs T); the last base is identical (T) for both,
+    // so under the (fixed) SpCas9-vs-Cas12a-aware model only the Cas12a score should
+    // move — checking the first, not last, base.
+    const gFirst = onTargetScore('GCGTACGTACGTACGTACGT', 'Cas12a');
+    const tFirst = onTargetScore('TCGTACGTACGTACGTACGT', 'Cas12a');
+    expect(gFirst).toBeGreaterThan(tFirst);
+
+    // Directly confirms the bug described in the audit is fixed: previously
+    // onTargetScore always inspected the LAST base regardless of enzyme, so a
+    // Cas12a-proximal G vs T at index 0 was nearly invisible to the score
+    // (both sequences end in the same last base, 'T'). With the fix, the true
+    // Cas12a seed (index 0) drives a full proxG/proxT swing.
+    expect(gFirst - tFirst).toBeGreaterThan(0.1);
+
+    // Meanwhile the SpCas9 scoring of the same two sequences (which differ only
+    // at the PAM-distal-for-SpCas9 first base) is barely affected.
+    const gFirstSpCas9 = onTargetScore('GCGTACGTACGTACGTACGT', 'SpCas9');
+    const tFirstSpCas9 = onTargetScore('TCGTACGTACGTACGTACGT', 'SpCas9');
+    expect(Math.abs(gFirstSpCas9 - tFirstSpCas9)).toBeLessThan(0.02);
+  });
 });
 
 describe('cfdScore — CFD-like seed vs distal mismatch penalty (Doench 2016)', () => {
@@ -155,6 +185,38 @@ describe('cfdScore — CFD-like seed vs distal mismatch penalty (Doench 2016)', 
     const single = PROTO20.split('');
     single[0] = 'C';
     expect(cfdScore(PROTO20, two.join(''))).toBeLessThan(cfdScore(PROTO20, single.join('')));
+  });
+
+  it('for Cas12a, penalises a mismatch at index 0 (the true PAM-proximal seed, since ' +
+    "Cas12a's TTTV PAM precedes the spacer) far more than one at index 19 (the true " +
+    '5prime-distal end) — the mirror image of the SpCas9 case above ' +
+    '(Zetsche et al. 2015; Kim et al. 2016 Nat. Biotechnol. 34:863).', () => {
+    const seedMismatch = PROTO20.split('');
+    seedMismatch[0] = seedMismatch[0] === 'A' ? 'C' : 'A'; // mismatch at index 0 (Cas12a seed)
+    const distalMismatch = PROTO20.split('');
+    distalMismatch[19] = distalMismatch[19] === 'A' ? 'C' : 'A'; // mismatch at index 19 (Cas12a distal)
+
+    const cfdSeed = cfdScore(PROTO20, seedMismatch.join(''), 'Cas12a');
+    const cfdDistal = cfdScore(PROTO20, distalMismatch.join(''), 'Cas12a');
+
+    expect(cfdDistal).toBeGreaterThan(cfdSeed);
+    expect(cfdDistal).toBeGreaterThan(0.8);
+    expect(cfdSeed).toBeLessThan(0.2);
+
+    // Directly confirms the seed/distal assignment flips between enzymes: the SAME
+    // two mutants score in the OPPOSITE relative order when scored as SpCas9.
+    const cfdSeedAsSpCas9 = cfdScore(PROTO20, seedMismatch.join(''), 'SpCas9');
+    const cfdDistalAsSpCas9 = cfdScore(PROTO20, distalMismatch.join(''), 'SpCas9');
+    expect(cfdSeedAsSpCas9).toBeGreaterThan(cfdDistalAsSpCas9);
+  });
+
+  it('defaults to the SpCas9 seed convention when no enzyme is given', () => {
+    const distal = PROTO20.split('');
+    distal[0] = distal[0] === 'A' ? 'C' : 'A';
+    const seed = PROTO20.split('');
+    seed[19] = seed[19] === 'A' ? 'C' : 'A';
+    expect(cfdScore(PROTO20, distal.join(''))).toBe(cfdScore(PROTO20, distal.join(''), 'SpCas9'));
+    expect(cfdScore(PROTO20, seed.join(''))).toBe(cfdScore(PROTO20, seed.join(''), 'SpCas9'));
   });
 });
 
@@ -199,6 +261,25 @@ describe('offTargetSearch — exact-copy detection & specificity', () => {
     expect(withExclusion.offTargetCount).toBe(0);
     expect(withExclusion.specificity).toBe(1);
   });
+
+  it("threads the `enzyme` option into per-site CFD scoring (Cas12a's seed is at index 0)", () => {
+    // Single-window genomes so there is exactly one forward-strand comparison to inspect.
+    const seedMismatchSite = `C${PROTO20.slice(1)}`; // mismatch at index 0
+    const distalMismatchSite = `${PROTO20.slice(0, 19)}${PROTO20[19] === 'T' ? 'C' : 'T'}`; // index 19
+
+    const fwdCfd = (guide: string, genome: string, enzyme?: 'SpCas9' | 'Cas12a'): number =>
+      offTargetSearch(guide, genome, { maxMismatch: 3, enzyme }).sites.find(
+        (s) => s.strand === '+' && s.position === 0,
+      )!.cfd;
+
+    // Cas12a: index 0 is the PAM-proximal seed (harshly penalised), index 19 is distal (tolerated).
+    expect(fwdCfd(PROTO20, seedMismatchSite, 'Cas12a')).toBeLessThan(0.2);
+    expect(fwdCfd(PROTO20, distalMismatchSite, 'Cas12a')).toBeGreaterThan(0.8);
+
+    // SpCas9 (default): the assignment is reversed — index 19 is the seed, index 0 is distal.
+    expect(fwdCfd(PROTO20, seedMismatchSite)).toBeGreaterThan(0.8);
+    expect(fwdCfd(PROTO20, distalMismatchSite)).toBeLessThan(0.2);
+  });
 });
 
 describe('rankGuides', () => {
@@ -231,6 +312,28 @@ describe('designGuides — self-search excludes own origin', () => {
     expect(guides).toHaveLength(1);
     expect(guides[0].protospacer).toBe(spacer);
     expect(guides[0].specificity).toBe(1); // own site excluded → no off-targets
+  });
+});
+
+describe('designGuides — Cas12a end-to-end scores use the correct PAM-proximal end', () => {
+  it('on-target score responds to the FIRST protospacer base, not the last, for Cas12a', () => {
+    // Two constructs identical except for the first base of the protospacer
+    // (G vs T); the PAM ('TTTA') and the rest of the spacer are unchanged.
+    const seqG = 'TTTAGCGTACGTACGTACGTACGT';
+    const seqT = 'TTTATCGTACGTACGTACGTACGT';
+
+    const guidesG = designGuides(seqG, { enzyme: 'Cas12a' });
+    const guidesT = designGuides(seqT, { enzyme: 'Cas12a' });
+    expect(guidesG).toHaveLength(1);
+    expect(guidesT).toHaveLength(1);
+    expect(guidesG[0].protospacer[0]).toBe('G');
+    expect(guidesT[0].protospacer[0]).toBe('T');
+
+    // A first-base G must score higher than a first-base T for Cas12a (matches
+    // the onTargetScore unit test above) — this fails under the old code, which
+    // only ever looked at the LAST base (identical, 'T', in both constructs).
+    expect(guidesG[0].onTarget).toBeGreaterThan(guidesT[0].onTarget);
+    expect(guidesG[0].onTarget - guidesT[0].onTarget).toBeGreaterThan(0.1);
   });
 });
 

@@ -30,9 +30,15 @@
  * ⟨P(α)⟩ and ⟨P(β)⟩ over the four residues.
  *
  * The per-residue output alphabet is H (helix) / E (extended/sheet) / C (coil).
- * β-turns are reported as an overlay annotation in `detail.turns` (they fold
- * into the coil fraction for the H/E/C accounting) rather than as a 4th letter,
- * matching the requested {H,E,C} contract.
+ * β-turns are reported as an INDEPENDENT overlay annotation in `detail.turns`
+ * (and flagged per-residue via `PerResidue.turn`) rather than as a 4th letter,
+ * matching the requested {H,E,C} contract. Critically, the turn scan does NOT
+ * modify the helix/sheet masks: a residue inside a detected β-turn tetrapeptide
+ * keeps whatever H/E/C label the nucleation+extension+resolution phases already
+ * gave it, so a turn can (and does) overlap a helix or sheet segment with zero
+ * effect on helixFraction/sheetFraction/coilFraction. `coilFraction` reflects
+ * only residues outside every accepted helix/sheet segment — it is NOT
+ * incremented merely because a β-turn was detected there.
  *
  * This module is pure and deterministic — no clock, no RNG, no I/O — so a run is
  * fully reproducible from its sequence alone.
@@ -142,7 +148,10 @@ export interface PerResidue {
   pAlpha: number;
   pBeta: number;
   pTurn: number;
-  /** True if this residue participates in a predicted β-turn tetrapeptide. */
+  /**
+   * True if this residue participates in a predicted β-turn tetrapeptide.
+   * Independent of `assignment` — a turn residue may be labelled H, E, or C.
+   */
   turn: boolean;
 }
 

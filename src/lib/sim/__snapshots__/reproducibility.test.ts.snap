@@ -9,8 +9,8 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
       "lipinskiViolations": 0,
       "logP": 0.51,
       "mw": 180.159,
-      "qed": 0.647854,
-      "tpsa": 71.44,
+      "qed": 0.648418,
+      "tpsa": 63.6,
     },
     "summary": "C9H8O4 MW 180.2 Da, logP 0.51, HBD 1, HBA 4; Lipinski 0 violations (drug-like); QED 0.648; 3/3 rule sets pass.",
   },
@@ -118,6 +118,14 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
       "oscillatingGenes": 3,
     },
     "summary": "repressilator oscillates with period ≈ 8.41 time units across 3 genes.",
+  },
+  "hodgkin-huxley": {
+    "metrics": {
+      "peakPotential": 39.0387,
+      "restingPotential": -65,
+      "spikeCount": 1,
+    },
+    "summary": "1 action potential fired (peak 39.0 mV).",
   },
   "hp-folding": {
     "metrics": {

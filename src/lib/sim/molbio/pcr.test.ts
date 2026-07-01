@@ -149,6 +149,22 @@ describe('melting temperature formulae', () => {
     expect(mixed).toBeGreaterThan(30);
     expect(mixed).toBeLessThan(75);
   });
+
+  it("'auto' stays on the GC formula at 50 nt (its documented ceiling) but hands off to " +
+    'nearest-neighbour just past it, instead of silently extrapolating GC past its own stated ' +
+    'validity range', () => {
+    // The file header documents gc as "valid for ~14-50 nt" and nn as the "modern gold
+    // standard". At exactly 50 nt, auto should still agree with the GC formula.
+    const at50 = MIDDLE.slice(0, 50);
+    expect(at50.length).toBe(50);
+    expect(primerTm(at50, 'auto')).toBeCloseTo(gcTm(at50), 6);
+
+    // At 51 nt — one past the documented GC ceiling — auto must match nn, not gc.
+    const at51 = MIDDLE.slice(0, 51);
+    expect(at51.length).toBe(51);
+    expect(primerTm(at51, 'auto')).toBeCloseTo(nnTm(at51), 6);
+    expect(gcTm(at51)).not.toBeCloseTo(nnTm(at51), 0); // the two formulas actually diverge here
+  });
 });
 
 describe('self-dimer and hairpin checks', () => {
@@ -203,6 +219,30 @@ describe('primer design', () => {
     const spanning = products.find((p) => p.length === target.length);
     expect(spanning).toBeDefined();
   });
+
+  it('brackets the requested length instead of a hardcoded 15 nt floor (schema boundary primerLength=6..8)', () => {
+    // Old code: minLen = Math.max(15, length - 4), which exceeds
+    // maxLen = length + 6 for any length < 9 (e.g. length=8 -> minLen=15 > maxLen=14),
+    // making pickLength throw even though primerLength=6..8 is schema-valid
+    // (paramsSchema.primerLength.min(6), see the params schema below).
+    for (const length of [6, 7, 8]) {
+      expect(() => designPrimers(target, { length, tmTarget: 55, tmMethod: 'gc' })).not.toThrow();
+      const p = designPrimers(target, { length, tmTarget: 55, tmMethod: 'gc' });
+      expect(p.forward.length).toBeGreaterThanOrEqual(4);
+      expect(p.forward.length).toBeLessThanOrEqual(length + 6);
+    }
+  });
+
+  it('no longer silently overrides a requested length under 19 nt with a fixed >=15 nt floor', () => {
+    // length=9 used to always yield >=15 nt (minLen = Math.max(15, 9-4) = 15
+    // regardless of the Tm target). The window is now [max(4, 9-4), 9+6] = [5, 15],
+    // and a Tm target that actually favors the short end lands on the requested
+    // 9 nt primer instead of being pinned to 15+.
+    const p = designPrimers(target, { length: 9, tmTarget: 28, tmMethod: 'wallace' });
+    expect(p.forward.length).toBe(9);
+    expect(p.forward.sequence).toBe(target.slice(0, 9));
+    expect(wallaceTm(p.forward.sequence)).toBe(28);
+  });
 });
 
 describe('spec.run — end-to-end engine contract', () => {
@@ -232,6 +272,23 @@ describe('spec.run — end-to-end engine contract', () => {
     const result = spec.run({
       template: TEMPLATE,
       primerLength: 20,
+      tmTarget: 55,
+      tmMethod: 'gc',
+      maxMismatches: 0,
+      seed: 'pcr',
+    });
+    expect(result.detail?.primers.autoDesigned).toBe(true);
+    const metricMap = Object.fromEntries(result.metrics.map((m) => [m.key, m.value]));
+    expect(metricMap.ampliconLength).toBeGreaterThan(0);
+  });
+
+  it('auto-designs primers at the schema-legal primerLength floor (6) without crashing', () => {
+    // paramsSchema declares primerLength: z.number().int().min(6).max(60); this used
+    // to throw "pickLength: no candidate primer fits the length window" internally
+    // for any primerLength < 9 because of a hardcoded 15 nt window floor.
+    const result = spec.run({
+      template: TEMPLATE,
+      primerLength: 6,
       tmTarget: 55,
       tmMethod: 'gc',
       maxMismatches: 0,

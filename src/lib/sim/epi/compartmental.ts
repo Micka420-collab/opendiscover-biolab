@@ -37,9 +37,14 @@
  *     obtained by solving the transcendental final-size equation
  *         ln(s∞/s0) = R0·(s∞ − s0 − i0),
  *     which for a fully-susceptible start reduces to  s∞ = e^{−R0(1−s∞)}.
- *   - Epidemic peak: dI/dt = 0 ⇒ S = N/R0. For SIR this yields the closed-form peak
- *     prevalence  i_max = i0 + s0 − 1/R0 − (1/R0)·ln(R0·s0). The peak time has no
- *     elementary closed form and is read from the integrated trajectory.
+ *   - Epidemic peak (SIR / SIRD only, direct-transmission models): dI/dt = 0 ⇒ S = N/R0.
+ *     For SIR this yields the closed-form peak prevalence
+ *         i_max = i0 + s0 − 1/R0 − (1/R0)·ln(R0·s0),
+ *     valid only when the effective reproduction number R0·s0 > 1 (otherwise I declines
+ *     monotonically from t=0 and the peak is simply i0). The peak time has no elementary
+ *     closed form and is read from the integrated trajectory. For SEIR, dI/dt = σE − γI,
+ *     so the peak occurs where σE = γI — a condition that lags the S = N/R0 crossing by
+ *     roughly the mean latent period 1/σ, not the same instant.
  *
  * References:
  *   - Kermack WO, McKendrick AG (1927). A contribution to the mathematical theory of
@@ -129,10 +134,14 @@ export function finalSize(R0: number, s0 = 1, i0 = 0): number {
  *   i + s − (1/R0)·ln s = const
  * evaluated at the peak where s = 1/R0:
  *   i_max = i0 + s0 − 1/R0 − (1/R0)·ln(R0·s0).
- * When R0 ≤ 1 the prevalence only declines, so the peak equals the initial i0.
+ * This closed form only applies when the trajectory actually reaches S = N/R0, i.e.
+ * when the EFFECTIVE reproduction number R0·s0 > 1 (equivalently s0 > 1/R0). If the
+ * initial susceptible fraction s0 is already at or below the threshold 1/R0 (e.g. due
+ * to pre-existing immunity/a large removed fraction), S never crosses N/R0 and I
+ * declines monotonically from t=0, so the peak equals the initial i0.
  */
 export function peakInfectedFractionSIR(R0: number, s0 = 1, i0 = 0): number {
-  if (R0 <= 1) return i0;
+  if (R0 * s0 <= 1) return i0;
   return i0 + s0 - 1 / R0 - (1 / R0) * Math.log(R0 * s0);
 }
 
@@ -333,8 +342,12 @@ function run(rawParams: CompartmentalParams): SimResult<CompartmentalDetail> {
   if (model === 'SEIR') yseries.E = traj.E;
   if (model === 'SIRD') yseries.D = traj.D;
 
+  // Whether prevalence actually grows from t=0 is governed by the EFFECTIVE
+  // reproduction number R0·s0 (accounting for any initial immune/removed fraction),
+  // not the raw R0 (which is defined for an otherwise fully susceptible population).
+  const effectiveR0 = R0 * s0;
   const summary =
-    `${model}: R0=${R0.toFixed(2)} ⇒ ${R0 > 1 ? 'epidemic' : 'no epidemic (dies out)'}. ` +
+    `${model}: R0=${R0.toFixed(2)} ⇒ ${effectiveR0 > 1 ? 'epidemic' : 'no epidemic (dies out)'}. ` +
     `Herd-immunity threshold ${(herd * 100).toFixed(1)}%, ` +
     `attack rate ${(attackRate * 100).toFixed(1)}%, ` +
     `peak prevalence ${((peakInfected / N) * 100).toFixed(1)}% on day ${peakDay.toFixed(1)}.`;
@@ -360,7 +373,11 @@ function run(rawParams: CompartmentalParams): SimResult<CompartmentalDetail> {
         label: 'Peak infectious',
         value: peakInfected,
         unit: 'individuals',
-        note: 'Maximum simultaneous prevalence (dI/dt = 0 at S = N/R₀)',
+        note:
+          model === 'SEIR'
+            ? 'Maximum simultaneous prevalence (dI/dt = 0 at σE = γI; lags the S = N/R₀ ' +
+              'crossing by roughly the mean latent period 1/σ)'
+            : 'Maximum simultaneous prevalence (dI/dt = 0 at S = N/R₀)',
       },
       {
         key: 'peakDay',

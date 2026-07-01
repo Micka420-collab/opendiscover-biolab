@@ -2,7 +2,7 @@
  * Distance-based phylogenetics.
  *
  * Reconstructs a phylogenetic tree from a set of *aligned* nucleotide sequences
- * in three stages:
+ * (DNA or RNA — 'U' is treated as equivalent to 'T') in three stages:
  *
  *   1. Pairwise evolutionary distances between every pair of sequences using one
  *      of three substitution models:
@@ -85,6 +85,20 @@ function isBase(c: string): boolean {
   return c === 'A' || c === 'C' || c === 'G' || c === 'T';
 }
 
+/**
+ * Normalize a single site character for comparison: uppercase, and map RNA's
+ * uracil ('U') onto thymine ('T') since they are the pairing-equivalent base
+ * (U replaces T in RNA; both are pyrimidines with the same purine/pyrimidine
+ * partners for transition/transversion classification). This lets the engine
+ * accept aligned RNA sequences (rRNA, viral RNA genomes, etc.) as well as DNA,
+ * matching the docstring's unqualified "nucleotide sequences" claim instead of
+ * silently dropping every genuine U-site as missing data.
+ */
+function normalizeBase(c: string): string {
+  const u = c.toUpperCase();
+  return u === 'U' ? 'T' : u;
+}
+
 // ---------------------------------------------------------------------------
 // 1. Pairwise distances
 // ---------------------------------------------------------------------------
@@ -110,9 +124,10 @@ export function siteCounts(a: string, b: string): SiteCounts {
   let transitions = 0;
   let transversions = 0;
   for (let i = 0; i < a.length; i++) {
-    const x = a[i].toUpperCase();
-    const y = b[i].toUpperCase();
+    const x = normalizeBase(a[i]);
+    const y = normalizeBase(b[i]);
     // Skip gaps ('-', '.') and ambiguous codes ('N', '?', IUPAC) — pairwise deletion.
+    // ('U' was already folded onto 'T' above, so RNA sequences compare normally.)
     if (!isBase(x) || !isBase(y)) continue;
     valid++;
     if (x === y) continue;
@@ -125,17 +140,28 @@ export function siteCounts(a: string, b: string): SiteCounts {
   return { valid, diff, transitions, transversions };
 }
 
-/** Uncorrected p-distance: fraction of differing sites. */
+/**
+ * Uncorrected p-distance: fraction of differing sites.
+ * Returns `NaN` when there are zero overlapping valid (non-gap, unambiguous)
+ * sites between the two sequences — there is no information to compute a
+ * distance from, so "0" (identical) would be a fabricated result rather than
+ * a measurement.
+ */
 export function pDistance(a: string, b: string): number {
   const { valid, diff } = siteCounts(a, b);
-  if (valid === 0) return 0;
+  if (valid === 0) return Number.NaN;
   return diff / valid;
 }
 
-/** Jukes–Cantor correction applied to an already-computed p-distance. */
+/**
+ * Jukes–Cantor correction applied to an already-computed p-distance.
+ * `p === NaN` (undefined p-distance — no overlapping valid sites) propagates
+ * to a `NaN` result rather than being coerced into a finite distance.
+ */
 export function jcFromP(p: number): number {
   const arg = 1 - (4 * p) / 3;
   // arg <= 0 ⇔ p >= 3/4: the correction diverges; report a saturated distance.
+  // (NaN comparisons are always false, so a NaN `p` falls through and yields NaN below.)
   if (arg <= 0) return SATURATED_DISTANCE;
   const d = -0.75 * Math.log(arg);
   return d === 0 ? 0 : d; // normalise -0 (p === 0) to +0
@@ -146,10 +172,13 @@ export function jukesCantorDistance(a: string, b: string): number {
   return jcFromP(pDistance(a, b));
 }
 
-/** Kimura 2-parameter distance between two aligned sequences. */
+/**
+ * Kimura 2-parameter distance between two aligned sequences.
+ * Returns `NaN` when there are zero overlapping valid sites (see `pDistance`).
+ */
 export function kimura2pDistance(a: string, b: string): number {
   const { valid, transitions, transversions } = siteCounts(a, b);
-  if (valid === 0) return 0;
+  if (valid === 0) return Number.NaN;
   const P = transitions / valid; // transition proportion
   const Q = transversions / valid; // transversion proportion
   const w1 = 1 - 2 * P - Q;
@@ -173,7 +202,15 @@ export function pairwiseDistance(a: string, b: string, model: SubstitutionModel)
   }
 }
 
-/** Build a full symmetric distance matrix from aligned sequences. */
+/**
+ * Build a full symmetric distance matrix from aligned sequences.
+ *
+ * Throws if any pair has zero overlapping valid sites (its distance would be
+ * mathematically undefined — see `pDistance`). Silently substituting 0 there
+ * would assert "identical" for a pair that in fact contributed no data at
+ * all, and that fabricated value would flow straight into NJ/UPGMA as if it
+ * were a real measurement.
+ */
 export function buildDistanceMatrix(
   sequences: NamedSequence[],
   model: SubstitutionModel,
@@ -192,6 +229,11 @@ export function buildDistanceMatrix(
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
       const d = pairwiseDistance(sequences[i].seq, sequences[j].seq, model);
+      if (Number.isNaN(d)) {
+        throw new Error(
+          `buildDistanceMatrix: '${sequences[i].name}' and '${sequences[j].name}' share no overlapping valid (non-gap, unambiguous) sites; their distance is undefined`,
+        );
+      }
       matrix[i][j] = d;
       matrix[j][i] = d;
     }
@@ -453,7 +495,14 @@ const sequenceSchema = z.object({
 });
 
 const paramsSchema = z.object({
-  /** Aligned nucleotide sequences (all the same length). At least 3 taxa. */
+  /**
+   * Aligned nucleotide sequences (all the same length). At least 3 taxa.
+   * DNA or RNA alphabet ('U' is treated as equivalent to 'T'); gaps ('-', '.')
+   * and ambiguity codes (e.g. 'N') are excluded site-by-site via pairwise
+   * deletion. A pair of sequences with zero overlapping valid sites will
+   * cause `buildDistanceMatrix` to throw rather than report a fabricated
+   * zero distance.
+   */
   sequences: z.array(sequenceSchema).min(3, 'at least 3 aligned sequences required'),
   /** Tree-building algorithm. Default: neighbor-joining. */
   method: z.enum(['nj', 'upgma']).optional(),
@@ -481,10 +530,11 @@ export const spec: EngineSpec<PhylogeneticsParams, PhylogeneticsDetail> = {
   domain: 'population-genetics',
   version: '1.0.0',
   description:
-    'Reconstructs a phylogenetic tree from aligned nucleotide sequences. Computes ' +
-    'pairwise evolutionary distances (p-distance, Jukes–Cantor, or Kimura 2-parameter), ' +
-    'builds a tree by Neighbor-Joining (unrooted, additive) or UPGMA (rooted, ultrametric), ' +
-    'and emits a Newick string with branch lengths. Fully deterministic.',
+    'Reconstructs a phylogenetic tree from aligned nucleotide sequences (DNA or RNA; ' +
+    "'U' is treated as equivalent to 'T'). Computes pairwise evolutionary distances " +
+    '(p-distance, Jukes–Cantor, or Kimura 2-parameter), builds a tree by Neighbor-Joining ' +
+    '(unrooted, additive) or UPGMA (rooted, ultrametric), and emits a Newick string with ' +
+    'branch lengths. Fully deterministic.',
   references: [
     'Jukes TH, Cantor CR (1969). Evolution of protein molecules.',
     'Kimura M (1980). J Mol Evol 16:111-120.',

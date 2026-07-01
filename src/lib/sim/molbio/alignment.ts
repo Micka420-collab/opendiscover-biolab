@@ -20,22 +20,31 @@ import { z } from 'zod';
 import { provenance } from '../core/types';
 import type { EngineSpec, SimResult } from '../core/types';
 
-export const alignmentParams = z.object({
-  /** First sequence (DNA / RNA / protein one-letter string). */
-  seqA: z.string().min(1).max(2000),
-  /** Second sequence. */
-  seqB: z.string().min(1).max(2000),
-  /** Global (end-to-end) or local (best substring) alignment. */
-  mode: z.enum(['global', 'local']).default('global'),
-  /** Score added for a matching column. */
-  match: z.number().default(2),
-  /** Score added for a mismatching column. */
-  mismatch: z.number().default(-1),
-  /** Linear gap penalty (negative). */
-  gap: z.number().default(-2),
-  /** Fold case before comparing. */
-  ignoreCase: z.boolean().default(true),
-});
+export const alignmentParams = z
+  .object({
+    /** First sequence (DNA / RNA / protein one-letter string). */
+    seqA: z.string().min(1).max(2000),
+    /** Second sequence. */
+    seqB: z.string().min(1).max(2000),
+    /** Global (end-to-end) or local (best substring) alignment. */
+    mode: z.enum(['global', 'local']).default('global'),
+    /** Score added for a matching column. */
+    match: z.number().default(2),
+    /** Score added for a mismatching column. */
+    mismatch: z.number().default(-1),
+    /** Linear gap penalty (negative). */
+    gap: z.number().default(-2),
+    /** Fold case before comparing. */
+    ignoreCase: z.boolean().default(true),
+  })
+  .refine((p) => p.gap <= 0, {
+    message: 'gap must be a penalty: gap <= 0',
+    path: ['gap'],
+  })
+  .refine((p) => p.mismatch <= p.match, {
+    message: 'mismatch must not score better than a match: mismatch <= match',
+    path: ['mismatch'],
+  });
 
 export type AlignmentParams = z.input<typeof alignmentParams>;
 

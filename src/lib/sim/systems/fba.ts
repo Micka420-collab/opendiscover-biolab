@@ -27,8 +27,13 @@
  *  - Only the core FBA problem is solved (no FVA, no parsimonious FBA, no MILP).
  *  - Bounds must be finite; non-finite bounds are clamped to ±`DEFAULT_BOUND`
  *    (1000), matching the common COBRA convention for "unbounded" reactions.
- *  - The solver is exact up to floating-point; on rational/integer toy networks
- *    it returns the analytic optimum to machine precision.
+ *  - The solver is exact up to floating-point *provided it converges within the
+ *    pivot cap*; on rational/integer toy networks it returns the analytic
+ *    optimum to machine precision. Bland's rule guarantees the pivot sequence
+ *    is finite and cycle-free, but — contrary to an earlier version of this
+ *    comment — it does **not** bound how large that finite count is. If the
+ *    cap is exhausted before reaching a verified optimum, `status` reports
+ *    `'iteration_limit'` rather than a false `'optimal'` (see `maxIter`).
  *
  * References
  *  - Orth, Thiele & Palsson, "What is flux balance analysis?", Nature
@@ -51,19 +56,31 @@ import { provenance } from '../core/types';
 export type Relation = '<=' | '>=' | '=';
 
 export interface LPResult {
-  status: 'optimal' | 'infeasible' | 'unbounded';
+  /**
+   * `'iteration_limit'` means the pivot cap (`maxIter`) was exhausted before a
+   * genuine optimality/unboundedness condition was reached: the returned
+   * `x`/`value` are the last tableau state, NOT a verified optimum, and must
+   * not be treated as the analytic answer.
+   */
+  status: 'optimal' | 'infeasible' | 'unbounded' | 'iteration_limit';
   /** Values of the structural (original) variables, length = c.length. */
   x: number[];
   /** Objective value cᵀx at the optimum (for a maximisation). */
   value: number;
-  /** Simplex pivots performed (diagnostic). */
+  /** Simplex pivots performed across both phases (diagnostic). */
   iterations: number;
 }
 
 interface SimplexOpts {
   /** Numerical zero tolerance for pivots / reduced costs. */
   eps?: number;
-  /** Safety cap on pivots (Bland's rule guarantees termination well below). */
+  /**
+   * Safety cap on pivots. Bland's rule guarantees the pivot sequence is finite
+   * and cycle-free, but it does NOT bound how large that finite count is, so
+   * this cap can in principle be hit on large/highly-degenerate networks. When
+   * it is, `simplex()` reports `status: 'iteration_limit'` instead of
+   * silently claiming `'optimal'`.
+   */
   maxIter?: number;
 }
 
@@ -164,7 +181,13 @@ export function simplex(
   };
 
   // --- Core pivoting loop, shared by both phases. --------------------------
-  const runCore = (cost: number[], forbidden: boolean[] | null): 'optimal' | 'unbounded' => {
+  // Returns both the outcome and the number of pivots actually performed, so
+  // callers can (a) accumulate a true pivot count and (b) tell a genuine
+  // optimum/unboundedness apart from a maxIter cutoff.
+  const runCore = (
+    cost: number[],
+    forbidden: boolean[] | null,
+  ): { status: 'optimal' | 'unbounded' | 'iteration_limit'; iter: number } => {
     let iter = 0;
     while (iter < maxIter) {
       // Entering column: Bland's rule -> first index with positive reduced cost.
@@ -178,7 +201,7 @@ export function simplex(
           break;
         }
       }
-      if (entering === -1) return 'optimal';
+      if (entering === -1) return { status: 'optimal', iter };
 
       // Leaving row: minimum ratio test, ties broken by smallest basis index.
       let leaving = -1;
@@ -195,25 +218,39 @@ export function simplex(
           }
         }
       }
-      if (leaving === -1) return 'unbounded'; // objective improves without bound
+      if (leaving === -1) return { status: 'unbounded', iter }; // objective improves without bound
 
       doPivot(leaving, entering);
       iter++;
     }
-    return 'optimal';
+    // Pivot cap exhausted without reaching a verified optimal/unbounded state:
+    // do NOT claim 'optimal' — the caller must be able to tell this apart from
+    // a real convergence (see the SimplexOpts.maxIter doc comment).
+    return { status: 'iteration_limit', iter };
   };
+
+  const zeros = (): number[] => new Array<number>(n).fill(0);
 
   // --- Phase 1: minimise the sum of artificials (maximise its negation). ----
   const hasArtificial = isArtificial.some(Boolean);
-  const iterations = 0;
+  let iterations = 0;
   if (hasArtificial) {
     const cost1 = isArtificial.map((a) => (a ? -1 : 0));
-    runCore(cost1, null);
+    const phase1 = runCore(cost1, null);
+    iterations += phase1.iter;
+    if (phase1.status === 'iteration_limit') {
+      return { status: 'iteration_limit', x: zeros(), value: 0, iterations };
+    }
     // Feasibility check: any artificial still carrying positive value => infeasible.
+    // The threshold is derived from `eps` (rather than an independent magic
+    // constant) so the one exposed tolerance knob has a single, consistent
+    // meaning throughout the solve; the 1e2 factor is a safety margin over the
+    // per-pivot tolerance to absorb summed rounding error across rows.
     let artSum = 0;
     for (let i = 0; i < m; i++) if (isArtificial[basis[i]!]) artSum += rhs[i]!;
-    if (artSum > 1e-7) {
-      return { status: 'infeasible', x: new Array<number>(n).fill(0), value: 0, iterations };
+    const infeasTol = eps * 1e2;
+    if (artSum > infeasTol) {
+      return { status: 'infeasible', x: zeros(), value: 0, iterations };
     }
     // Drive any artificial still basic (necessarily at value 0) out of the basis.
     // This is essential: a basic artificial left in place could grow during phase 2
@@ -225,6 +262,7 @@ export function simplex(
       for (let j = 0; j < N; j++) {
         if (!isArtificial[j] && Math.abs(T[i]?.[j]!) > eps) {
           doPivot(i, j);
+          iterations++;
           break;
         }
       }
@@ -234,9 +272,13 @@ export function simplex(
   // --- Phase 2: optimise the real objective; artificials may never re-enter.
   const cost2 = new Array<number>(N).fill(0);
   for (let j = 0; j < n; j++) cost2[j] = c[j] ?? 0;
-  const status2 = runCore(cost2, isArtificial);
-  if (status2 === 'unbounded') {
-    return { status: 'unbounded', x: new Array<number>(n).fill(0), value: 0, iterations };
+  const phase2 = runCore(cost2, isArtificial);
+  iterations += phase2.iter;
+  if (phase2.status === 'unbounded') {
+    return { status: 'unbounded', x: zeros(), value: 0, iterations };
+  }
+  if (phase2.status === 'iteration_limit') {
+    return { status: 'iteration_limit', x: zeros(), value: 0, iterations };
   }
 
   // Read the structural variables out of the final basis.
@@ -272,7 +314,17 @@ export interface MetabolicModel {
 }
 
 export interface FbaSolution {
-  status: 'optimal' | 'infeasible' | 'unbounded';
+  /**
+   * `'iteration_limit'` means the underlying simplex pivot cap was exhausted
+   * before a verified optimum was found; `objectiveValue`/`fluxes` below are
+   * NOT a trustworthy analytic answer in that case (see `simplex`'s
+   * `SimplexOpts.maxIter`). In practice every reaction gets an explicit
+   * `x_j <= ub_j - lb_j` row (bounds are clamped to finite values before the
+   * LP is built), so the feasible region is always a bounded polytope and
+   * `'unbounded'` cannot occur through this function; it remains part of the
+   * type because `simplex()` itself is also exported and used directly.
+   */
+  status: 'optimal' | 'infeasible' | 'unbounded' | 'iteration_limit';
   /** Optimal objective value cᵀv (growth / biomass flux). */
   objectiveValue: number;
   /** Optimal flux vector v, length nR. */
@@ -306,7 +358,13 @@ function clampBound(v: number): number {
  *    v <= ub            ->   x_j <= ub_j - lb_j (one <= row per reaction)
  *
  * An infeasible or fully blocked network yields objective 0 with a zero flux
- * vector, matching standard FBA semantics.
+ * vector, matching standard FBA semantics. A genuinely `'unbounded'` LP (in
+ * real FBA, typically a thermodynamically-infeasible energy-generating loop;
+ * see Schellenberger, Lewis & Palsson 2011, Biophys J 100:544-553) is a
+ * different failure mode from infeasibility — growth is not "zero", it is
+ * unconstrained — but every reaction here is bound by an explicit
+ * `x_j <= ub_j - lb_j` row, so the LP built by this function is always a
+ * bounded polytope and `'unbounded'` cannot actually be returned by it.
  */
 export function solveFba(model: MetabolicModel, opts: SolveFbaOpts = {}): FbaSolution {
   const eps = opts.eps ?? 1e-9;
@@ -465,10 +523,19 @@ export const spec: EngineSpec<FbaParams, FbaDetail> = {
     // Verify mass balance for provenance/plausibility (S·v across metabolites).
     const residual = model.metabolites.length > 0 ? matVec(model.stoichiometry, sol.fluxes) : [];
 
+    // 'unbounded' is a different failure mode from infeasible/blocked (growth
+    // is unconstrained, not absent — see the `FbaSolution` doc comment), and
+    // 'iteration_limit' means the result is not a verified optimum at all;
+    // neither should be described as "no feasible growth (objective 0)".
     const summary =
       sol.status === 'optimal'
         ? `Optimal objective flux ${sol.objectiveValue.toFixed(3)} with ${sol.activeReactions} of ${model.reactions.length} reactions active.`
-        : `Network ${sol.status} — no feasible growth (objective 0).`;
+        : sol.status === 'unbounded'
+          ? 'Network unbounded — objective grows without bound (check for an energy-generating / ' +
+            'thermodynamically-infeasible cycle; Schellenberger et al. 2011, Biophys J 100:544-553).'
+          : sol.status === 'iteration_limit'
+            ? 'Solver did not converge within the pivot limit — result is not a verified optimum.'
+            : `Network ${sol.status} — no feasible growth (objective 0).`;
 
     return {
       engine: spec.slug,

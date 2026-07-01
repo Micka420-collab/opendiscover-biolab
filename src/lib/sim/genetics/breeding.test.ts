@@ -102,9 +102,66 @@ describe('breeding — classical Mendelian ratios', () => {
     const total = (r.detail?.phenotypeDistribution ?? []).reduce((s, d) => s + d.probability, 0);
     expect(total).toBeCloseTo(1, 10);
   });
+
+  it('multi-character allele symbols do not corrupt phenotype derivation (ABO-style locus)', () => {
+    // Regression test: genotype pairs used to be represented internally as a
+    // concatenated string (e.g. "Aa") and later re-split by character position
+    // (pair[0], pair[1]) to recover the two alleles. That round-trip silently
+    // produced garbage once a symbol was longer than one character. Model this
+    // on the classic ABO blood-group locus (Klug et al., Concepts of Genetics —
+    // codominance of I^A and I^B, each dominant to i): IAi × IBi should yield the
+    // four distinct genotypes IAIB, IAi, IBi, ii at 1/4 each, with phenotypes
+    // built from the correct pair of allele labels rather than mis-sliced
+    // substrings ("I"/"A") that collapse distinct genotypes together.
+    const geneABO: Gene = {
+      symbol: 'I',
+      name: 'ABO blood group',
+      alleles: [
+        { symbol: 'IA', label: 'A-antigen' },
+        { symbol: 'IB', label: 'B-antigen' },
+        { symbol: 'i', label: 'no antigen' },
+      ],
+      mode: 'codominant',
+    };
+    const r = spec.run({
+      genes: [geneABO],
+      parentA: { I: ['IA', 'i'] },
+      parentB: { I: ['IB', 'i'] },
+      offspringCount: 0,
+    });
+
+    expect(r.detail?.genotypeDistribution.length).toBe(4);
+    expect(r.detail?.genotypeDistribution.map((g) => g.genotype).sort()).toEqual(
+      ['IAIB', 'IAi', 'IBi', 'ii'].sort(),
+    );
+    for (const g of r.detail?.genotypeDistribution ?? []) {
+      expect(g.probability).toBeCloseTo(0.25, 10);
+    }
+
+    expect(r.detail?.phenotypeDistribution.length).toBe(4);
+    expect(phenoProb(r, 'A-antigen/B-antigen')).toBeCloseTo(0.25, 10);
+    expect(phenoProb(r, 'A-antigen/no antigen')).toBeCloseTo(0.25, 10);
+    expect(phenoProb(r, 'B-antigen/no antigen')).toBeCloseTo(0.25, 10);
+    expect(phenoProb(r, 'no antigen')).toBeCloseTo(0.25, 10);
+    // The old bug collapsed IAIB and IAi to the identical wrong label "I/A".
+    expect(phenoProb(r, 'I/A')).toBe(0);
+  });
 });
 
 describe('breeding — linkage & recombination', () => {
+  it('run() always assumes independent assortment; linkage/recombination is not wired in, and the public description says so', () => {
+    // `recombinantGametes` is a standalone gamete-frequency helper — it is never
+    // called from `run()` (no linkage-phase/recombination-frequency field exists
+    // on `breedingParams`), so a dihybrid cross must reproduce the unlinked 9:3:3:1
+    // ratio regardless of how "linked" the loci might be in a real organism.
+    const r = spec.run(breedingParams.parse(spec.example));
+    expect(r.detail?.phenotypicRatio).toBe('9:3:3:1');
+    // The public-facing description must not overstate that linkage/recombination
+    // is part of the cross computation itself.
+    expect(spec.description).toContain('recombinantGametes');
+    expect(spec.description).toContain('not used by this cross calculator');
+  });
+
   it('parental gametes get (1-r)/2 and recombinants r/2', () => {
     const g = recombinantGametes(
       [

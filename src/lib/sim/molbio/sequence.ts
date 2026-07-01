@@ -16,8 +16,11 @@
  *  - translate    mRNA/DNA -> protein via the FULL standard genetic code
  *                 (all 64 codons; stop codons rendered as '*')
  *  - gcContent    %GC of the valid bases
- *  - meltingTemp  Wallace rule for oligos < 14 nt; the Marmur–Wetmur %GC
- *                 approximation 64.9 + 41·(nGC − 16.4)/N for longer sequences
+ *  - meltingTemp  Wallace rule for oligos < 12 nt; the Marmur–Wetmur %GC
+ *                 approximation 64.9 + 41·(nGC − 16.4)/N for oligos >= 16 nt;
+ *                 the two are linearly blended between 12-15 nt to avoid a
+ *                 sharp jump at the cutover (a heuristic estimate, not a
+ *                 nearest-neighbour thermodynamic calculation)
  *  - molecularWeight  single-stranded DNA average MW (IDT residue weights)
  *  - findORFs     all six reading frames, ATG…stop, with a minimum length
  *  - aminoAcidComposition  residue counts of a protein
@@ -220,10 +223,27 @@ export function gcContent(seq: string): number {
   return ((c.G + c.C) / total) * 100;
 }
 
+// Melting-temperature model: the Wallace rule (short oligos) and the %GC
+// approximation (longer ones) are each individually well cited, but naively
+// switching between them at a single length threshold produces a sharp,
+// non-physical jump right at the cutover — e.g. for an AT-rich oligo, Tm can
+// appear to *drop* by roughly 9-10 degC when a single base is appended right
+// at the old n=14 boundary (2*13=26 vs 64.9+41*(0-16.4)/14≈16.9). Neither
+// formula is "wrong" for its own regime, but splicing them abruptly is not
+// physically meaningful, so the two estimates are linearly blended across a
+// short transition window instead. Below the window, only the Wallace rule
+// is used; above it, only the %GC formula is used; the blend keeps both
+// endpoints continuous with their respective pure regimes.
+const TM_BLEND_LOW_N = 12; // below this length (nt): pure Wallace rule
+const TM_BLEND_HIGH_N = 16; // at/above this length (nt): pure %GC formula
+
 /**
- * Melting temperature (°C).
- *  - Oligos < 14 valid bases: Wallace rule  Tm = 2·(A+T) + 4·(G+C).
- *  - Length ≥ 14: %GC approximation  Tm = 64.9 + 41·(nGC − 16.4)/N.
+ * Melting temperature (°C) — a heuristic estimate, not a thermodynamic
+ * (nearest-neighbour) calculation.
+ *  - Oligos < 12 valid bases: Wallace rule  Tm = 2·(A+T) + 4·(G+C).
+ *  - Oligos ≥ 16 valid bases: %GC approximation  Tm = 64.9 + 41·(nGC − 16.4)/N.
+ *  - 12-15 valid bases: linear blend of the two formulas above, so Tm does
+ *    not jump sharply across the transition (see TM_BLEND_LOW_N/HIGH_N).
  * (U is counted as T so RNA oligos are handled too.)
  */
 export function meltingTemp(seq: string): number {
@@ -232,8 +252,12 @@ export function meltingTemp(seq: string): number {
   const gc = c.G + c.C;
   const n = at + gc;
   if (n === 0) return 0;
-  if (n < 14) return 2 * at + 4 * gc;
-  return 64.9 + (41 * (gc - 16.4)) / n;
+  const wallace = 2 * at + 4 * gc;
+  if (n < TM_BLEND_LOW_N) return wallace;
+  const gcFormula = 64.9 + (41 * (gc - 16.4)) / n;
+  if (n >= TM_BLEND_HIGH_N) return gcFormula;
+  const weight = (n - TM_BLEND_LOW_N) / (TM_BLEND_HIGH_N - TM_BLEND_LOW_N);
+  return (1 - weight) * wallace + weight * gcFormula;
 }
 
 /**
@@ -490,7 +514,7 @@ export function run(params: SequenceParams): SimResult<SequenceDetail> {
         label: 'Melting temperature',
         value: tm,
         unit: '°C',
-        note: 'Wallace (<14 nt) or %GC formula',
+        note: 'Wallace (<12 nt), %GC formula (>=16 nt), blended in between — a heuristic, not a nearest-neighbour Tm',
       },
       {
         key: 'orfCount',
@@ -523,10 +547,12 @@ export const spec: EngineSpec<SequenceParams, SequenceDetail> = {
   description:
     'Core sequence biology on a DNA, RNA, or protein string: complement and ' +
     'reverse complement, transcription, translation via the full standard ' +
-    'genetic code, GC content, melting temperature (Wallace rule for short ' +
-    'oligos and the %GC approximation for longer ones), single-stranded DNA ' +
-    'molecular weight, six-frame ORF discovery, and amino-acid composition. ' +
-    'Fully deterministic — no randomness, no external state.',
+    'genetic code, GC content, melting temperature (a documented heuristic: ' +
+    'the Wallace rule for short oligos and the %GC approximation for longer ' +
+    'ones, linearly blended between 12-15 nt to avoid a sharp jump at the ' +
+    'cutover — not a nearest-neighbour thermodynamic calculation), ' +
+    'single-stranded DNA molecular weight, six-frame ORF discovery, and ' +
+    'amino-acid composition. Fully deterministic — no randomness, no external state.',
   references: [
     'Alberts et al., Molecular Biology of the Cell — standard genetic code (NCBI table 1).',
     'Wallace R.B. et al. (1979) Nucleic Acids Res. 6:3543 — 2(A+T)+4(G+C) Tm rule.',

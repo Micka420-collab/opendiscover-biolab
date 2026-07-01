@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { needlemanWunsch, smithWaterman, spec } from './alignment';
+import { alignmentParams, needlemanWunsch, smithWaterman, spec } from './alignment';
 
 const sc = { match: 1, mismatch: -1, gap: -1 };
 const metric = (r: ReturnType<typeof spec.run>, key: string) =>
@@ -34,6 +34,18 @@ describe('Needleman–Wunsch global alignment', () => {
     const ba = needlemanWunsch('GCATGCU', 'GATTACA', sc).score;
     expect(ab).toBe(ba);
   });
+
+  it('pays one gap penalty per unit of length difference (boundary row/column init)', () => {
+    // 'AAAAA' vs 'A': one match (+1) plus four gap columns for the extra A's
+    // (4 × -1 = -4) ⇒ -3. A broken/missing F[i][0]/F[0][j] boundary
+    // initialization would instead let the DP find a spurious +1 (score of a
+    // single match with the leftover row/column left at 0), so this exercises
+    // a length gap the other fixtures (max diff of 1 char) never reach.
+    const a = needlemanWunsch('AAAAA', 'A', sc);
+    expect(a.score).toBe(-3);
+    expect(a.alignedA).toBe('AAAAA');
+    expect(a.alignedB).toBe('----A');
+  });
 });
 
 describe('Smith–Waterman local alignment', () => {
@@ -50,6 +62,21 @@ describe('Smith–Waterman local alignment', () => {
   it('never scores below zero', () => {
     const a = smithWaterman('AAAA', 'TTTT', { match: 1, mismatch: -1, gap: -1 });
     expect(a.score).toBe(0);
+  });
+
+  it('floors the H-matrix at zero so a divergent prefix does not drag down a later local match', () => {
+    // CCCC/GGGG is all-mismatch (would drive an un-floored score to -4 by the
+    // time the AAAA/AAAA run starts), but Smith–Waterman resets to 0 at every
+    // cell whose best predecessor score would go negative (Smith & Waterman
+    // 1981, J. Mol. Biol. 147:195, eq. for H_ij = max(0, ...)), so the trailing
+    // perfect match is recovered as its own local alignment.
+    const a = smithWaterman('CCCCAAAA', 'GGGGAAAA', { match: 1, mismatch: -1, gap: -1 });
+    expect(a.score).toBe(4);
+    expect(a.alignedA).toBe('AAAA');
+    expect(a.alignedB).toBe('AAAA');
+    // Traceback must stop at the reset point, not extend into the mismatched prefix.
+    expect(a.aStart).toBe(4);
+    expect(a.bStart).toBe(4);
   });
 
   it('local score ≥ global score when similarity is only local', () => {
@@ -81,5 +108,25 @@ describe('alignment engine', () => {
   it('is deterministic', () => {
     const p = { seqA: 'GATTACAGTC', seqB: 'GCATGCAGTC' };
     expect(spec.run(p)).toEqual(spec.run(p));
+  });
+
+  it('rejects a positive (non-penalty) gap score', () => {
+    // gap must be <= 0: a positive gap turns the DP's whole rationale upside
+    // down (it would prefer inserting gaps over matching identical residues),
+    // e.g. gap=5 with match=1 aligns identical 'AC'/'AC' as '--AC'/'AC--'
+    // instead of reporting 100% identity.
+    expect(() =>
+      alignmentParams.parse({ seqA: 'AC', seqB: 'AC', match: 1, mismatch: -1, gap: 5 }),
+    ).toThrow();
+  });
+
+  it('rejects a mismatch score better than a match score', () => {
+    expect(() =>
+      alignmentParams.parse({ seqA: 'AC', seqB: 'AC', match: 1, mismatch: 2, gap: -1 }),
+    ).toThrow();
+  });
+
+  it('accepts the documented default penalties', () => {
+    expect(() => alignmentParams.parse({ seqA: 'AC', seqB: 'AC' })).not.toThrow();
   });
 });

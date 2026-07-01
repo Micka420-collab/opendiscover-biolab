@@ -80,6 +80,93 @@ describe('translate', () => {
     const stops = Object.values(RNA_CODON_TABLE).filter((a) => a === '*');
     expect(stops).toHaveLength(3);
   });
+
+  // The shape check above (64 entries / 3 stops) can't catch a mistranslated
+  // codon as long as the swap preserves that shape (e.g. transposing two
+  // synonymous-codon rows, or conflating the standard code with a
+  // mitochondrial variant). Pin the exact table against the canonical NCBI
+  // "standard" genetic code, translation table 1:
+  // https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG1
+  it('matches the canonical NCBI standard genetic code (table 1) codon-for-codon', () => {
+    const NCBI_STANDARD_CODE_TABLE_1: Readonly<Record<string, string>> = {
+      UUU: 'F',
+      UUC: 'F',
+      UUA: 'L',
+      UUG: 'L',
+      CUU: 'L',
+      CUC: 'L',
+      CUA: 'L',
+      CUG: 'L',
+      AUU: 'I',
+      AUC: 'I',
+      AUA: 'I',
+      AUG: 'M',
+      GUU: 'V',
+      GUC: 'V',
+      GUA: 'V',
+      GUG: 'V',
+      UCU: 'S',
+      UCC: 'S',
+      UCA: 'S',
+      UCG: 'S',
+      CCU: 'P',
+      CCC: 'P',
+      CCA: 'P',
+      CCG: 'P',
+      ACU: 'T',
+      ACC: 'T',
+      ACA: 'T',
+      ACG: 'T',
+      GCU: 'A',
+      GCC: 'A',
+      GCA: 'A',
+      GCG: 'A',
+      UAU: 'Y',
+      UAC: 'Y',
+      UAA: '*',
+      UAG: '*',
+      CAU: 'H',
+      CAC: 'H',
+      CAA: 'Q',
+      CAG: 'Q',
+      AAU: 'N',
+      AAC: 'N',
+      AAA: 'K',
+      AAG: 'K',
+      GAU: 'D',
+      GAC: 'D',
+      GAA: 'E',
+      GAG: 'E',
+      UGU: 'C',
+      UGC: 'C',
+      UGA: '*',
+      UGG: 'W',
+      CGU: 'R',
+      CGC: 'R',
+      CGA: 'R',
+      CGG: 'R',
+      AGU: 'S',
+      AGC: 'S',
+      AGA: 'R',
+      AGG: 'R',
+      GGU: 'G',
+      GGC: 'G',
+      GGA: 'G',
+      GGG: 'G',
+    };
+    expect(RNA_CODON_TABLE).toEqual(NCBI_STANDARD_CODE_TABLE_1);
+  });
+
+  // Spot-check the specific codons where the standard code diverges from the
+  // vertebrate mitochondrial code — the exact places a "fix" that conflates
+  // the two codes would silently corrupt (UGA=Stop not Trp, AUA=Ile not Met,
+  // AGA/AGG=Arg not Stop).
+  it('does not conflate the standard code with the vertebrate mitochondrial code', () => {
+    expect(RNA_CODON_TABLE.UGA).toBe('*'); // mito: Trp (W)
+    expect(RNA_CODON_TABLE.AUA).toBe('I'); // mito: Met (M)
+    expect(RNA_CODON_TABLE.AGA).toBe('R'); // mito: Stop
+    expect(RNA_CODON_TABLE.AGG).toBe('R'); // mito: Stop
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -104,18 +191,39 @@ describe('gcContent', () => {
 // Melting temperature.
 // ---------------------------------------------------------------------------
 describe('meltingTemp', () => {
-  it('uses the Wallace rule for short oligos (< 14 nt)', () => {
+  it('uses the Wallace rule for short oligos (< 12 nt)', () => {
     // ATGC: 2*(A+T) + 4*(G+C) = 2*2 + 4*2 = 12
     expect(meltingTemp('ATGC')).toBe(12);
     // AAAA: 2*4 + 0 = 8
     expect(meltingTemp('AAAA')).toBe(8);
   });
 
-  it('uses the %GC formula for length >= 14 nt', () => {
-    // 14-mer with nGC = 6, N = 14: 64.9 + 41*(6-16.4)/14 = 34.442857...
+  it('uses the %GC formula for length >= 16 nt', () => {
+    // 16-mer, all-A (nGC = 0, N = 16): 64.9 + 41*(0-16.4)/16
+    const tm = meltingTemp('A'.repeat(16));
+    expect(tm).toBeCloseTo(64.9 + (41 * (0 - 16.4)) / 16, 6);
+  });
+
+  it('linearly blends the Wallace and %GC formulas for 12-15 nt', () => {
+    // 14-mer with nGC = 6, N = 14: Wallace = 2*8 + 4*6 = 40,
+    // %GC formula = 64.9 + 41*(6-16.4)/14 = 34.442857..., blended 50/50
+    // (n=14 is the midpoint of the 12-16 transition window).
+    const wallace = 2 * 8 + 4 * 6;
+    const gcFormula = 64.9 + (41 * (6 - 16.4)) / 14;
     const tm = meltingTemp('ATGCATGCATGCAT');
-    expect(tm).toBeCloseTo(64.9 + (41 * (6 - 16.4)) / 14, 6);
-    expect(tm).toBeCloseTo(34.4429, 3);
+    expect(tm).toBeCloseTo(0.5 * wallace + 0.5 * gcFormula, 6);
+    expect(tm).toBeCloseTo(37.2214, 3);
+  });
+
+  // Regression for the audit finding: a hard cutover at n=14 made Tm *drop*
+  // by ~9-10 degC when a single AT-rich base was appended right at the
+  // boundary (meltingTemp('A'.repeat(13)) = 26 vs meltingTemp('A'.repeat(14))
+  // = 16.87 under the old two-branch splice). The blended transition keeps
+  // that per-nucleotide swing small instead of a double-digit jump.
+  it('keeps Tm changes small across the old 13/14 nt cutover for AT-rich oligos', () => {
+    const tm13 = meltingTemp('A'.repeat(13));
+    const tm14 = meltingTemp('A'.repeat(14));
+    expect(Math.abs(tm13 - tm14)).toBeLessThan(2);
   });
 });
 

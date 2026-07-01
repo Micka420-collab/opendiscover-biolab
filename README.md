@@ -50,7 +50,8 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `fba` | Flux balance analysis via a built-in linear-programming solver |
 | 🌱 Population genetics | `wright-fisher` | Genetic drift, selection, mutation, fixation probability |
 | | `phylogenetics` | Distance models (JC/K2P), Neighbor-Joining & UPGMA trees, Newick output |
-| | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes, linkage |
+| | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes (loci always unlinked; `recombinantGametes` is a standalone helper, not wired into the cross) |
+| 🧠 Neuroscience | `hodgkin-huxley` | The 1952 action-potential model (Nobel Prize, 1963): spike threshold, repetitive firing |
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |
@@ -145,6 +146,8 @@ Honesty about what has and hasn't been run for real:
 - No load testing, no security audit, no production deployment yet.
 
 **Scientific accuracy — models, not lab results.** Every engine reproduces the textbook/analytical case it's tested against, but several use documented simplifications rather than state-of-the-art methods: see each engine's `references` and the caveats noted in its test file (e.g. the ADMET logP is a crude atom-contribution estimate, not a calibrated model; CRISPR on/off-target scoring is a documented heuristic, not the trained Doench/CFD models; HP lattice folding is a teaching model, not a real force field). Treat outputs as illustrative, not as a substitute for wet-lab or peer-reviewed computational results.
+
+All 20 pre-existing engines went through an independent scientific-accuracy audit (each checked against its own cited references) that found and fixed **real, verifiable bugs** — not just wording. Highlights: `admet`'s TPSA fragment classifier miscounted ether/amine oxygens as carbonyls (aspirin's TPSA silently read 71.4 instead of the correct 63.6 Å²); `bioreactor`'s chemostat steady-state formula was applied at D=0, a genuine mathematical singularity, instead of the true closed-batch limit; `breeding` corrupted any multi-character allele symbol (e.g. an ABO-style locus) through a lossy string-splitting round-trip; `compartmental`'s SIR peak-prevalence formula was applied even when the effective reproduction number R₀·s₀ ≤ 1, where the epidemic never actually peaks. Every fix shipped with a regression test that fails on the old code and passes on the new. Full detail in each engine's `changesSummary` is in the commit history.
 
 ---
 

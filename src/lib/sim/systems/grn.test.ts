@@ -205,6 +205,72 @@ describe('feed-forward loop settles to a steady ON state', () => {
   });
 });
 
+describe('linear-stability threshold: odd-N Hopf secant vs even-N real-eigenvalue saddle', () => {
+  // Reference: Thron CD, "The secant condition for instability in biochemical
+  // feedback control models," Bull Math Biol 53:383-401 (1991); Mallet-Paret J,
+  // Smith HL, "The Poincare-Bendixson theorem for monotone cyclic feedback
+  // systems," J Dyn Diff Eq 2:367-421 (1990).
+  //
+  // Linearizing a symmetric N-gene repressor ring about its symmetric fixed
+  // point p* gives a circulant Jacobian with eigenvalues
+  //   λ_k = -γ - m·exp(i·2πk/N),  k = 0..N-1,  m = |f'(p*)|.
+  // The least-stable mode sits at whichever k lands closest to angle π:
+  //   - odd N (repressilator, N=3): no k lands exactly on π; the closest pair
+  //     is at π ± π/N, giving a complex-conjugate (Hopf) threshold m/γ > sec(π/N).
+  //   - even N (toggle switch, N=2): k=N/2 lands exactly on π, giving a REAL
+  //     eigenvalue λ = -γ + m, so the threshold is simply m/γ > 1 — a saddle,
+  //     not a Hopf bifurcation. sec(π/2) is undefined (cos 90° = 0), so the
+  //     odd-N formula cannot be applied here.
+
+  /** Symmetric fixed point of p' = basal + beta*H(p) - gamma*p via bisection. */
+  function symmetricFixedPoint(
+    basal: number,
+    beta: number,
+    gamma: number,
+    edge: { K: number; n: number },
+  ): number {
+    const g = (p: number) => basal + beta * hillResponse(p, { sign: -1, ...edge }) - gamma * p;
+    let lo = 0;
+    let hi = 100;
+    for (let i = 0; i < 200; i++) {
+      const mid = (lo + hi) / 2;
+      if (g(mid) > 0) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  /** |d/dp [basal + beta*H(p)]| at p via central finite difference. */
+  function loopGainMagnitude(beta: number, p: number, edge: { K: number; n: number }): number {
+    const h = 1e-5 * Math.max(1, p);
+    const H = (x: number) => hillResponse(x, { sign: -1, ...edge });
+    return Math.abs((beta * H(p + h) - beta * H(p - h)) / (2 * h));
+  }
+
+  it('repressilator (odd N=3): |f’(p*)|/γ exceeds the Hopf secant threshold sec(π/3) = 2', () => {
+    const preset = buildPreset('repressilator');
+    const g0 = preset.genes[0]!;
+    const e = preset.edges[0]!; // K=1, n=4 on every edge
+    const pStar = symmetricFixedPoint(g0.basal, g0.beta, g0.degradation, { K: e.K, n: e.n });
+    const m = loopGainMagnitude(g0.beta, pStar, { K: e.K, n: e.n });
+    const secThreshold = 1 / Math.cos(Math.PI / 3);
+    expect(secThreshold).toBeCloseTo(2, 10);
+    expect(m / g0.degradation).toBeGreaterThan(secThreshold);
+  });
+
+  it('toggle switch (even N=2): |f’(p*)|/γ exceeds the real-eigenvalue saddle threshold of 1 (sec(π/2) is undefined)', () => {
+    const preset = buildPreset('toggleSwitch');
+    const g0 = preset.genes[0]!;
+    const e = preset.edges[0]!; // K=1, n=3
+    const pStar = symmetricFixedPoint(g0.basal, g0.beta, g0.degradation, { K: e.K, n: e.n });
+    const m = loopGainMagnitude(g0.beta, pStar, { K: e.K, n: e.n });
+    // cos(pi/2) = 0 => sec(pi/2) is undefined; the odd-N Hopf formula does not
+    // apply to this even-N ring. The actual instability condition is m/gamma > 1.
+    expect(Math.cos(Math.PI / 2)).toBeCloseTo(0, 10);
+    expect(m / g0.degradation).toBeGreaterThan(1);
+  });
+});
+
 describe('custom network and validation', () => {
   it('runs a user-supplied two-node repression network', () => {
     const res = run({

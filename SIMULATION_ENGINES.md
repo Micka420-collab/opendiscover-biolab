@@ -2,8 +2,8 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **20 deterministic simulation engines** across
-8 domains of computational biology. Every engine is a *pure function* — no clock,
+The OpenDiscover BioLab ships **21 deterministic simulation engines** across
+9 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
 
@@ -19,6 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding)
+- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`fba`](#fba)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
@@ -32,7 +33,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 ### `sequence` — DNA/RNA/Protein Sequence Toolkit
 
-Core sequence biology on a DNA, RNA, or protein string: complement and reverse complement, transcription, translation via the full standard genetic code, GC content, melting temperature (Wallace rule for short oligos and the %GC approximation for longer ones), single-stranded DNA molecular weight, six-frame ORF discovery, and amino-acid composition. Fully deterministic — no randomness, no external state.
+Core sequence biology on a DNA, RNA, or protein string: complement and reverse complement, transcription, translation via the full standard genetic code, GC content, melting temperature (a documented heuristic: the Wallace rule for short oligos and the %GC approximation for longer ones, linearly blended between 12-15 nt to avoid a sharp jump at the cutover — not a nearest-neighbour thermodynamic calculation), single-stranded DNA molecular weight, six-frame ORF discovery, and amino-acid composition. Fully deterministic — no randomness, no external state.
 
 **References**
 - Alberts et al., Molecular Biology of the Cell — standard genetic code (NCBI table 1).
@@ -147,6 +148,7 @@ Designs SpCas9 (5'-NGG-3') or Cas12a (5'-TTTV-3') guide RNAs against a target DN
 - Doench et al. (2016) Nat. Biotechnol. 34:184 — CFD off-target model.
 - Hsu et al. (2013) Nat. Biotechnol. 31:827 — MIT specificity score.
 - Zetsche et al. (2015) Cell 163:759 — Cas12a/Cpf1 TTTV PAM.
+- Kim et al. (2016) Nat. Biotechnol. 34:863 — Cas12a/Cpf1 PAM-proximal seed specificity.
 
 **Parameters**
 
@@ -298,6 +300,49 @@ Two-dimensional square-lattice HP (hydrophobic-polar) protein folding — the cl
 _Run it: `POST /api/lab/run { "engine": "hp-folding", "params": … }` or interactively at `/lab/hp-folding`._
 
 
+## neuroscience
+
+### `hodgkin-huxley` — Hodgkin–Huxley Neuron
+
+The classic biophysical model of the neuronal action potential (Nobel Prize, 1963): four coupled ODEs for membrane potential and voltage-gated Na⁺/K⁺ channel gating variables, integrated with adaptive RK45. Reproduces the hallmark all-or-none spike threshold and repetitive firing under sustained current injection, using the original 1952 squid giant axon parameters.
+
+**References**
+- Hodgkin AL, Huxley AF (1952). J. Physiol. 117:500–544.
+- Dayan P, Abbott LF. Theoretical Neuroscience (2001), ch. 5.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `iExt` | number | `10` |  |  |
+| `stimStart` | number | `5` | ≥ 0 |  |
+| `stimDuration` | number | `1` | ≥ 0 |  |
+| `tEnd` | number | `50` | ≥ 0 |  |
+| `outputPoints` | integer | `500` | ≥ 0, ≤ 5000 |  |
+| `cm` | number | `1` | ≥ 0 |  |
+| `gNa` | number | `120` | ≥ 0 |  |
+| `gK` | number | `36` | ≥ 0 |  |
+| `gL` | number | `0.3` | ≥ 0 |  |
+| `eNa` | number | `50` |  |  |
+| `eK` | number | `-77` |  |  |
+| `eL` | number | `-54.4` |  |  |
+| `vRest` | number | `-65` |  |  |
+| `tol` | number | `0.00001` | ≥ 0 |  |
+
+**Example**
+
+```json
+{
+  "iExt": 10,
+  "stimStart": 5,
+  "stimDuration": 1,
+  "tEnd": 50
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "hodgkin-huxley", "params": … }` or interactively at `/lab/hodgkin-huxley`._
+
+
 ## ⚙️ Systems biology
 
 ### `enzyme-kinetics` — Enzyme Kinetics
@@ -308,6 +353,7 @@ Single-substrate enzyme kinetics: Michaelis–Menten velocity, competitive / non
 - Michaelis L, Menten ML (1913). Biochem. Z. 49:333.
 - Cornish-Bowden A. Fundamentals of Enzyme Kinetics, 4th ed. (2012).
 - Segel IH. Enzyme Kinetics (1975).
+- Hill AV (1910). The possible effects of the aggregation of the molecules of haemoglobin on its dissociation curves. J. Physiol. 40:iv-vii.
 
 **Parameters**
 
@@ -355,6 +401,9 @@ Deterministic ODE simulator for transcription-factor networks using Hill activat
 - Elowitz MB, Leibler S. A synthetic oscillatory network of transcriptional regulators. Nature 403:335-338 (2000).
 - Gardner TS, Cantor CR, Collins JJ. Construction of a genetic toggle switch in Escherichia coli. Nature 403:339-342 (2000).
 - Alon U. Network motifs: theory and experimental approaches. Nat Rev Genet 8:450-461 (2007).
+- Thron CD. The secant condition for instability in biochemical feedback control models. Bull Math Biol 53(3):383-401 (1991).
+- Mallet-Paret J, Smith HL. The Poincare-Bendixson theorem for monotone cyclic feedback systems. J Dyn Diff Eq 2:367-421 (1990).
+- Mangan S, Alon U. Structure and function of the feed-forward loop network motif. Proc Natl Acad Sci USA 100:11980-11985 (2003).
 
 **Parameters**
 
@@ -527,7 +576,7 @@ _Run it: `POST /api/lab/run { "engine": "wright-fisher", "params": … }` or int
 
 ### `phylogenetics` — Distance-based Phylogenetics
 
-Reconstructs a phylogenetic tree from aligned nucleotide sequences. Computes pairwise evolutionary distances (p-distance, Jukes–Cantor, or Kimura 2-parameter), builds a tree by Neighbor-Joining (unrooted, additive) or UPGMA (rooted, ultrametric), and emits a Newick string with branch lengths. Fully deterministic.
+Reconstructs a phylogenetic tree from aligned nucleotide sequences (DNA or RNA; 'U' is treated as equivalent to 'T'). Computes pairwise evolutionary distances (p-distance, Jukes–Cantor, or Kimura 2-parameter), builds a tree by Neighbor-Joining (unrooted, additive) or UPGMA (rooted, ultrametric), and emits a Newick string with branch lengths. Fully deterministic.
 
 **References**
 - Jukes TH, Cantor CR (1969). Evolution of protein molecules.
@@ -577,7 +626,7 @@ _Run it: `POST /api/lab/run { "engine": "phylogenetics", "params": … }` or int
 
 ### `breeding` — Mendelian Breeding & Genetic Crossing
 
-Cross two diploid parents across independent gene loci and get the full offspring genotype and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance (1:2:1), and two-locus linkage with recombination for test-cross analysis.
+Cross two diploid parents across independent gene loci and get the full offspring genotype and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance (1:2:1) under independent assortment (Mendel's second law). A separate standalone helper, `recombinantGametes`, computes two-locus linked-gene gamete frequencies for test-cross analysis; it is not used by this cross calculator, which always treats loci as unlinked.
 
 **References**
 - Mendel G. (1866). Versuche über Pflanzen-Hybriden.
@@ -663,7 +712,7 @@ _Run it: `POST /api/lab/run { "engine": "breeding", "params": … }` or interact
 
 ### `bioreactor` — Bioreactor & Fermentation
 
-Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors. Integrates the biomass/substrate/product balances with adaptive RK45 and reports analytic chemostat steady states (S* = Ks*D/(muMax-D), X* = Yxs*(Sin-S*)), washout thresholds, and mass-balance-consistent batch trajectories.
+Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors. Integrates the biomass/substrate/product balances with adaptive RK45 and reports analytic chemostat steady states (S* = Ks*D/(muMax-D), X* = Yxs*(Sin-S*)) for D > 0, washout thresholds, and mass-balance-consistent batch trajectories. At the schema-permitted edge case D = 0 the CSTR degenerates to a closed batch system, so the reported steady state falls back to the batch-invariant limit instead of the feed-based formula.
 
 **References**
 - Monod, J. (1949) The growth of bacterial cultures. Annu. Rev. Microbiol. 3:371-394.

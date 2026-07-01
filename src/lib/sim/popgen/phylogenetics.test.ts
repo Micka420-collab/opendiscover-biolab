@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type TreeNode,
+  buildDistanceMatrix,
   jcFromP,
   jukesCantorDistance,
   kimura2pDistance,
@@ -100,6 +101,58 @@ describe('pairwise distances', () => {
   it('ignores gap / ambiguous sites (pairwise deletion)', () => {
     // 4 valid sites, 1 difference → p = 0.25; the '-' and 'N' columns are dropped.
     expect(pDistance('ACGT-A', 'ACAT-N')).toBeCloseTo(0.25, 12);
+  });
+
+  it('treats RNA "U" as equivalent to "T" instead of silently excluding it as missing data', () => {
+    // Same site pattern as the p-distance test above, but written with RNA's
+    // 'U' in place of DNA's 'T': 12 aligned sites, 3 differences → p = 0.25.
+    // Before treating U as a recognized base, these differing U-sites were
+    // dropped from `valid` (pairwise deletion), so the comparison fell back to
+    // the 9 identical sites and falsely reported p = 0 ("identical").
+    const rnaA = 'AAAAAAAAAAAA';
+    const rnaB = 'AAAAAAAAAUUU';
+    expect(pDistance(rnaA, rnaB)).toBeCloseTo(0.25, 12);
+    expect(jukesCantorDistance(rnaA, rnaB)).toBeCloseTo(jukesCantorDistance(s1, s2), 12);
+  });
+
+  it('classifies U consistently with T for transition/transversion (Kimura 2P)', () => {
+    // pos 0-6 identical; pos 7,8: A→G transitions; pos 9: A→U transversion.
+    // U is the pyrimidine equivalent of T, so A→U is a transversion exactly
+    // like A→T, giving the same P = 0.2, Q = 0.1 and closed-form distance as
+    // the all-DNA Kimura test above.
+    const a = 'AAAAAAAAAA';
+    const b = 'AAAAAAAGGU';
+    const expected = 0.4023594781085251;
+    expect(kimura2pDistance(a, b)).toBeCloseTo(expected, 12);
+  });
+});
+
+// ==========================================================================
+// 1b. Undefined distances — zero overlapping valid sites must not be "0"
+// ==========================================================================
+
+describe('undefined distances (zero overlapping valid sites)', () => {
+  // Two sequences that share no comparable data at all: one is all gaps, the
+  // other all ambiguity codes, so pairwise deletion excludes every site.
+  const allGaps = '----';
+  const allNs = 'NNNN';
+
+  it('pDistance returns NaN rather than fabricating a "0" (identical) result', () => {
+    expect(pDistance(allGaps, allNs)).toBeNaN();
+  });
+
+  it('jukesCantorDistance and kimura2pDistance also propagate NaN', () => {
+    expect(jukesCantorDistance(allGaps, allNs)).toBeNaN();
+    expect(kimura2pDistance(allGaps, allNs)).toBeNaN();
+  });
+
+  it('buildDistanceMatrix throws instead of silently baking in a fabricated zero distance', () => {
+    const sequences = [
+      { name: 'A', seq: 'ACGT' },
+      { name: 'B', seq: 'ACGA' },
+      { name: 'C', seq: '----' }, // no overlapping valid sites with A or B
+    ];
+    expect(() => buildDistanceMatrix(sequences, 'jc')).toThrow(/no overlapping valid/i);
   });
 });
 

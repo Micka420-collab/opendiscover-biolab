@@ -6,8 +6,13 @@
  *
  *   - Genetic drift  — the next generation's 2N gene copies are a *random sample*
  *                      (with replacement) of the current gene pool.  We draw the
- *                      new count of A alleles as Binomial(2N, p'), which is the
- *                      exact Wright-Fisher transition kernel.
+ *                      new count of A alleles as Binomial(2N, p'), the exact
+ *                      Wright-Fisher transition kernel. In this codebase that
+ *                      draw is delegated to the shared PRNG's `binomial()`,
+ *                      which performs a true Bernoulli-sum simulation for
+ *                      2N ≤ 1000 (popSize ≤ 500) but falls back to a
+ *                      continuity-corrected normal approximation above that —
+ *                      so "exact" should be read as applying up to that size.
  *   - Selection      — genotypes AA / Aa / aa reproduce in proportion to their
  *                      relative fitnesses wAA / wAa / waa.  Under Hardy-Weinberg
  *                      mating the post-selection allele frequency is
@@ -162,14 +167,57 @@ export interface ReplicateResult {
   trajectory: number[];
   /** Frequency of A at the final recorded generation. */
   finalFreq: number;
-  /** A reached fixation (count === 2N) at some generation. */
+  /**
+   * A is fixed (count === 2N) at the FINAL recorded generation. Without
+   * mutation the boundaries are absorbing, so this coincides with "ever
+   * reached fixation". With mutation present the boundaries are merely
+   * permeable, so a replicate that touched 2N and later drifted back to an
+   * interior frequency is correctly reported as NOT fixed here — see
+   * `everReachedFixation` for the (weaker) first-passage notion.
+   */
   fixed: boolean;
-  /** A was lost (count === 0) at some generation. */
+  /**
+   * A was lost (count === 0) at the FINAL recorded generation. See the note
+   * on `fixed`; `everReachedLoss` exposes the first-passage notion instead.
+   */
   lost: boolean;
-  /** Generation index of first fixation of A, or null if never fixed. */
+  /** Generation index of first fixation-boundary touch, or null if never touched. */
   fixationTime: number | null;
-  /** Generation index of first absorption (fixation or loss), or null. */
+  /** Generation index of first absorption-boundary touch (fixation or loss), or null. */
   absorptionTime: number | null;
+  /**
+   * True if the trajectory ever touched the fixation boundary (count === 2N)
+   * at any generation, even if it later drifted back to an interior
+   * frequency (only possible when mutation is present). Equivalent to
+   * `fixed` whenever there is no mutation (boundaries are absorbing).
+   */
+  everReachedFixation: boolean;
+  /**
+   * True if the trajectory ever touched the loss boundary (count === 0)
+   * before any fixation touch, even if it later drifted back (only possible
+   * when mutation is present). Equivalent to `lost` whenever there is no
+   * mutation (boundaries are absorbing).
+   */
+  everReachedLoss: boolean;
+}
+
+/**
+ * Convert a requested initial frequency into an integer allele count out of
+ * `2*popSize` copies. For small populations / frequencies not near a multiple
+ * of 1/(2N), naive rounding can silently turn a nonzero requested frequency
+ * into count 0 (or a sub-1 frequency into count 2N) — guaranteeing loss (or
+ * fixation) for every replicate before any drift happens, a qualitatively
+ * different, deterministic scenario from the one requested. We therefore clamp
+ * to at least 1 copy away from a boundary whenever the requested frequency was
+ * strictly interior, so the simulated scenario always matches the requested
+ * one in kind (segregating vs. monomorphic).
+ */
+export function initialAlleleCount(popSize: number, initFreq: number): number {
+  const twoN = 2 * popSize;
+  let count = Math.round(initFreq * twoN);
+  if (initFreq > 0 && count === 0) count = 1;
+  if (initFreq < 1 && count === twoN) count = twoN - 1;
+  return count;
 }
 
 /**
@@ -178,8 +226,11 @@ export interface ReplicateResult {
  * When there is no mutation the boundary states (0 and 2N) are absorbing, so we
  * short-circuit once absorbed and pad the remaining trajectory with the constant
  * boundary frequency — this keeps every trajectory the same length while making
- * long neutral runs cheap. With mutation present the boundaries are permeable,
- * so we always simulate the full length.
+ * long neutral runs cheap. With mutation present the boundaries are merely
+ * permeable (a population can touch 0 or 2N and later drift back to an
+ * interior frequency), so we always simulate the full length and classify
+ * `fixed`/`lost` from the actual final state rather than from ever having
+ * touched a boundary.
  */
 export function simulateReplicate(
   popSize: number,
@@ -191,10 +242,13 @@ export function simulateReplicate(
 ): ReplicateResult {
   const twoN = 2 * popSize;
   const absorbing = m.forward === 0 && m.back === 0;
-  // Round the initial frequency to an integer allele count.
-  let count = Math.round(initFreq * twoN);
+  let count = initialAlleleCount(popSize, initFreq);
   const trajectory: number[] = [count / twoN];
 
+  // First-passage bookkeeping: the generation at which a boundary was FIRST
+  // touched. These remain well-defined even when mutation makes the
+  // boundaries permeable, but (unlike `fixed`/`lost` below) they do not by
+  // themselves imply the replicate ended up fixed or lost in that regime.
   let fixationTime: number | null = count === twoN ? 0 : null;
   let absorptionTime: number | null = count === twoN || count === 0 ? 0 : null;
 
@@ -215,10 +269,15 @@ export function simulateReplicate(
   return {
     trajectory,
     finalFreq,
-    fixed: fixationTime !== null,
-    lost: absorptionTime !== null && fixationTime === null,
+    // Classify from the actual final state, not a one-time latch on ever
+    // touching a boundary — with permeable (mutation) boundaries those can
+    // differ (see the module-level "Key analytical facts" note and tests).
+    fixed: count === twoN,
+    lost: count === 0,
     fixationTime,
     absorptionTime,
+    everReachedFixation: fixationTime !== null,
+    everReachedLoss: absorptionTime !== null && fixationTime === null,
   };
 }
 
@@ -410,6 +469,15 @@ const DEFAULT_SEED: number | string = 1;
 export type WrightFisherParams = z.infer<typeof paramsSchema>;
 
 interface WrightFisherDetail {
+  /**
+   * The allele frequency actually simulated (rounded starting count / 2N),
+   * which can differ slightly from the requested `initFreq` for small
+   * populations. `hardyWeinbergAtStart` and `neutralFixationProbability`
+   * below are computed from this value so they stay consistent with what
+   * was actually simulated rather than the raw (possibly unrepresentable)
+   * request.
+   */
+  actualInitFreq: number;
   hardyWeinbergAtStart: { AA: number; Aa: number; aa: number };
   neutralFixationProbability: number;
   numFixed: number;
@@ -457,9 +525,17 @@ function runEngine(params: WrightFisherParams): SimResult<WrightFisherDetail> {
   const numLost = stats.replicates.filter((r) => r.lost).length;
   const numSegregating = replicates - numFixed - numLost;
 
+  // What was actually simulated, after rounding to an integer allele count
+  // (and clamping away from an unrequested boundary) — see
+  // `initialAlleleCount`. Reported nominal figures are derived from this,
+  // not the raw request, so they never describe a scenario that wasn't
+  // actually simulated.
+  const actualInitFreq = initialAlleleCount(p.popSize, p.initFreq) / (2 * p.popSize);
+
   const detail: WrightFisherDetail = {
-    hardyWeinbergAtStart: hardyWeinberg(p.initFreq),
-    neutralFixationProbability: neutralFixationProbability(p.initFreq),
+    actualInitFreq,
+    hardyWeinbergAtStart: hardyWeinberg(actualInitFreq),
+    neutralFixationProbability: neutralFixationProbability(actualInitFreq),
     numFixed,
     numLost,
     numSegregating,

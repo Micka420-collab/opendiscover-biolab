@@ -10,10 +10,13 @@
  *   - incomplete    — heterozygote is an intermediate blend (1:2:1)
  *   - codominant    — heterozygote expresses both alleles jointly (1:2:1)
  *
- * Genes assort independently (Mendel's second law). Two-locus linkage with a
- * recombination frequency is provided separately via `recombinantGametes` for
- * test-cross analysis. Everything is a pure function of the parameters; the only
- * randomness is the offspring sample, drawn from the shared seeded PRNG.
+ * Genes assort independently (Mendel's second law) — `run()` always combines loci via
+ * an independent Cartesian product (equivalent to unlinked loci / recombination
+ * frequency r = 0.5). Two-locus linkage with an arbitrary recombination frequency is
+ * available as a standalone helper, `recombinantGametes`, for test-cross gamete-frequency
+ * analysis; it is not wired into the cross computation performed by `run()`. Everything is
+ * a pure function of the parameters; the only randomness is the offspring sample, drawn
+ * from the shared seeded PRNG.
  *
  * References:
  *   - Mendel G. (1866). Versuche über Pflanzen-Hybriden.
@@ -113,8 +116,12 @@ export function crossLocus(
   const dist = new Map<string, number>();
   for (const gA of parent) {
     for (const gB of other) {
-      const [a, b] = orderPair(gene, gA, gB);
-      const key = `${a}${b}`;
+      const pair = orderPair(gene, gA, gB);
+      // Reversible key: JSON-encode the ordered pair rather than concatenate the two
+      // allele symbols. Concatenation is lossy/ambiguous whenever a symbol is not
+      // exactly one character (e.g. an ABO-style locus with "IA"/"IB"/"i"), since the
+      // two symbols can no longer be recovered by splitting at a fixed character index.
+      const key = JSON.stringify(pair);
       dist.set(key, (dist.get(key) ?? 0) + 0.25);
     }
   }
@@ -167,13 +174,17 @@ function run(rawParams: BreedingParams): SimResult<BreedingDetail> {
   });
 
   // Combine loci by independent assortment (Cartesian product of distributions).
-  let combos: { genotype: Record<string, string>; probability: number }[] = [
+  // Each locus's genotype is kept as an actual [allele, allele] tuple (never
+  // concatenated into a single string) so it can be handed straight to
+  // `genePhenotype` without re-splitting by character position — see `crossLocus`.
+  let combos: { genotype: Record<string, [string, string]>; probability: number }[] = [
     { genotype: {}, probability: 1 },
   ];
   for (const { gene, dist } of perLocus) {
     const next: typeof combos = [];
     for (const combo of combos) {
-      for (const [pair, prob] of dist) {
+      for (const [key, prob] of dist) {
+        const pair = JSON.parse(key) as [string, string];
         next.push({
           genotype: { ...combo.genotype, [gene.symbol]: pair },
           probability: combo.probability * prob,
@@ -183,15 +194,10 @@ function run(rawParams: BreedingParams): SimResult<BreedingDetail> {
     combos = next;
   }
 
-  const genotypeLabel = (g: Record<string, string>) =>
-    p.genes.map((gene) => g[gene.symbol]).join(' ');
-  const phenotypeLabel = (g: Record<string, string>) =>
-    p.genes
-      .map((gene) => {
-        const pair = g[gene.symbol];
-        return genePhenotype(gene, [pair[0], pair[1]] as [string, string]);
-      })
-      .join(', ');
+  const genotypeLabel = (g: Record<string, [string, string]>) =>
+    p.genes.map((gene) => g[gene.symbol].join('')).join(' ');
+  const phenotypeLabel = (g: Record<string, [string, string]>) =>
+    p.genes.map((gene) => genePhenotype(gene, g[gene.symbol])).join(', ');
 
   // Aggregate phenotype distribution.
   const phenoMap = new Map<string, number>();
@@ -224,9 +230,9 @@ function run(rawParams: BreedingParams): SimResult<BreedingDetail> {
   return {
     engine: 'breeding',
     summary: `${genotypeLabel(
-      Object.fromEntries(p.genes.map((g) => [g.symbol, (p.parentA[g.symbol] ?? []).join('')])),
+      Object.fromEntries(p.genes.map((g) => [g.symbol, p.parentA[g.symbol] ?? ['', '']])),
     )} × ${genotypeLabel(
-      Object.fromEntries(p.genes.map((g) => [g.symbol, (p.parentB[g.symbol] ?? []).join('')])),
+      Object.fromEntries(p.genes.map((g) => [g.symbol, p.parentB[g.symbol] ?? ['', '']])),
     )} → ${phenotypeDistribution.length} phenotype(s) in ${phenotypicRatio}; most common "${top.phenotype}" (${(top.probability * 100).toFixed(1)}%).`,
     metrics: [
       {
@@ -260,7 +266,9 @@ export const spec: EngineSpec<BreedingParams, BreedingDetail> = {
     'Cross two diploid parents across independent gene loci and get the full offspring genotype ' +
     'and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete ' +
     'offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance ' +
-    '(1:2:1), and two-locus linkage with recombination for test-cross analysis.',
+    "(1:2:1) under independent assortment (Mendel's second law). A separate standalone helper, " +
+    '`recombinantGametes`, computes two-locus linked-gene gamete frequencies for test-cross ' +
+    'analysis; it is not used by this cross calculator, which always treats loci as unlinked.',
   references: [
     'Mendel G. (1866). Versuche über Pflanzen-Hybriden.',
     'Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage.',

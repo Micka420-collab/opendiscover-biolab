@@ -34,11 +34,19 @@ describe('enzyme table', () => {
   });
 
   it('stores correct recognition sites', () => {
-    // Textbook recognition sequences (NEB / REBASE).
+    // Textbook recognition sequences (NEB / REBASE), all 12 bundled enzymes.
     expect(getEnzyme('EcoRI').site).toBe('GAATTC');
     expect(getEnzyme('BamHI').site).toBe('GGATCC');
+    expect(getEnzyme('HindIII').site).toBe('AAGCTT');
     expect(getEnzyme('NotI').site).toBe('GCGGCCGC');
+    expect(getEnzyme('XhoI').site).toBe('CTCGAG');
     expect(getEnzyme('PstI').site).toBe('CTGCAG');
+    expect(getEnzyme('SmaI').site).toBe('CCCGGG');
+    expect(getEnzyme('EcoRV').site).toBe('GATATC');
+    expect(getEnzyme('KpnI').site).toBe('GGTACC');
+    expect(getEnzyme('SacI').site).toBe('GAGCTC');
+    expect(getEnzyme('SpeI').site).toBe('ACTAGT');
+    expect(getEnzyme('NcoI').site).toBe('CCATGG');
   });
 
   it('every recognition site is palindromic (its own reverse complement)', () => {
@@ -180,6 +188,25 @@ describe('digest — fragment counting', () => {
     expect(right.length).toBe(9); // "AATTCTTTT"
     expect(right.sequence).toBe('AATTCTTTT');
     expect(right.leftEnd.enzyme).toBe('EcoRI');
+  });
+
+  it('circular fragments always satisfy end >= start, even the wrap-around one', () => {
+    // Two EcoRI sites (cutPositions 1 and 11) on a 20 bp circle: the fragment
+    // that starts at cutPosition 11 and runs back around to cutPosition 1
+    // wraps the origin, so its reported `end` (= start + length) exceeds n.
+    const seq = 'GAATTCAAAAGAATTCCCCC';
+    const n = seq.length;
+    const frags = digest(seq, ['EcoRI'], { circular: true });
+    expect(frags).toHaveLength(2);
+    for (const f of frags) {
+      expect(f.end).toBeGreaterThanOrEqual(f.start);
+      expect(f.end - f.start).toBe(f.length);
+    }
+    const wrapFrag = frags.find((f) => f.end > n);
+    expect(wrapFrag).toBeDefined();
+    expect(wrapFrag?.start).toBe(11);
+    expect(wrapFrag?.end).toBe(21); // start(11) + length(10), past the origin at n=20
+    expect(wrapFrag?.sequence).toBe('AATTCCCCCG');
   });
 
   it('finds a site spanning the origin only on a circular template', () => {

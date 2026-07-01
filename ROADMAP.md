@@ -49,6 +49,15 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,
       cross-platform snapshot (summary + metrics @ 6 sig figs) so any science change is caught.
+- [x] **Production build hardening** — `pnpm build` was actually broken (3 GET routes tried to
+      hit a live DB during static prerendering). Fixed with explicit `dynamic = 'force-dynamic'`
+      + Cache-Control headers; new CI `build` job runs with no DB service at all to guard it.
+- [x] **Scientific rigor audit (all 20 pre-existing engines)** — independent per-engine audit vs.
+      each engine's own cited references, found and fixed real bugs with regression tests (not
+      just wording): admet TPSA ether/amine misclassification, bioreactor D=0 chemostat
+      singularity, breeding multi-char allele corruption, compartmental SIR peak formula misuse
+      below R₀·s₀≤1, crispr Cas12a PAM-orientation bug, wright-fisher fixation-latch bug, and
+      more — full detail in each engine's commit / the audit's `changesSummary`. 579 tests total.
 
 ### Later
 - [ ] Multi-agent lab: a PI agent decomposing a grand goal into parallel bench-agent campaigns

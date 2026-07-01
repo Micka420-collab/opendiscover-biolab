@@ -10,7 +10,8 @@
  *   - aromaticity       (F+W+Y mole fraction)
  *   - instability index (Guruprasad DIWV dipeptide weighting; stable < 40)
  *   - aliphatic index   (Ikai 1980, relative volume of A/V/I/L side chains)
- *   - extinction (280nm) (Pace/Gill–von Hippel: 5500·W + 1490·Y + 125·C)
+ *   - extinction (280nm) (Pace/Gill–von Hippel: 5500·W + 1490·Y + 125·⌊C/2⌋,
+ *     the 125 cystine term applying per disulfide-bonded Cys PAIR, not per Cys)
  *   - net charge at a chosen pH
  *
  * The whole engine is a pure deterministic function of the sequence — no RNG,
@@ -106,7 +107,7 @@ const PKA = {
 /** Molar extinction coefficients at 280 nm (M^-1 cm^-1) per chromophore. */
 const EXT_W = 5500;
 const EXT_Y = 1490;
-const EXT_C = 125; // per cysteine (contribution of a cystine bridge, split)
+const EXT_C = 125; // per cystine (a disulfide-bonded PAIR of Cys residues), not per Cys
 
 /**
  * Guruprasad dipeptide instability weight matrix (DIWV). Row = first residue,
@@ -688,11 +689,16 @@ export function aliphaticIndex(sequence: string): number {
 
 /**
  * Molar extinction coefficient at 280 nm (M^-1 cm^-1), assuming all cysteines
- * form cystines: ε = 5500·nW + 1490·nY + 125·nC.
+ * pair up into cystines (disulfide bonds): ε = 5500·nW + 1490·nY + 125·nCystine,
+ * where nCystine = floor(nC / 2) — the 125 term is per disulfide-bonded PAIR
+ * of Cys residues, not per individual Cys (Pace et al. 1995; matches ProtParam
+ * / Biopython's `molar_extinction_coefficient`, which also floor-divides Cys
+ * count by 2). A lone, unpaired Cys therefore contributes 0.
  */
 export function extinctionCoefficient280(sequence: string): number {
   const counts = aaComposition(sequence);
-  return EXT_W * (counts.W ?? 0) + EXT_Y * (counts.Y ?? 0) + EXT_C * (counts.C ?? 0);
+  const nCystine = Math.floor((counts.C ?? 0) / 2);
+  return EXT_W * (counts.W ?? 0) + EXT_Y * (counts.Y ?? 0) + EXT_C * nCystine;
 }
 
 // ---------------------------------------------------------------------------
@@ -719,7 +725,10 @@ export interface PropertiesDetail {
   cleanSequence: string;
   aaComposition: Record<string, number>;
   charged: {
-    positive: number; // Arg + Lys + His residues
+    positive: number; // Arg + Lys residues (ProtParam convention). His is
+    // excluded here: at physiological pH its imidazole (pKa ~6.5) is mostly
+    // neutral, and it is already modelled as a fractionally-titrating group
+    // in netChargeAtPH/theoreticalPI rather than a binary "positive" residue.
     negative: number; // Asp + Glu residues
     netChargeAtPH7: number;
   };
@@ -743,7 +752,9 @@ function run(params: PropertiesParams): SimResult<PropertiesDetail> {
   const ai = aliphaticIndex(seq);
   const netAt7 = netChargeAtPH(seq, 7);
 
-  const positive = (counts.R ?? 0) + (counts.K ?? 0) + (counts.H ?? 0);
+  // ProtParam reports "positively charged residues" as Arg + Lys only; His is
+  // deliberately excluded (see PropertiesDetail.charged doc above).
+  const positive = (counts.R ?? 0) + (counts.K ?? 0);
   const negative = (counts.D ?? 0) + (counts.E ?? 0);
   const stable = ii < 40;
 

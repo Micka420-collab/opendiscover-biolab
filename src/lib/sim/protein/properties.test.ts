@@ -86,10 +86,26 @@ describe('Molecular weight (average masses + water)', () => {
 });
 
 describe('Extinction coefficient at 280 nm', () => {
-  it('matches 5500*W + 1490*Y + 125*C exactly', () => {
-    // WWYYC -> 2*5500 + 2*1490 + 1*125 = 14105
-    expect(extinctionCoefficient280('WWYYC')).toBe(2 * 5500 + 2 * 1490 + 125);
-    expect(extinctionCoefficient280('WYC')).toBe(5500 + 1490 + 125);
+  it('matches 5500*W + 1490*Y + 125*floor(C/2) (125 is per CYSTINE PAIR, not per Cys)', () => {
+    // A lone, unpaired Cys cannot form a disulfide bond, so it contributes 0 -
+    // only complete Cys/Cys pairs (cystines) add the 125 term (Pace et al.
+    // 1995; ProtParam / Biopython's molar_extinction_coefficient floor-divides
+    // the Cys count by 2 the same way).
+    expect(extinctionCoefficient280('WWYY')).toBe(2 * 5500 + 2 * 1490);
+    expect(extinctionCoefficient280('WYC')).toBe(5500 + 1490); // single unpaired Cys -> +0
+    expect(extinctionCoefficient280('C')).toBe(0);
+    expect(extinctionCoefficient280('CC')).toBe(125); // one full cystine pair
+    expect(extinctionCoefficient280('CCC')).toBe(125); // 3 Cys -> 1 pair + 1 unpaired leftover
+    expect(extinctionCoefficient280('CCCC')).toBe(2 * 125); // two cystine pairs
+  });
+
+  it('matches the textbook hen egg-white lysozyme reference value (37,970 M^-1cm^-1)', () => {
+    // Lysozyme has 6 Trp, 3 Tyr and 8 Cys (4 disulfide bonds). Its published
+    // ProtParam/cystine-assumption extinction coefficient is
+    // 6*5500 + 3*1490 + 4*125 = 37,970 M^-1cm^-1 (Pace et al. 1995, Table 3).
+    // Composition-only sequence (order doesn't affect this function's math).
+    const lysozymeLikeComposition = 'W'.repeat(6) + 'Y'.repeat(3) + 'C'.repeat(8);
+    expect(extinctionCoefficient280(lysozymeLikeComposition)).toBe(37970);
   });
 
   it('is zero for a peptide with no chromophores', () => {
@@ -157,6 +173,15 @@ describe('spec.run', () => {
     expect(r2.metrics).toEqual(r1.metrics);
     expect(r2.detail).toEqual(r1.detail);
     expect(r2.series).toEqual(r1.series);
+  });
+
+  it('counts charged residues per the ProtParam convention (positive = Arg+Lys only, His excluded)', () => {
+    // R=1, K=1, H=1, D=1, E=1 -> positive should be 2 (R+K), not 3; His is
+    // mostly neutral at physiological pH and is already handled fractionally
+    // by netChargeAtPH/theoreticalPI, not as a binary "positive" residue here.
+    const r = spec.run({ sequence: 'RKHDE' });
+    expect(r.detail?.charged.positive).toBe(2);
+    expect(r.detail?.charged.negative).toBe(2);
   });
 
   it('validates the example params and rejects non-standard letters', () => {

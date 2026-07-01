@@ -183,6 +183,40 @@ describe('Bliss independence', () => {
     expect(a.faB).toBeCloseTo(0.5, 12);
     expect(a.blissExpected).toBeCloseTo(0.75, 12);
     expect(a.blissExcess).toBeCloseTo(0, 12);
+    // Regression: the default (no faObserved) path must NOT report a Loewe CI
+    // derived from the Bliss prediction (see the dedicated model-mixing test
+    // below) — it is flagged as not-computed rather than silently wrong.
+    expect(a.observedSupplied).toBe(false);
+    expect(Number.isNaN(a.loeweCI)).toBe(true);
+  });
+
+  it('does not conflate Bliss and Loewe: omitting faObserved must NOT yield a Loewe CI computed from the Bliss prediction', () => {
+    // Regression test for a real bug: a "sham combination" of a drug with
+    // itself (two doses of the SAME drug) is additive by construction — the
+    // true combined effect is just the Hill response at the summed dose, so
+    // the true Loewe CI is exactly 1 (Loewe 1953; the sham-combination
+    // self-additivity check is a standard sanity test, e.g. Chou 2006,
+    // Pharmacol. Rev. 58:621-681). Bliss independence is a DIFFERENT null
+    // model (probability-based, not dose-based) and generally disagrees with
+    // Loewe additivity except in special cases (Berenbaum, "What is synergy?",
+    // Pharmacol. Rev. 1989, 41:93-141). Previously, `analyzeCombination`
+    // defaulted the Loewe isoeffect target to the Bliss-predicted fraction
+    // when `faObserved` was omitted, which computed loeweCI = 5/9 ~= 0.5556
+    // here -- reporting spurious SYNERGY for a sham combination that must be
+    // perfectly additive. The fixed behavior must not do this: loeweCI is NaN
+    // and observedSupplied is false unless a real observed effect is given.
+    const drug: HillParams = { e0: 0, emax: 1, ec50: 1, hill: 1 };
+    const a = analyzeCombination(drug, drug, 1, 4); // faObserved intentionally omitted
+    expect(a.blissExpected).toBeCloseTo(0.9, 10); // fa=0.5, fb=0.8 -> 0.5+0.8-0.4=0.9
+    expect(a.observedSupplied).toBe(false);
+    expect(Number.isNaN(a.loeweCI)).toBe(true);
+
+    // Supplying the TRUE combined effect (not the Bliss guess) for the same
+    // sham combination must recover CI = 1 exactly.
+    const trueCombined = hillFraction(1 + 4, drug.ec50, drug.hill); // = 5/6
+    const b = analyzeCombination(drug, drug, 1, 4, trueCombined);
+    expect(b.observedSupplied).toBe(true);
+    expect(b.loeweCI).toBeCloseTo(1, 10);
   });
 });
 
@@ -221,6 +255,24 @@ describe('Loewe additivity / combination index', () => {
     const DB = doseForFraction(target, drugB.ec50, drugB.hill);
     const a = analyzeCombination(drugA, drugB, DA / 4, DB / 4, target); // only quarter-doses
     expect(a.loeweCI).toBeLessThan(1);
+  });
+
+  it('returns NaN rather than an unguarded Infinity/NaN division when an isoeffective dose is zero', () => {
+    // At the zero-effect boundary (fa <= 0), doseForFraction returns 0, so the
+    // isoeffective single-agent dose DA/DB is 0 and dA/DA (or DB/DB) is an
+    // undefined ratio. loeweCombinationIndex must guard this explicitly rather
+    // than silently emit Infinity (x/0) or NaN (0/0) into the metric.
+    expect(Number.isNaN(loeweCombinationIndex(1, 4, 0, 30))).toBe(true); // x/0
+    expect(Number.isNaN(loeweCombinationIndex(0, 4, 0, 30))).toBe(true); // 0/0 case for A
+    expect(Number.isNaN(loeweCombinationIndex(1, 0, 3, 0))).toBe(true); // 0/0 case for B
+
+    // Reachable through analyzeCombination when faObserved is explicitly 0.
+    const drugA: HillParams = { e0: 0, emax: 1, ec50: 1, hill: 1 };
+    const drugB: HillParams = { e0: 0, emax: 1, ec50: 10, hill: 1 };
+    const a = analyzeCombination(drugA, drugB, 1, 4, 0);
+    expect(a.isoDoseA).toBe(0);
+    expect(a.isoDoseB).toBe(0);
+    expect(Number.isNaN(a.loeweCI)).toBe(true);
   });
 });
 

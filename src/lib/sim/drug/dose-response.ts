@@ -45,7 +45,12 @@
  *   Loewe additivity / combination index: if doses dA,dB in combination produce
  *   an effect that the single agents reach alone at doses DA,DB, then
  *   CI = dA/DA + dB/DB.  CI = 1 additive (on the isobologram), CI<1 synergy,
- *   CI>1 antagonism.
+ *   CI>1 antagonism. This requires an actually observed/measured combined
+ *   effect to locate DA,DB; Bliss independence and Loewe additivity are
+ *   different null models that generally disagree (Berenbaum 1989), so a
+ *   Bliss-predicted fraction is NOT a valid stand-in isoeffect target for the
+ *   Loewe CI (see `analyzeCombination`, which returns `loeweCI: NaN` rather
+ *   than silently mixing the two models when no observed effect is supplied).
  *
  * Assumptions: a single homogeneous receptor population / mechanism, effect
  * monotone in concentration, equilibrium (no time dependence), and for the
@@ -380,8 +385,14 @@ export function blissExcess(faObserved: number, fa: number, fb: number): number 
  * Loewe combination index CI = dA/DA + dB/DB, where dA,dB are the doses used in
  * combination and DA,DB are the single-agent doses producing the same effect.
  * CI = 1 additive, CI < 1 synergy, CI > 1 antagonism.
+ *
+ * DA and DB must be strictly positive, finite isoeffective doses for the ratio
+ * to be meaningful; at the zero-effect boundary (fa -> 0) the isoeffective
+ * dose is 0 and the ratio is undefined (0/0 or x/0). Rather than silently
+ * emitting Infinity/NaN into downstream metrics, this returns NaN explicitly.
  */
 export function loeweCombinationIndex(dA: number, dB: number, DA: number, DB: number): number {
+  if (!(DA > 0) || !(DB > 0)) return Number.NaN;
   return dA / DA + dB / DB;
 }
 
@@ -400,8 +411,20 @@ export interface ComboAnalysis {
   isoDoseA: number;
   /** Single-agent dose of B producing faObserved. */
   isoDoseB: number;
-  /** Loewe combination index at the observed effect. */
+  /**
+   * Loewe combination index at the observed effect. Only meaningful when an
+   * actually observed/measured combined effect was supplied (`faObserved`
+   * argument); it is `NaN` when `observedSupplied` is `false` (see below) — a
+   * Bliss-independence prediction is not a valid Loewe isoeffect target.
+   */
   loeweCI: number;
+  /**
+   * Whether `faObserved` was actually supplied by the caller. When `false`,
+   * `faObserved` was defaulted to the Bliss-independence prediction purely so
+   * `blissExcess` reads as 0; `loeweCI` is intentionally left `NaN` in that
+   * case (see `analyzeCombination`).
+   */
+  observedSupplied: boolean;
 }
 
 /**
@@ -417,10 +440,26 @@ export function doseForFraction(fa: number, ec50: number, hill: number): number 
 
 /**
  * Full two-drug combination analysis at a pair of doses. Fractions affected are
- * measured on each drug's own effect scale (0 = E0, 1 = Emax). If an observed
- * combined fraction is supplied it is used for the Loewe isobologram and the
- * Bliss excess; otherwise the drugs are assumed non-interacting and the Bliss
- * prediction is used (giving CI as computed on the additive surface).
+ * measured on each drug's own effect scale (0 = E0, 1 = Emax).
+ *
+ * If an observed combined fraction (`faObserved`) is supplied, it is used for
+ * both the Bliss excess and the Loewe isobologram/combination index.
+ *
+ * If it is omitted, the Bliss-independence prediction is used only to fill in
+ * `faObserved` for reporting purposes (so `blissExcess` trivially reads 0) —
+ * `loeweCI` is deliberately NOT computed from it (it is returned as `NaN`, and
+ * `observedSupplied` is `false`). Bliss independence (a probability-based null
+ * model) and Loewe additivity (a dose-based null model) are different models
+ * that generally disagree except in special cases (Berenbaum, "What is
+ * synergy?", Pharmacol. Rev. 1989, 41:93-141); feeding the Bliss prediction
+ * into the Loewe CI formula does NOT yield CI = 1 for non-interacting drugs in
+ * general. For example, two doses of the *same* drug (a "sham combination",
+ * which is additive by construction — see Chou 2006) at C=1 and C=4 with
+ * ec50=1, hill=1 gives a true combined effect of 5/6 (CI = 1 exactly), while
+ * the Bliss prediction is 0.9, which would compute as CI = 0.5556 — a false
+ * synergy signal that is purely a model-mixing artifact, not a real
+ * pharmacological one. A real Loewe CI requires an actually observed/measured
+ * combined effect.
  */
 export function analyzeCombination(
   drugA: HillParams,
@@ -432,6 +471,7 @@ export function analyzeCombination(
   const faA = hillFraction(doseA, drugA.ec50, drugA.hill);
   const faB = hillFraction(doseB, drugB.ec50, drugB.hill);
   const blissExpected = blissIndependence(faA, faB);
+  const observedSupplied = faObserved !== undefined;
   const observed = faObserved ?? blissExpected;
   const isoDoseA = doseForFraction(observed, drugA.ec50, drugA.hill);
   const isoDoseB = doseForFraction(observed, drugB.ec50, drugB.hill);
@@ -443,7 +483,10 @@ export function analyzeCombination(
     blissExcess: observed - blissExpected,
     isoDoseA,
     isoDoseB,
-    loeweCI: loeweCombinationIndex(doseA, doseB, isoDoseA, isoDoseB),
+    loeweCI: observedSupplied
+      ? loeweCombinationIndex(doseA, doseB, isoDoseA, isoDoseB)
+      : Number.NaN,
+    observedSupplied,
   };
 }
 
@@ -564,7 +607,9 @@ function comboMetrics(analysis: ComboAnalysis): Metric[] {
       key: 'loeweCI',
       label: 'Loewe combination index',
       value: analysis.loeweCI,
-      note: 'CI<1 synergy, ~1 additive, CI>1 antagonism',
+      note: analysis.observedSupplied
+        ? 'CI<1 synergy, ~1 additive, CI>1 antagonism'
+        : 'undefined (NaN): no observed combined effect (faObserved) was supplied, so no Loewe isoeffect target is available — the Bliss prediction is NOT a valid substitute (Bliss and Loewe are different null models)',
     },
   ];
 }

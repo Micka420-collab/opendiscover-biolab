@@ -103,6 +103,49 @@ describe('SMILES parser — atom & heteroatom counting', () => {
   });
 });
 
+describe('TPSA (Ertl fragment) estimation — non-aromatic ethers, amines and esters', () => {
+  // Regression tests for a bug where "sum of incident bond orders >= 2" was
+  // used as a stand-in for "has a double bond": an ether O (two single bonds,
+  // 1+1=2) or a tertiary amine N (three single bonds) satisfied that test just
+  // as much as a real C=O/C=N double bond, so ethers/esters/tertiary amines
+  // were silently misclassified as carbonyls/imines. estimateTPSA now checks
+  // the actual per-bond order instead.
+
+  it('diethyl ether CCOCC has a single ether-oxygen fragment -> TPSA 9.23', () => {
+    // Ertl, Rohde & Selzer (2000) J. Med. Chem. 43:3714-3717, Table 1: "-O-" = 9.23 A^2.
+    expect(smilesToDescriptors('CCOCC').tpsa).toBeCloseTo(9.23, 2);
+  });
+
+  it('anisole (aromatic methyl ether) COc1ccccc1 -> TPSA 9.23 (ether O, not carbonyl)', () => {
+    expect(smilesToDescriptors('COc1ccccc1').tpsa).toBeCloseTo(9.23, 2);
+  });
+
+  it('triethylamine CCN(CC)CC (tertiary amine, no H, no double bond) -> TPSA 3.24', () => {
+    // Ertl et al. (2000) Table 1: tertiary aliphatic amine "N(-*)(-*)-*" = 3.24 A^2.
+    expect(smilesToDescriptors('CCN(CC)CC').tpsa).toBeCloseTo(3.24, 2);
+  });
+
+  it('aspirin CC(=O)Oc1ccccc1C(=O)O -> TPSA 63.60 (PubChem CID 2244 reference value)', () => {
+    // https://pubchem.ncbi.nlm.nih.gov/compound/2244 — Topological Polar Surface Area: 63.6 A^2.
+    expect(smilesToDescriptors('CC(=O)Oc1ccccc1C(=O)O').tpsa).toBeCloseTo(63.6, 1);
+  });
+});
+
+describe('Rotatable-bond counting — amide C(=O)-N exclusion (Veber et al. 2002)', () => {
+  // Veber, Johnson, Cheng, Smith, Ward & Kopple (2002) J. Med. Chem. 45:2615-2623
+  // explicitly excludes amide C-N bonds from the rotatable-bond count (high
+  // rotational-energy barrier / partial double-bond character), in addition to
+  // ring bonds and bonds to terminal atoms.
+
+  it('N-methylacetamide CC(=O)NC has no rotatable bonds (only terminal/amide bonds)', () => {
+    expect(smilesToDescriptors('CC(=O)NC').rotatableBonds).toBe(0);
+  });
+
+  it('acetanilide CC(=O)Nc1ccccc1 has exactly 1 rotatable bond (N-phenyl, not the amide C-N)', () => {
+    expect(smilesToDescriptors('CC(=O)Nc1ccccc1').rotatableBonds).toBe(1);
+  });
+});
+
 describe("Lipinski's Rule of Five", () => {
   // Aspirin: MW ~180, logP ~1.2, HBD 1, HBA 4 -> passes cleanly.
   const aspirin = { mw: 180.16, logP: 1.2, hbd: 1, hba: 4 };
@@ -241,6 +284,9 @@ describe('spec.run', () => {
     expect(hbd?.value).toBe(1);
     const hba = r.metrics.find((m) => m.key === 'hba');
     expect(hba?.value).toBe(4);
+    // PubChem CID 2244 (aspirin) reference TPSA: 63.6 A^2.
+    const tpsa = r.metrics.find((m) => m.key === 'tpsa');
+    expect(tpsa?.value).toBeCloseTo(63.6, 1);
     expect(r.detail?.rulePass.lipinski).toBe(true);
   });
 

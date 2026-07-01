@@ -9,12 +9,14 @@ import {
   frequencyAfterMutation,
   frequencyAfterSelection,
   hardyWeinberg,
+  initialAlleleCount,
   meanFitness,
   moranFixationProbability,
   neutralFixationProbability,
   paramsSchema,
   runWrightFisher,
   simulateMoran,
+  simulateReplicate,
   spec,
 } from './wright-fisher';
 
@@ -115,6 +117,128 @@ describe('neutral Wright-Fisher drift (analytical checks)', () => {
     });
     expect(Math.abs(stats.fixationProbability - 0.5)).toBeLessThan(0.06);
     expect(Math.abs(stats.lossProbability - 0.5)).toBeLessThan(0.06);
+  });
+});
+
+describe('fixed/lost classification with permeable boundaries (mutation)', () => {
+  // Regression test for a bug where fixationTime/absorptionTime latched
+  // permanently the first time a replicate's count ever touched a boundary
+  // (0 or 2N) and `fixed`/`lost` were derived from that latch. With mutation
+  // present the boundaries are only *permeable* (documented at the top of
+  // simulateReplicate's docstring), so a replicate can touch a boundary and
+  // later drift back to an interior, still-segregating frequency. `fixed`
+  // and `lost` must reflect the actual final state, not the historical latch.
+  it('a replicate that touches loss/fixation then drifts back to an interior frequency is reported as segregating, not fixed/lost', () => {
+    const mutation = { forward: 0.2, back: 0.2 };
+    // This exact popSize/initFreq/generations/seed combination is known to
+    // produce (with the pre-fix latch logic) a replicate whose trajectory
+    // touches count=0 at generation 13 and later mutates back up to a
+    // final frequency of 0.55 — clearly segregating, yet previously
+    // reported as lost=true.
+    const rng = createRng('neutral-drift');
+    let sawBoundaryTouchWithInteriorFinal = false;
+    for (let r = 0; r < 200; r++) {
+      const rep = simulateReplicate(10, 0.5, 60, NEUTRAL_FITNESS, mutation, rng);
+      const interiorFinal = rep.finalFreq > 0 && rep.finalFreq < 1;
+      // Invariant: fixed/lost must always agree with the actual final state.
+      expect(rep.fixed).toBe(rep.finalFreq === 1);
+      expect(rep.lost).toBe(rep.finalFreq === 0);
+      // A replicate cannot be simultaneously fixed and lost, nor both
+      // fixed/lost and segregating.
+      expect(rep.fixed && rep.lost).toBe(false);
+      if ((rep.everReachedFixation || rep.everReachedLoss) && interiorFinal) {
+        sawBoundaryTouchWithInteriorFinal = true;
+        // Touched a boundary at some point (so the old latch-based logic
+        // would have called this fixed/lost)...
+        expect(rep.everReachedFixation || rep.everReachedLoss).toBe(true);
+        // ...but the corrected classification must NOT call it lost/fixed,
+        // since it drifted back to an interior, segregating frequency.
+        expect(rep.fixed).toBe(false);
+        expect(rep.lost).toBe(false);
+      }
+    }
+    // Sanity check: this seed/config combination must actually exercise the
+    // boundary-touch-then-drift-back scenario, otherwise the assertions
+    // above would trivially pass without ever having caught the bug.
+    expect(sawBoundaryTouchWithInteriorFinal).toBe(true);
+  });
+
+  it('numFixed + numLost + numSegregating reflects actual final trajectory states under mutation', () => {
+    const stats = runWrightFisher({
+      popSize: 10,
+      initFreq: 0.5,
+      generations: 60,
+      replicates: 200,
+      fitness: NEUTRAL_FITNESS,
+      mutation: { forward: 0.2, back: 0.2 },
+      rng: createRng('mutation-classification'),
+    });
+    const numFixed = stats.replicates.filter((r) => r.fixed).length;
+    const numLost = stats.replicates.filter((r) => r.lost).length;
+    const numSegregating = stats.replicates.length - numFixed - numLost;
+    for (const rep of stats.replicates) {
+      expect(rep.fixed).toBe(rep.finalFreq === 1);
+      expect(rep.lost).toBe(rep.finalFreq === 0);
+    }
+    // With substantial two-way mutation (0.2 each direction) on a tiny
+    // population, the vast majority of replicates should remain segregating
+    // at generation 60 rather than sitting at an exact boundary.
+    expect(numSegregating).toBeGreaterThan(0);
+    expect(numFixed + numLost + numSegregating).toBe(stats.replicates.length);
+  });
+});
+
+describe('initialAlleleCount rounding of small/unrepresentable frequencies', () => {
+  it('rounds to the nearest achievable count for representable frequencies', () => {
+    // popSize=20 -> 2N=40, so 1/40 = 0.025 steps; 0.3 is exactly representable.
+    expect(initialAlleleCount(20, 0.3)).toBe(12);
+    expect(initialAlleleCount(50, 0.5)).toBe(50);
+  });
+
+  it('does not silently collapse a nonzero rare-allele frequency to count 0', () => {
+    // popSize=5 -> 2N=10. Naive Math.round(0.04 * 10) = Math.round(0.4) = 0,
+    // which would guarantee loss for every replicate before any drift, even
+    // though the requested frequency (0.04) is nonzero. At least 1 copy of A
+    // must be simulated so the scenario stays qualitatively "segregating",
+    // matching what was requested.
+    const count = initialAlleleCount(5, 0.04);
+    expect(count).toBe(1);
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it('does not silently collapse a sub-1 rare-allele frequency to count 2N', () => {
+    const count = initialAlleleCount(5, 0.96);
+    expect(count).toBe(9); // 2N - 1, not 2N=10.
+    expect(count).toBeLessThan(2 * 5);
+  });
+
+  it('true boundary requests (p0=0 or p0=1) are respected exactly', () => {
+    expect(initialAlleleCount(5, 0)).toBe(0);
+    expect(initialAlleleCount(5, 1)).toBe(10);
+  });
+
+  it('reported hardyWeinbergAtStart/neutralFixationProbability stay consistent with what was actually simulated', () => {
+    // popSize=5, initFreq=0.04: the naive rounded count would be 0 (guaranteed
+    // loss for every replicate), but the engine must report Hardy-Weinberg and
+    // neutral-fixation-probability figures for the frequency it *actually*
+    // simulated (1/10 = 0.1), not the raw, unrepresentable 0.04 request.
+    const result = spec.run({
+      popSize: 5,
+      initFreq: 0.04,
+      generations: 5,
+      replicates: 10,
+      seed: 'small-pop-rounding',
+    });
+    const detail = result.detail as {
+      actualInitFreq: number;
+      hardyWeinbergAtStart: { AA: number; Aa: number; aa: number };
+      neutralFixationProbability: number;
+    };
+    expect(detail.actualInitFreq).toBeCloseTo(0.1, 12);
+    expect(detail.neutralFixationProbability).toBeCloseTo(0.1, 12);
+    expect(detail.hardyWeinbergAtStart.AA).toBeCloseTo(0.01, 12);
+    expect(detail.hardyWeinbergAtStart.Aa).toBeCloseTo(0.18, 12);
+    expect(detail.hardyWeinbergAtStart.aa).toBeCloseTo(0.81, 12);
   });
 });
 
