@@ -49,6 +49,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `fba` | Flux balance analysis via a built-in linear-programming solver |
 | 🌱 Population genetics | `wright-fisher` | Genetic drift, selection, mutation, fixation probability |
 | | `phylogenetics` | Distance models (JC/K2P), Neighbor-Joining & UPGMA trees, Newick output |
+| | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes, linkage |
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |

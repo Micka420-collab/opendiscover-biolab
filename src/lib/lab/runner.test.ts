@@ -3,11 +3,11 @@ import { getEngine, listEngines, runEngine } from '../sim';
 import { metricValue, replicateExperiment, runExperiment } from './runner';
 
 describe('registry', () => {
-  it('exposes all 18 engines with unique slugs', () => {
+  it('exposes the full catalog with unique slugs', () => {
     const engines = listEngines();
-    expect(engines.length).toBe(18);
+    expect(engines.length).toBeGreaterThanOrEqual(19);
     const slugs = new Set(engines.map((e) => e.slug));
-    expect(slugs.size).toBe(18);
+    expect(slugs.size).toBe(engines.length); // every slug is unique
   });
 
   it('every engine runs its own documented example', () => {

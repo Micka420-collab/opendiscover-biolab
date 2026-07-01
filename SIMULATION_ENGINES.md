@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **18 deterministic simulation engines** across
+The OpenDiscover BioLab ships **19 deterministic simulation engines** across
 8 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -20,7 +20,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`fba`](#fba)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
 - **💊 Drug discovery** — [`admet`](#admet) · [`dose-response`](#dose-response)
@@ -535,6 +535,91 @@ Reconstructs a phylogenetic tree from aligned nucleotide sequences. Computes pai
 ```
 
 _Run it: `POST /api/lab/run { "engine": "phylogenetics", "params": … }` or interactively at `/lab/phylogenetics`._
+
+---
+
+### `breeding` — Mendelian Breeding & Genetic Crossing
+
+Cross two diploid parents across independent gene loci and get the full offspring genotype and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance (1:2:1), and two-locus linkage with recombination for test-cross analysis.
+
+**References**
+- Mendel G. (1866). Versuche über Pflanzen-Hybriden.
+- Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `genes` | json | **required** |  |  |
+| `parentA` | json | **required** |  |  |
+| `parentB` | json | **required** |  |  |
+| `offspringCount` | integer | `12` | ≥ 0, ≤ 1000 |  |
+| `seed` | json | `breeding` |  |  |
+
+**Example**
+
+```json
+{
+  "genes": [
+    {
+      "symbol": "A",
+      "name": "Seed shape",
+      "alleles": [
+        {
+          "symbol": "A",
+          "label": "Round"
+        },
+        {
+          "symbol": "a",
+          "label": "Wrinkled"
+        }
+      ],
+      "mode": "complete",
+      "dominant": "A"
+    },
+    {
+      "symbol": "B",
+      "name": "Seed colour",
+      "alleles": [
+        {
+          "symbol": "B",
+          "label": "Yellow"
+        },
+        {
+          "symbol": "b",
+          "label": "Green"
+        }
+      ],
+      "mode": "complete",
+      "dominant": "B"
+    }
+  ],
+  "parentA": {
+    "A": [
+      "A",
+      "a"
+    ],
+    "B": [
+      "B",
+      "b"
+    ]
+  },
+  "parentB": {
+    "A": [
+      "A",
+      "a"
+    ],
+    "B": [
+      "B",
+      "b"
+    ]
+  },
+  "offspringCount": 16,
+  "seed": "peas"
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "breeding", "params": … }` or interactively at `/lab/breeding`._
 
 
 ## 🏭 Bioprocess

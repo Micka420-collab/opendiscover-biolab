@@ -4,10 +4,10 @@ import { labDescribeEngine, labListEngines, labRunEngine, registerLabTools } fro
 const body = (r: { content: { text: string }[] }) => JSON.parse(r.content[0].text);
 
 describe('mcp lab tools', () => {
-  it('list_engines returns all 18 engines', () => {
+  it('list_engines returns the full catalog', () => {
     const r = labListEngines();
     expect(r.isError).toBeUndefined();
-    expect(body(r).count).toBe(18);
+    expect(body(r).count).toBeGreaterThanOrEqual(19);
   });
 
   it('list_engines filters by domain', () => {
