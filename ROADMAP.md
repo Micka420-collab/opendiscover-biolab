@@ -14,8 +14,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 - [x] Green build: 437 tests, tsc clean, biome clean; CI `engines` job
 
 ### Next (priority order)
-- [ ] **Lab API routes** — `/api/lab/engines` (catalog), `/api/lab/run` (run engine),
-      `/api/lab/campaigns` (launch + poll autonomous campaign)
+- [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
+      (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
+      Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).
 - [ ] **Lab workbench UI** — `/lab` catalog, `/lab/[engine]` interactive playground
       (param form from Zod schema + Vega-Lite result charts), `/lab/campaigns` live viewer
 - [ ] **SIMULATION_ENGINES.md** — full catalog: each engine's model, params, references,
