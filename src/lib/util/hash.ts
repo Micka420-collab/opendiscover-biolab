@@ -17,13 +17,9 @@ export async function canonicalHash(value: unknown): Promise<string> {
 
 function canonicalize(v: unknown): string {
   if (v === null || typeof v !== 'object') return JSON.stringify(v);
-  if (Array.isArray(v)) return '[' + v.map(canonicalize).join(',') + ']';
+  if (Array.isArray(v)) return `[${v.map(canonicalize).join(',')}]`;
   const keys = Object.keys(v as Record<string, unknown>).sort();
-  return (
-    '{' +
-    keys
-      .map((k) => JSON.stringify(k) + ':' + canonicalize((v as Record<string, unknown>)[k]))
-      .join(',') +
-    '}'
-  );
+  return `{${keys
+    .map((k) => `${JSON.stringify(k)}:${canonicalize((v as Record<string, unknown>)[k])}`)
+    .join(',')}}`;
 }

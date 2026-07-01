@@ -134,7 +134,11 @@ const PROTOCOLS = [
 
 async function main() {
   const handle = 'demo-contributor';
-  const [existing] = await db.select().from(schema.users).where(eq(schema.users.handle, handle)).limit(1);
+  const [existing] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.handle, handle))
+    .limit(1);
   if (!existing) {
     await db
       .insert(schema.users)
@@ -151,7 +155,7 @@ async function main() {
         target: schema.protocols.contentHash,
         set: { ...p, updatedAt: new Date() },
       });
-    console.log('seeded', p.slug, 'v' + p.version);
+    console.log('seeded', p.slug, `v${p.version}`);
   }
   process.exit(0);
 }

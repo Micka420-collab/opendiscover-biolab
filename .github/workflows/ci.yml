@@ -6,6 +6,22 @@ on:
     branches: [main]
 
 jobs:
+  # Fast path: the deterministic simulation engines need no database and no
+  # secrets. This job proves the whole sim/ + lab/ layer stays green on its own.
+  engines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:sim
+
   ci:
     runs-on: ubuntu-latest
     services:

@@ -7,8 +7,8 @@
  * Falls back to in-process EventEmitter in dev (no Redis required).
  */
 
-import { Redis } from '@upstash/redis';
 import { EventEmitter } from 'node:events';
+import { Redis } from '@upstash/redis';
 
 export interface DiscoveryEvent {
   type: 'promoted' | 'reviewed' | 'confirmed' | 'refuted';

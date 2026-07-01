@@ -6,7 +6,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noUncheckedIndexedAccess": true,
+    // Deliberately off: the simulation library (src/lib/sim) is numerics-heavy
+    // and indexes provably-non-empty arrays on nearly every line. This flag adds
+    // hundreds of false positives with negligible safety upside there, and the
+    // usual `?? 0` workaround would mask genuinely-missing values. Full `strict`
+    // (null checks, no implicit any, etc.) stays on.
+    "noUncheckedIndexedAccess": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",

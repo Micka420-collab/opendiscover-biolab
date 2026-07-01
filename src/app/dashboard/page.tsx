@@ -1,11 +1,11 @@
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { headers } from 'next/headers';
-import { eq, desc, count, avg } from 'drizzle-orm';
-import { getAppSession, isGuestSession } from '@/lib/auth';
-import { db, schema } from '@/lib/db';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getAppSession, isGuestSession } from '@/lib/auth';
+import { db, schema } from '@/lib/db';
+import { avg, count, desc, eq } from 'drizzle-orm';
+import { headers } from 'next/headers';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,9 +32,19 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  let submissions = [] as Awaited<ReturnType<typeof db.select>>;
-  let stats: { total?: number; avgNovelty?: number } | undefined;
-  let discoveryRows: Array<{ id: string; title: string; noveltyScore: number; status: string }> = [];
+  type SubmissionRow = {
+    id: string;
+    sliceKey: string;
+    outputHash: string;
+    noveltyScore: number | null;
+    status: (typeof schema.submissions.$inferSelect)['status'];
+    createdAt: Date;
+    protocolTitle: string;
+  };
+  let submissions: SubmissionRow[] = [];
+  let stats: { total: number; avgNovelty: string | null } | undefined;
+  let discoveryRows: Array<{ id: string; title: string; noveltyScore: number; status: string }> =
+    [];
 
   try {
     submissions = await db
@@ -82,8 +92,8 @@ export default async function DashboardPage() {
     const err = error as { code?: string };
     if (err?.code === 'ECONNREFUSED') {
       console.warn('[dashboard] Database unavailable — using empty fallbacks for UI');
-      submissions = [] as any;
-      stats = { total: 0, avgNovelty: undefined };
+      submissions = [];
+      stats = { total: 0, avgNovelty: null };
       discoveryRows = [];
     } else {
       throw error;
@@ -95,10 +105,7 @@ export default async function DashboardPage() {
     reputation?: number;
   };
   const handle =
-    user.handle ??
-    user.name ??
-    ('email' in user ? user.email : undefined) ??
-    'contributor';
+    user.handle ?? user.name ?? ('email' in user ? user.email : undefined) ?? 'contributor';
   const reputation = typeof user.reputation === 'number' ? user.reputation : 1.0;
   const guest = isGuestSession(session);
 
@@ -110,9 +117,7 @@ export default async function DashboardPage() {
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">@{handle}</h1>
-          <Badge variant={reputationVariant(reputation)}>
-            rep {reputation.toFixed(2)}
-          </Badge>
+          <Badge variant={reputationVariant(reputation)}>rep {reputation.toFixed(2)}</Badge>
         </div>
         {!guest ? (
           <Link
@@ -167,9 +172,14 @@ export default async function DashboardPage() {
                 </thead>
                 <tbody>
                   {submissions.map((s) => (
-                    <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-muted/20">
+                    <tr
+                      key={s.id}
+                      className="border-b border-border/50 last:border-0 hover:bg-muted/20"
+                    >
                       <td className="px-5 py-3 font-medium">{s.protocolTitle}</td>
-                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground">{s.sliceKey}</td>
+                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
+                        {s.sliceKey}
+                      </td>
                       <td className="px-5 py-3">
                         <Badge variant={SUBMISSION_STATUS_VARIANT[s.status] ?? 'muted'}>
                           {s.status.replace(/_/g, ' ')}

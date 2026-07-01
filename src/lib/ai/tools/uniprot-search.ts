@@ -7,8 +7,8 @@
  * involves a sequence or motif, this is the first place to look.
  */
 
-import { z } from 'zod';
 import { tool } from 'ai';
+import { z } from 'zod';
 
 const UNIPROT_BASE = 'https://rest.uniprot.org/uniprotkb/search';
 
@@ -54,9 +54,8 @@ export const searchUniProt = tool({
       organism: r.organism?.scientificName ?? 'unknown',
       length: r.sequence?.length ?? null,
       function:
-        r.comments
-          ?.find((c) => c.commentType === 'FUNCTION')
-          ?.texts?.[0]?.value?.slice(0, 600) ?? null,
+        r.comments?.find((c) => c.commentType === 'FUNCTION')?.texts?.[0]?.value?.slice(0, 600) ??
+        null,
     }));
     return { hits };
   },

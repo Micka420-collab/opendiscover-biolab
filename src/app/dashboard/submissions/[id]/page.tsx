@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { eq } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { db, schema } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +113,9 @@ export default async function SubmissionTrackerPage({
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-start gap-2">
               <span className="w-28 shrink-0 text-muted-foreground">Slice key</span>
-              <code className="font-mono text-xs bg-muted px-2 py-0.5 rounded">{submission.sliceKey}</code>
+              <code className="font-mono text-xs bg-muted px-2 py-0.5 rounded">
+                {submission.sliceKey}
+              </code>
             </div>
             <div className="flex items-start gap-2">
               <span className="w-28 shrink-0 text-muted-foreground">Output hash</span>
@@ -155,12 +157,19 @@ export default async function SubmissionTrackerPage({
                         isDone
                           ? 'bg-emerald-500 ring-emerald-500/30 text-white'
                           : isActive
-                          ? 'bg-accent ring-accent/30 text-accent-foreground'
-                          : 'bg-muted ring-border text-muted-foreground',
+                            ? 'bg-accent ring-accent/30 text-accent-foreground'
+                            : 'bg-muted ring-border text-muted-foreground',
                       ].join(' ')}
                     >
                       {isDone ? (
-                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <svg
+                          aria-hidden="true"
+                          className="h-3 w-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={3}
+                        >
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
@@ -207,9 +216,7 @@ export default async function SubmissionTrackerPage({
                       <span className="text-muted-foreground"> ({run.durationMs}ms)</span>
                     )}
                   </span>
-                  {run.error && (
-                    <span className="text-red-400 truncate max-w-xs">{run.error}</span>
-                  )}
+                  {run.error && <span className="text-red-400 truncate max-w-xs">{run.error}</span>}
                 </div>
               ))}
             </CardContent>

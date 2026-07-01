@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
@@ -18,7 +18,10 @@ export const CardHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
 export const CardTitle = ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3 className={cn('font-semibold leading-tight', className)} {...props} />
 );
-export const CardDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+export const CardDescription = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p className={cn('text-sm text-muted-foreground', className)} {...props} />
 );
 export const CardContent = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

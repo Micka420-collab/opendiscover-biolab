@@ -87,7 +87,7 @@ const MAX_GAP_TO_MERGE = 2;
  * ≤ MAX_GAP_TO_MERGE ordered residues so short islands of order do not split
  * what is biologically a single disordered stretch.
  */
-function buildDisorderRegions(plddt: number[], sequence: string): DisorderRegion[] {
+function buildDisorderRegions(plddt: number[], _sequence: string): DisorderRegion[] {
   const n = plddt.length;
   if (n === 0) return [];
 
@@ -122,8 +122,7 @@ function buildDisorderRegions(plddt: number[], sequence: string): DisorderRegion
     } else if (!isDisordered && regionStart !== -1) {
       const regionEnd = i - 1; // inclusive
       const regionPlddt = plddt.slice(regionStart, regionEnd + 1);
-      const meanPlddt =
-        regionPlddt.reduce((sum, v) => sum + v, 0) / regionPlddt.length;
+      const meanPlddt = regionPlddt.reduce((sum, v) => sum + v, 0) / regionPlddt.length;
       regions.push({
         start: regionStart,
         end: regionEnd,
@@ -139,28 +138,22 @@ function buildDisorderRegions(plddt: number[], sequence: string): DisorderRegion
 
 // ── Public runner ──────────────────────────────────────────────────────────
 
-export function runAlphaFoldDisorder(
-  input: AlphaFoldDisorderInput,
-): AlphaFoldDisorderOutput {
+export function runAlphaFoldDisorder(input: AlphaFoldDisorderInput): AlphaFoldDisorderOutput {
   validateInput(input);
 
   const { uniprotAccession, plddt, sequence } = input;
   const totalResidues = sequence.length;
 
   const disorderedResidues = plddt.filter((v) => v < DISORDER_THRESHOLD).length;
-  const disorderFraction =
-    totalResidues > 0 ? disorderedResidues / totalResidues : 0;
+  const disorderFraction = totalResidues > 0 ? disorderedResidues / totalResidues : 0;
 
   const disorderRegions = buildDisorderRegions(plddt, sequence);
 
   const longestDisorderRegion =
-    disorderRegions.length > 0
-      ? Math.max(...disorderRegions.map((r) => r.length))
-      : 0;
+    disorderRegions.length > 0 ? Math.max(...disorderRegions.map((r) => r.length)) : 0;
 
   // noveltyConservationScore = min(1, longestStretch / 50) × disorderFraction
-  const noveltyConservationScore =
-    Math.min(1, longestDisorderRegion / 50) * disorderFraction;
+  const noveltyConservationScore = Math.min(1, longestDisorderRegion / 50) * disorderFraction;
 
   return {
     uniprotAccession,
@@ -174,8 +167,6 @@ export function runAlphaFoldDisorder(
   };
 }
 
-export async function hashAlphaFoldOutput(
-  output: AlphaFoldDisorderOutput,
-): Promise<string> {
+export async function hashAlphaFoldOutput(output: AlphaFoldDisorderOutput): Promise<string> {
   return canonicalHash(output);
 }

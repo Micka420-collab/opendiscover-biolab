@@ -5,10 +5,10 @@
  * sub-10ms cosine-distance retrieval at our scale.
  */
 
+import type { CorpusNeighbor } from '@/lib/ai/novelty';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from './index';
-import { corpusEntries, submissions, discoveries, protocols, users } from './schema';
-import type { CorpusNeighbor } from '@/lib/ai/novelty';
+import { corpusEntries, discoveries, protocols, submissions, users } from './schema';
 
 /* ─── Vector kNN ─────────────────────────────────────────────────────── */
 
@@ -90,11 +90,7 @@ export async function recentDiscoveries(limit = 50) {
 }
 
 export async function discoveryById(id: string) {
-  const [row] = await db
-    .select()
-    .from(discoveries)
-    .where(eq(discoveries.id, id))
-    .limit(1);
+  const [row] = await db.select().from(discoveries).where(eq(discoveries.id, id)).limit(1);
   return row;
 }
 

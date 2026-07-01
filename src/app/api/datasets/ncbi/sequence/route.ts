@@ -11,9 +11,9 @@
  *   - Sanitize input — only fetch slices, no metadata bombs.
  */
 
+import { unstable_cache } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { unstable_cache } from 'next/cache';
 
 const params = z.object({
   accession: z.string().regex(/^[A-Z0-9_.]+$/i, 'invalid accession'),
@@ -55,7 +55,10 @@ export async function GET(req: NextRequest) {
     strand: url.searchParams.get('strand') ?? '1',
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: 'invalid_input', details: parsed.error.format() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'invalid_input', details: parsed.error.format() },
+      { status: 400 },
+    );
   }
   const { accession, start, stop, strand } = parsed.data;
   if (stop <= start) {

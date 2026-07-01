@@ -1,11 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const format = req.nextUrl.searchParams.get('format') ?? 'json-ld';
 
@@ -26,10 +23,7 @@ export async function GET(
       contributorHandle: schema.users.handle,
     })
     .from(schema.discoveryTriggers)
-    .innerJoin(
-      schema.submissions,
-      eq(schema.submissions.id, schema.discoveryTriggers.submissionId),
-    )
+    .innerJoin(schema.submissions, eq(schema.submissions.id, schema.discoveryTriggers.submissionId))
     .innerJoin(schema.users, eq(schema.users.id, schema.submissions.contributorId))
     .where(eq(schema.discoveryTriggers.discoveryId, id));
 

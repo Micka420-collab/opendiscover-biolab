@@ -10,7 +10,7 @@
  * what we want to match against literature.
  */
 
-import { embed, MODELS } from './gateway';
+import { MODELS, embed } from './gateway';
 
 export const EMBEDDING_DIM = 3072;
 
@@ -49,9 +49,9 @@ export function buildClaimSummary(
 
 export function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) throw new Error('dimension mismatch');
-  let dot = 0,
-    na = 0,
-    nb = 0;
+  let dot = 0;
+  let na = 0;
+  let nb = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i]! * b[i]!;
     na += a[i]! * a[i]!;

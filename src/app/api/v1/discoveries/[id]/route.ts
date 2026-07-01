@@ -1,14 +1,11 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { limitSubmission } from '@/lib/security/rate-limit';
+import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Rate limit keyed by IP
   const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
   const rl = await limitSubmission(ip);
@@ -48,10 +45,7 @@ export async function GET(
   const contributorRows = await db
     .selectDistinct({ handle: schema.users.handle })
     .from(schema.discoveryTriggers)
-    .innerJoin(
-      schema.submissions,
-      eq(schema.discoveryTriggers.submissionId, schema.submissions.id),
-    )
+    .innerJoin(schema.submissions, eq(schema.discoveryTriggers.submissionId, schema.submissions.id))
     .innerJoin(schema.users, eq(schema.submissions.contributorId, schema.users.id))
     .where(eq(schema.discoveryTriggers.discoveryId, id));
 

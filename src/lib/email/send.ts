@@ -28,8 +28,8 @@ export async function sendDiscoveryNotification(args: {
   }
   const subject =
     args.role === 'author'
-      ? `🧬 You triggered a Discovery on OpenDiscover`
-      : `🧬 Your submission corroborated a Discovery`;
+      ? '🧬 You triggered a Discovery on OpenDiscover'
+      : '🧬 Your submission corroborated a Discovery';
   await resend.emails.send({
     from: 'OpenDiscover <discoveries@opendiscover.science>',
     to: args.to,

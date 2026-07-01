@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { count, desc, eq, sql } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { desc, eq, sql } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
 
 export const revalidate = 60;
 

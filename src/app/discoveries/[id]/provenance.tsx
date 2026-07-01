@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 interface Trigger {
   submissionId: string;

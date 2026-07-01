@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface LiveEvent {
   type: string;
@@ -35,7 +35,9 @@ export function LiveDiscoveryFeed({ initialEvents = [] }: { initialEvents?: Live
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm">Live discoveries</h3>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className={`inline-block w-2 h-2 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'}`} />
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-600'}`}
+          />
           {connected ? 'streaming' : 'reconnecting'}
         </div>
       </div>

@@ -8,7 +8,7 @@
  */
 
 import { z } from 'zod';
-import { generateObject, generateText, MODELS, SYSTEM_PROMPTS } from './gateway';
+import { MODELS, SYSTEM_PROMPTS, generateObject, generateText } from './gateway';
 import type { NoveltyJudgment } from './novelty';
 
 const cardSchema = z.object({
@@ -79,7 +79,11 @@ Produce a single Vega-Lite v5 spec that best communicates the signal. Inline the
     temperature: 0,
   });
 
-  const trimmed = text.trim().replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
+  const trimmed = text
+    .trim()
+    .replace(/^```(?:json)?/, '')
+    .replace(/```$/, '')
+    .trim();
   try {
     return JSON.parse(trimmed) as Record<string, unknown>;
   } catch {

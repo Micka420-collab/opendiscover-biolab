@@ -1,6 +1,6 @@
+import { getAppSession, isGuestSession } from '@/lib/auth';
 import { headers } from 'next/headers';
 import Link from 'next/link';
-import { getAppSession, isGuestSession } from '@/lib/auth';
 
 export async function NavAuth() {
   const session = await getAppSession({ headers: await headers() });
@@ -34,10 +34,7 @@ export async function NavAuth() {
         @{handle}
       </Link>
       <form action={guest ? '/api/auth/guest/sign-out' : '/api/auth/sign-out'} method="POST">
-        <button
-          type="submit"
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
+        <button type="submit" className="text-xs text-muted-foreground hover:text-foreground">
           Sign out
         </button>
       </form>

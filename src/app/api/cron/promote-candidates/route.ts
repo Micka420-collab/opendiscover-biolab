@@ -11,10 +11,10 @@
  * Auth: Vercel cron calls include "Authorization: Bearer <CRON_SECRET>".
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { and, eq, gt } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { inngest } from '@/lib/inngest';
+import { and, eq, gt } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const threshold = parseFloat(process.env.NOVELTY_THRESHOLD ?? '0.75');
+  const threshold = Number.parseFloat(process.env.NOVELTY_THRESHOLD ?? '0.75');
 
   // Submissions that are triaged_interesting (not yet promoted) and above the
   // novelty threshold — these are the candidates ready to be re-evaluated.

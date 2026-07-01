@@ -1,29 +1,17 @@
-/**
- * Drizzle schema — Postgres + pgvector (native column type via custom helper).
- *
- * Why Drizzle over Prisma:
- *  - Native pgvector + ivfflat / hnsw indexes declared in the schema (no raw SQL).
- *  - Edge-runtime compatible (works in Vercel Functions on Fluid Compute without
- *    bundling a heavy Rust engine).
- *  - Type-safe joins, no client generation step, sub-millisecond cold start.
- *  - Direct relational queries with full inference.
- */
-
-import { sql } from 'drizzle-orm';
 import {
-  pgTable,
-  text,
-  integer,
-  real,
-  doublePrecision,
-  timestamp,
-  jsonb,
   boolean,
-  pgEnum,
-  index,
-  uniqueIndex,
   customType,
+  doublePrecision,
+  index,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
   primaryKey,
+  real,
+  text,
+  timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 /* ─── Custom vector type ─────────────────────────────────────────────── */
@@ -74,7 +62,9 @@ export const reviewActionEnum = pgEnum('review_action', [
 /* ─── Contributors / accounts ────────────────────────────────────────── */
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   handle: text('handle').notNull().unique(),
   email: text('email').unique(),
   emailVerified: timestamp('email_verified', { mode: 'date' }),
@@ -87,7 +77,9 @@ export const users = pgTable('users', {
 
 export const sessions = pgTable('sessions', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   ipAddress: text('ip_address'),
@@ -97,7 +89,9 @@ export const sessions = pgTable('sessions', {
 
 export const accounts = pgTable('accounts', {
   id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   providerId: text('provider_id').notNull(),
   accountId: text('account_id').notNull(),
   accessToken: text('access_token'),
@@ -120,7 +114,9 @@ export const verifications = pgTable('verifications', {
 export const protocols = pgTable(
   'protocols',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     slug: text('slug').notNull(),
     version: integer('version').default(1).notNull(),
     title: text('title').notNull(),
@@ -147,9 +143,15 @@ export const protocols = pgTable(
 export const submissions = pgTable(
   'submissions',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-    contributorId: text('contributor_id').notNull().references(() => users.id),
-    protocolId: text('protocol_id').notNull().references(() => protocols.id),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    contributorId: text('contributor_id')
+      .notNull()
+      .references(() => users.id),
+    protocolId: text('protocol_id')
+      .notNull()
+      .references(() => protocols.id),
     protocolVersion: integer('protocol_version').notNull(),
     inputSlice: jsonb('input_slice').notNull(),
     sliceKey: text('slice_key').notNull(),
@@ -179,14 +181,20 @@ export const submissions = pgTable(
 export const discoveries = pgTable(
   'discoveries',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-    authorId: text('author_id').notNull().references(() => users.id),
-    protocolId: text('protocol_id').notNull().references(() => protocols.id),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    authorId: text('author_id')
+      .notNull()
+      .references(() => users.id),
+    protocolId: text('protocol_id')
+      .notNull()
+      .references(() => protocols.id),
     title: text('title').notNull(),
     summary: text('summary').notNull(),
     cardMarkdown: text('card_markdown').notNull(),
     visualizationSpec: jsonb('visualization_spec').notNull(),
-    structureSpec: jsonb('structure_spec'),                       // optional Mol*/3D scene
+    structureSpec: jsonb('structure_spec'), // optional Mol*/3D scene
     rawData: jsonb('raw_data').notNull(),
     noveltyScore: real('novelty_score').notNull(),
     noveltyReasoning: text('novelty_reasoning').notNull(),
@@ -209,8 +217,12 @@ export const discoveries = pgTable(
 export const discoveryTriggers = pgTable(
   'discovery_triggers',
   {
-    discoveryId: text('discovery_id').notNull().references(() => discoveries.id, { onDelete: 'cascade' }),
-    submissionId: text('submission_id').notNull().references(() => submissions.id, { onDelete: 'cascade' }),
+    discoveryId: text('discovery_id')
+      .notNull()
+      .references(() => discoveries.id, { onDelete: 'cascade' }),
+    submissionId: text('submission_id')
+      .notNull()
+      .references(() => submissions.id, { onDelete: 'cascade' }),
     role: text('role').notNull(), // 'trigger' | 'corroboration'
     weight: real('weight').default(1.0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -227,9 +239,15 @@ export const discoveryTriggers = pgTable(
 export const peerReviews = pgTable(
   'peer_reviews',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-    reviewerId: text('reviewer_id').notNull().references(() => users.id),
-    discoveryId: text('discovery_id').notNull().references(() => discoveries.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reviewerId: text('reviewer_id')
+      .notNull()
+      .references(() => users.id),
+    discoveryId: text('discovery_id')
+      .notNull()
+      .references(() => discoveries.id, { onDelete: 'cascade' }),
     action: reviewActionEnum('action').notNull(),
     payload: jsonb('payload').notNull(),
     weight: real('weight').default(1.0).notNull(),
@@ -245,7 +263,9 @@ export const peerReviews = pgTable(
 export const corpusEntries = pgTable(
   'corpus_entries',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     source: text('source').notNull(),
     externalId: text('external_id').notNull(),
     title: text('title').notNull(),
@@ -264,8 +284,12 @@ export const corpusEntries = pgTable(
 export const pipelineRuns = pgTable(
   'pipeline_runs',
   {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-    submissionId: text('submission_id').notNull().references(() => submissions.id, { onDelete: 'cascade' }),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    submissionId: text('submission_id')
+      .notNull()
+      .references(() => submissions.id, { onDelete: 'cascade' }),
     runId: text('run_id').notNull().unique(),
     stage: text('stage').notNull(),
     status: text('status').notNull(),
@@ -291,3 +315,125 @@ export type Discovery = typeof discoveries.$inferSelect;
 export type NewDiscovery = typeof discoveries.$inferInsert;
 export type CorpusEntry = typeof corpusEntries.$inferSelect;
 export type PeerReview = typeof peerReviews.$inferSelect;
+
+/* ═══════════════════════════════════════════════════════════════════════
+ *  BioLab — autonomous in-silico laboratory
+ *
+ *  The lab turns the deterministic simulation engines (src/lib/sim) into a
+ *  research instrument: AI scientist agents run parameter-swept experiments
+ *  inside research campaigns, journal their reasoning in a lab notebook, and
+ *  surface promising results into the existing discovery pipeline.
+ * ═════════════════════════════════════════════════════════════════════ */
+
+export const campaignStatusEnum = pgEnum('campaign_status', [
+  'planning',
+  'running',
+  'paused',
+  'completed',
+  'failed',
+  'aborted',
+]);
+
+export const notebookKindEnum = pgEnum('notebook_kind', [
+  'hypothesis',
+  'plan',
+  'experiment',
+  'observation',
+  'analysis',
+  'conclusion',
+  'error',
+]);
+
+/** A research campaign: a goal an autonomous scientist agent pursues via many experiments. */
+export const campaigns = pgTable(
+  'campaigns',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    ownerId: text('owner_id').references(() => users.id),
+    title: text('title').notNull(),
+    goal: text('goal').notNull(),
+    hypothesis: text('hypothesis'),
+    /** Which simulation engines the agent is allowed to reach for. */
+    engineScope: jsonb('engine_scope').notNull(),
+    /** Configuration: model, max experiments, seed budget, stop conditions. */
+    config: jsonb('config').notNull(),
+    status: campaignStatusEnum('status').default('planning').notNull(),
+    /** Rolling agent-authored synthesis of what has been learned so far. */
+    findings: text('findings'),
+    experimentCount: integer('experiment_count').default(0).notNull(),
+    bestScore: doublePrecision('best_score'),
+    /** 'human' | 'agent:<model>' — who is driving. */
+    driver: text('driver').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    startedAt: timestamp('started_at'),
+    completedAt: timestamp('completed_at'),
+  },
+  (t) => ({
+    byStatus: index('campaigns_status_idx').on(t.status, t.createdAt),
+    byOwner: index('campaigns_owner_idx').on(t.ownerId),
+  }),
+);
+
+/** One deterministic engine run inside (or outside) a campaign. */
+export const experiments = pgTable(
+  'experiments',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    campaignId: text('campaign_id').references(() => campaigns.id, { onDelete: 'cascade' }),
+    authorId: text('author_id').references(() => users.id),
+    engine: text('engine').notNull(),
+    engineVersion: text('engine_version').notNull(),
+    params: jsonb('params').notNull(),
+    /** Canonical hash of {engine, version, params} — dedupes & enables replication. */
+    inputHash: text('input_hash').notNull(),
+    /** Canonical hash of the SimResult — the reproducibility fingerprint. */
+    outputHash: text('output_hash').notNull(),
+    summary: text('summary').notNull(),
+    metrics: jsonb('metrics').notNull(),
+    result: jsonb('result').notNull(),
+    /** Agent- or heuristic-assigned interestingness in [0,1]. */
+    score: doublePrecision('score'),
+    seed: text('seed'),
+    durationMs: integer('duration_ms'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    byCampaign: index('experiments_campaign_idx').on(t.campaignId, t.createdAt),
+    byEngine: index('experiments_engine_idx').on(t.engine),
+    byInputHash: index('experiments_input_hash_idx').on(t.inputHash),
+    byScore: index('experiments_score_idx').on(t.score),
+  }),
+);
+
+/** The lab notebook — the agent's transparent, append-only reasoning trail. */
+export const notebookEntries = pgTable(
+  'notebook_entries',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    campaignId: text('campaign_id')
+      .notNull()
+      .references(() => campaigns.id, { onDelete: 'cascade' }),
+    experimentId: text('experiment_id').references(() => experiments.id, { onDelete: 'set null' }),
+    seq: integer('seq').notNull(),
+    kind: notebookKindEnum('kind').notNull(),
+    content: text('content').notNull(),
+    data: jsonb('data'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    byCampaign: index('notebook_campaign_seq_idx').on(t.campaignId, t.seq),
+  }),
+);
+
+export type Campaign = typeof campaigns.$inferSelect;
+export type NewCampaign = typeof campaigns.$inferInsert;
+export type Experiment = typeof experiments.$inferSelect;
+export type NewExperiment = typeof experiments.$inferInsert;
+export type NotebookEntry = typeof notebookEntries.$inferSelect;
+export type NewNotebookEntry = typeof notebookEntries.$inferInsert;

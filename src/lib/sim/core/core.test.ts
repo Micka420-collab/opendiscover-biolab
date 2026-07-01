@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { euler, rk4, rk45, component } from './ode';
+import { identity, matMul, matVec, solve, transpose } from './linalg';
+import { component, euler, rk4, rk45 } from './ode';
 import { createRng, hashSeed } from './prng';
-import { solve, matVec, transpose, matMul, identity } from './linalg';
 
 describe('prng', () => {
   it('is deterministic for a given seed', () => {

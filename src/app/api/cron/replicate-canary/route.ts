@@ -9,10 +9,10 @@
  * Auth: Vercel cron calls include "Authorization: Bearer <CRON_SECRET>".
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { and, desc, eq, inArray } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { inngest } from '@/lib/inngest';
+import { and, desc, eq, inArray } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -29,9 +29,7 @@ export async function GET(req: NextRequest) {
   const recentDiscoveries = await db
     .select({ id: schema.discoveries.id })
     .from(schema.discoveries)
-    .where(
-      inArray(schema.discoveries.status, ['confirmed', 'provisional']),
-    )
+    .where(inArray(schema.discoveries.status, ['confirmed', 'provisional']))
     .orderBy(desc(schema.discoveries.createdAt))
     .limit(5);
 

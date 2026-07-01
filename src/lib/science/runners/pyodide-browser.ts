@@ -47,7 +47,8 @@ async function loadPyodideOnce(): Promise<PyodideInstance> {
     });
     document.head.appendChild(script);
     await loaded;
-    const py = await window.loadPyodide!({ indexURL: PYODIDE_CDN });
+    const py = await window.loadPyodide?.({ indexURL: PYODIDE_CDN });
+    if (!py) throw new Error('Pyodide failed to initialize');
     return py;
   })();
   return _pyodide;

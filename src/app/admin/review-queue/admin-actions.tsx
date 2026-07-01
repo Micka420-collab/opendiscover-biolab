@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface AdminActionsProps {
   submissionId: string;
@@ -26,6 +26,7 @@ export function AdminActions({ submissionId }: AdminActionsProps) {
   return (
     <div className="flex items-center gap-2">
       <button
+        type="button"
         onClick={() => handleAction('approve')}
         disabled={loading !== null}
         className="px-2 py-1 text-xs rounded bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-40"
@@ -33,6 +34,7 @@ export function AdminActions({ submissionId }: AdminActionsProps) {
         {loading === 'approve' ? '…' : 'Approve'}
       </button>
       <button
+        type="button"
         onClick={() => handleAction('reject')}
         disabled={loading !== null}
         className="px-2 py-1 text-xs rounded border border-border text-muted-foreground hover:text-foreground disabled:opacity-40"

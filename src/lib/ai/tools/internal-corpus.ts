@@ -5,10 +5,10 @@
  * before reaching for live web tools.
  */
 
-import { z } from 'zod';
-import { tool } from 'ai';
-import { embedClaim } from '../embeddings';
 import { nearestCorpus } from '@/lib/db/queries';
+import { tool } from 'ai';
+import { z } from 'zod';
+import { embedClaim } from '../embeddings';
 
 export const searchInternalCorpus = tool({
   description:

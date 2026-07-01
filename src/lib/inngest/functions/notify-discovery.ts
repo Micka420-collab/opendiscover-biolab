@@ -3,11 +3,11 @@
  * the event to the live SSE channel that powers the public feed.
  */
 
-import { inArray } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
-import { inngest } from '../client';
 import { sendDiscoveryNotification } from '@/lib/email/send';
 import { publishDiscoveryEvent } from '@/lib/realtime/channel';
+import { inArray } from 'drizzle-orm';
+import { inngest } from '../client';
 
 export const notifyDiscoveryFn = inngest.createFunction(
   { id: 'notify-discovery', name: 'Notify on promoted discovery', retries: 5 },

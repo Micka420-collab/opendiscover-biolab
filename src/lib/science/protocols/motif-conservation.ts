@@ -135,15 +135,12 @@ export function runMotifConservation(input: MotifConservationInput): MotifConser
   const hitGenomes = Array.from(new Set(allHits.map((h) => h.genomeId))).sort();
   const outsideHits = allHits.filter((h) => !h.insideAnnotatedDomain);
   const conservedOutsideDomains = new Set(outsideHits.map((h) => h.genomeId)).size;
-  const distances = outsideHits
-    .map((h) => h.nearestDomainDistance)
-    .filter((d) => d >= 0);
+  const distances = outsideHits.map((h) => h.nearestDomainDistance).filter((d) => d >= 0);
   const medianDist = median(distances);
 
   // Score: rewards genomes-hit-outside-domains × evidence that motif sits in
   // genuinely unannotated regions.
-  const noveltyConservationScore =
-    conservedOutsideDomains * Math.min(1, medianDist / 50);
+  const noveltyConservationScore = conservedOutsideDomains * Math.min(1, medianDist / 50);
 
   return {
     motif,

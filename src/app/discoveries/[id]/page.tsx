@@ -1,13 +1,13 @@
-import { notFound } from 'next/navigation';
-import { headers } from 'next/headers';
-import { desc, eq } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
-import { getAppSession, isGuestSession } from '@/lib/auth';
+import { PeerReviewPanel } from '@/components/discovery/peer-review-panel';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DiscoveryVisualization } from './visualization';
+import { getAppSession, isGuestSession } from '@/lib/auth';
+import { db, schema } from '@/lib/db';
+import { desc, eq } from 'drizzle-orm';
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { ProvenanceGraph } from './provenance';
-import { PeerReviewPanel } from '@/components/discovery/peer-review-panel';
+import { DiscoveryVisualization } from './visualization';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +49,7 @@ export default async function DiscoveryDetail({ params }: { params: Promise<{ id
       contributorHandle: schema.users.handle,
     })
     .from(schema.discoveryTriggers)
-    .innerJoin(
-      schema.submissions,
-      eq(schema.submissions.id, schema.discoveryTriggers.submissionId),
-    )
+    .innerJoin(schema.submissions, eq(schema.submissions.id, schema.discoveryTriggers.submissionId))
     .innerJoin(schema.users, eq(schema.users.id, schema.submissions.contributorId))
     .where(eq(schema.discoveryTriggers.discoveryId, d.id));
 
@@ -94,7 +91,8 @@ export default async function DiscoveryDetail({ params }: { params: Promise<{ id
   const viewerId = session?.user?.id;
   const guest = isGuestSession(session);
   const isAuthor = viewerId !== undefined && viewerId === d.authorId;
-  const alreadyReviewed = viewerId !== undefined && reviewRows.some((r) => r.reviewerId === viewerId);
+  const alreadyReviewed =
+    viewerId !== undefined && reviewRows.some((r) => r.reviewerId === viewerId);
   const canReview = !guest && viewerId !== undefined && !isAuthor && !alreadyReviewed;
 
   return (
@@ -141,12 +139,14 @@ export default async function DiscoveryDetail({ params }: { params: Promise<{ id
             <div>
               <div className="font-medium mb-2">Closest existing literature</div>
               <ul className="space-y-1">
-                {(d.citations as Array<{ external_id: string; overlap_summary: string }>).map((c) => (
-                  <li key={c.external_id} className="text-xs">
-                    <code className="font-mono text-muted-foreground mr-2">{c.external_id}</code>
-                    {c.overlap_summary}
-                  </li>
-                ))}
+                {(d.citations as Array<{ external_id: string; overlap_summary: string }>).map(
+                  (c) => (
+                    <li key={c.external_id} className="text-xs">
+                      <code className="font-mono text-muted-foreground mr-2">{c.external_id}</code>
+                      {c.overlap_summary}
+                    </li>
+                  ),
+                )}
               </ul>
             </div>
           )}
@@ -173,9 +173,24 @@ export default async function DiscoveryDetail({ params }: { params: Promise<{ id
 
       <div className="flex gap-2 text-xs">
         <span className="text-muted-foreground">Export:</span>
-        <a href={`/api/discoveries/${d.id}/export?format=json-ld`} className="hover:text-accent underline">JSON-LD</a>
-        <a href={`/api/discoveries/${d.id}/export?format=bibtex`} className="hover:text-accent underline">BibTeX</a>
-        <a href={`/api/discoveries/${d.id}/export?format=ro-crate`} className="hover:text-accent underline">RO-Crate</a>
+        <a
+          href={`/api/discoveries/${d.id}/export?format=json-ld`}
+          className="hover:text-accent underline"
+        >
+          JSON-LD
+        </a>
+        <a
+          href={`/api/discoveries/${d.id}/export?format=bibtex`}
+          className="hover:text-accent underline"
+        >
+          BibTeX
+        </a>
+        <a
+          href={`/api/discoveries/${d.id}/export?format=ro-crate`}
+          className="hover:text-accent underline"
+        >
+          RO-Crate
+        </a>
       </div>
     </div>
   );

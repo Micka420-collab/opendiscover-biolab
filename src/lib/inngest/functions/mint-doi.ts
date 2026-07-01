@@ -1,7 +1,7 @@
-import { eq, inArray } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
-import { inngest } from '../client';
 import { createZenodoDeposit } from '@/lib/integrations/zenodo';
+import { eq, inArray } from 'drizzle-orm';
+import { inngest } from '../client';
 
 export const mintDoiFn = inngest.createFunction(
   { id: 'mint-doi', name: 'Mint DOI for promoted discovery', retries: 3 },
@@ -26,7 +26,8 @@ export const mintDoiFn = inngest.createFunction(
         .limit(1);
 
       if (!row) throw new Error(`Discovery not found: ${discoveryId}`);
-      if (row.doi) return { ...row, contributors: [] as Array<{ handle: string; orcid: string | null }> };
+      if (row.doi)
+        return { ...row, contributors: [] as Array<{ handle: string; orcid: string | null }> };
 
       const triggers = await db
         .select({

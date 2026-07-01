@@ -77,8 +77,13 @@ export interface EngineSpec<TParams = Record<string, unknown>, TDetail = unknown
   description: string;
   /** Key references (textbook / paper) grounding the model. */
   references?: string[];
-  /** Zod schema validating & documenting the parameters. */
-  paramsSchema: z.ZodType<TParams>;
+  /**
+   * Zod schema validating & documenting the parameters. Typed loosely so engines
+   * whose schema uses `.default()` — where the parse *input* type legitimately
+   * differs from the resolved *output* type — still satisfy the contract. Runtime
+   * validation in `kernel.validateParams` is what actually enforces the shape.
+   */
+  paramsSchema: z.ZodTypeAny;
   /** Pure, deterministic entry point. */
   run(params: TParams): SimResult<TDetail>;
   /** A ready-to-run example parameter set for demos and tests. */

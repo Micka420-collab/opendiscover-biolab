@@ -38,9 +38,15 @@ function relativeDate(iso: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canReview }: PeerReviewPanelProps) {
+export function PeerReviewPanel({
+  discoveryId,
+  reviews: initialReviews,
+  canReview,
+}: PeerReviewPanelProps) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [verdict, setVerdict] = useState<'approved' | 'disputed' | 'rejected_low_quality'>('approved');
+  const [verdict, setVerdict] = useState<'approved' | 'disputed' | 'rejected_low_quality'>(
+    'approved',
+  );
   const [comment, setComment] = useState('');
   const [confidence, setConfidence] = useState(0.8);
   const [submitted, setSubmitted] = useState(false);
@@ -86,9 +92,7 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">Peer Reviews</h2>
 
-      {reviews.length === 0 && (
-        <p className="text-sm text-muted-foreground">No reviews yet.</p>
-      )}
+      {reviews.length === 0 && <p className="text-sm text-muted-foreground">No reviews yet.</p>}
 
       <ul className="space-y-4">
         {reviews.map((r) => (
@@ -100,7 +104,9 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
                 {VERDICT_LABELS[r.verdict] ?? r.verdict}
               </span>
               <span className="text-sm font-medium">@{r.reviewer}</span>
-              <span className="text-xs text-muted-foreground ml-auto">{relativeDate(r.createdAt)}</span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                {relativeDate(r.createdAt)}
+              </span>
               <span className="text-xs text-muted-foreground">
                 {Math.round(r.confidence * 100)}% confidence
               </span>
@@ -115,7 +121,9 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
           <h3 className="font-medium text-sm">Submit your review</h3>
 
           <fieldset className="space-y-2">
-            <legend className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Verdict</legend>
+            <legend className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Verdict
+            </legend>
             <div className="flex gap-4 flex-wrap">
               {(['approved', 'disputed', 'rejected_low_quality'] as const).map((v) => (
                 <label key={v} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -134,10 +142,14 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
           </fieldset>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+            <label
+              htmlFor="review-comment"
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wide block"
+            >
               Comment
             </label>
             <textarea
+              id="review-comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               minLength={10}
@@ -150,10 +162,14 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+            <label
+              htmlFor="review-confidence"
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wide block"
+            >
               Confidence — {Math.round(confidence * 100)}%
             </label>
             <input
+              id="review-confidence"
               type="range"
               min={0}
               max={1}
@@ -164,9 +180,7 @@ export function PeerReviewPanel({ discoveryId, reviews: initialReviews, canRevie
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           <button
             type="submit"

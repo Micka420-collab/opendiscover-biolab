@@ -15,9 +15,9 @@
  * its base image in `runnerModule`.
  */
 
-import { Sandbox } from '@vercel/sandbox';
-import path from 'node:path';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { Sandbox } from '@vercel/sandbox';
 
 export interface SandboxRunArgs {
   protocolSlug: string;
@@ -69,9 +69,7 @@ export async function runProtocolInSandbox(args: SandboxRunArgs): Promise<Sandbo
     });
 
     if (run.exitCode !== 0) {
-      throw new Error(
-        `Sandbox exit ${run.exitCode}: ${run.stderr.slice(0, 500)}`,
-      );
+      throw new Error(`Sandbox exit ${run.exitCode}: ${run.stderr.slice(0, 500)}`);
     }
 
     const output = JSON.parse(run.stdout) as Record<string, unknown>;

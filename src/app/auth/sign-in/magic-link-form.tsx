@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 export function MagicLinkForm() {
   const [email, setEmail] = useState('');
@@ -53,9 +53,7 @@ export function MagicLinkForm() {
         disabled={status === 'loading'}
         className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
       />
-      {status === 'error' && (
-        <p className="text-xs text-red-400">{errorMessage}</p>
-      )}
+      {status === 'error' && <p className="text-xs text-red-400">{errorMessage}</p>}
       <Button type="submit" className="w-full" disabled={status === 'loading'}>
         {status === 'loading' ? 'Sending…' : 'Send magic link'}
       </Button>

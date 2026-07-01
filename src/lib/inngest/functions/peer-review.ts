@@ -1,5 +1,5 @@
-import { eq, sql, count, and } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { and, count, eq, sql } from 'drizzle-orm';
 import { inngest } from '../client';
 
 // Maps the reviewActionEnum values to reputation deltas
@@ -59,8 +59,8 @@ export const peerReviewFunction = inngest.createFunction(
         tally[row.action] = Number(row.total);
       }
 
-      const approvals = (tally['endorse'] ?? 0) + (tally['replicate'] ?? 0);
-      const disputes = (tally['challenge'] ?? 0) + (tally['retract'] ?? 0);
+      const approvals = (tally.endorse ?? 0) + (tally.replicate ?? 0);
+      const disputes = (tally.challenge ?? 0) + (tally.retract ?? 0);
 
       let newStatus: (typeof schema.discoveries.$inferSelect)['status'] | null = null;
       if (approvals >= 3) {

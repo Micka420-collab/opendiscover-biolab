@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createGuestSessionToken, getGuestCookieOptions } from '@/lib/auth/guest';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   const form = await req.formData();

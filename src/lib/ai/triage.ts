@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { generateObject, MODELS, SYSTEM_PROMPTS } from './gateway';
+import { MODELS, SYSTEM_PROMPTS, generateObject } from './gateway';
 
 const triageSchema = z.object({
   interesting: z.boolean(),

@@ -4,8 +4,8 @@
  * automatically on close.
  */
 
-import { NextRequest } from 'next/server';
 import { subscribeDiscoveryEvents } from '@/lib/realtime/channel';
+import type { NextRequest } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 600;

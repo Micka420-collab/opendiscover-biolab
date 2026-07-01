@@ -13,7 +13,7 @@ const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   throw new Error(
-    'Missing DATABASE_URL. Create a local .env.local file and set DATABASE_URL to your Postgres connection string.'
+    'Missing DATABASE_URL. Create a local .env.local file and set DATABASE_URL to your Postgres connection string.',
   );
 }
 

@@ -10,11 +10,27 @@
     "rules": {
       "recommended": true,
       "suspicious": { "noExplicitAny": "warn", "noConsoleLog": "off" },
-      "style": { "useImportType": "error", "useNodejsImportProtocol": "error" },
+      "style": {
+        "useImportType": "error",
+        "useNodejsImportProtocol": "error",
+        "noNonNullAssertion": "warn"
+      },
       "correctness": { "noUnusedImports": "error", "noUnusedVariables": "warn" },
       "performance": { "noAccumulatingSpread": "warn" }
     }
   },
+  "overrides": [
+    {
+      "include": ["**/*.test.ts", "e2e/**"],
+      "linter": {
+        "rules": {
+          "style": { "noNonNullAssertion": "off" },
+          "suspicious": { "noExplicitAny": "off" },
+          "correctness": { "noPrecisionLoss": "off" }
+        }
+      }
+    }
+  ],
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

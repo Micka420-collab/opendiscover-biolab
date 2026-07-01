@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getGuestCookieOptions } from '@/lib/auth/guest';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   const response = NextResponse.redirect(new URL('/auth/sign-in', req.url));

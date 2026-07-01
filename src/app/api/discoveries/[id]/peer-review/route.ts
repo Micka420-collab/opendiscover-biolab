@@ -1,9 +1,9 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { getAppSession, isGuestSession } from '@/lib/auth';
 import { db, schema } from '@/lib/db';
 import { inngest } from '@/lib/inngest';
-import { getAppSession, isGuestSession } from '@/lib/auth';
+import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const maxDuration = 30;
 export const runtime = 'nodejs';
@@ -33,7 +33,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: 'invalid_input', details: parsed.error.format() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'invalid_input', details: parsed.error.format() },
+      { status: 400 },
+    );
   }
   const { verdict, comment, confidence } = parsed.data;
 
@@ -63,8 +66,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   await inngest.send({
     name: 'discovery/peer-review',
-    data: { discoveryId, reviewId: review!.id },
+    data: { discoveryId, reviewId: review?.id },
   });
 
-  return NextResponse.json({ id: review!.id }, { status: 201 });
+  return NextResponse.json({ id: review?.id }, { status: 201 });
 }

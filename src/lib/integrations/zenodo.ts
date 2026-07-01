@@ -16,9 +16,7 @@ export interface ZenodoDepositResult {
 }
 
 const baseUrl =
-  process.env.NODE_ENV === 'production'
-    ? 'https://zenodo.org'
-    : 'https://sandbox.zenodo.org';
+  process.env.NODE_ENV === 'production' ? 'https://zenodo.org' : 'https://sandbox.zenodo.org';
 
 async function zenodoFetch(path: string, init: RequestInit): Promise<Response> {
   const token = process.env.ZENODO_ACCESS_TOKEN;
@@ -84,10 +82,10 @@ export async function createZenodoDeposit(
     }
   }
 
-  const publishRes = await zenodoFetch(
-    `/api/deposit/depositions/${depositId}/actions/publish`,
-    { method: 'POST', body: '' },
-  );
+  const publishRes = await zenodoFetch(`/api/deposit/depositions/${depositId}/actions/publish`, {
+    method: 'POST',
+    body: '',
+  });
 
   const data = await publishRes.json();
 

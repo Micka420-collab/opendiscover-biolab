@@ -8,8 +8,8 @@
  * last week. The agent calls this tool to widen the search before judging.
  */
 
-import { z } from 'zod';
 import { tool } from 'ai';
+import { z } from 'zod';
 
 const EUROPE_PMC_BASE = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search';
 

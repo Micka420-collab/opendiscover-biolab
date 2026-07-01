@@ -5,8 +5,8 @@
 
 import 'dotenv/config';
 import { sql } from 'drizzle-orm';
-import { db, schema } from '../src/lib/db';
 import { embedClaim } from '../src/lib/ai/embeddings';
+import { db, schema } from '../src/lib/db';
 
 const SEED = [
   {

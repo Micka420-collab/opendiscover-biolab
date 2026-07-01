@@ -20,15 +20,15 @@
  *  12. emit "discovery/promoted" event
  */
 
-import { eq, sql } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
-import { inngest } from '../client';
-import { triageSubmission } from '@/lib/ai/triage';
+import { runNoveltyAgent } from '@/lib/ai/agents/novelty-agent';
 import { buildClaimSummary, embedClaim } from '@/lib/ai/embeddings';
 import { findCorroborations } from '@/lib/ai/pattern-detect';
-import { runNoveltyAgent } from '@/lib/ai/agents/novelty-agent';
+import { triageSubmission } from '@/lib/ai/triage';
 import { generateDiscoveryCard, generateVisualizationSpec } from '@/lib/ai/vulgarize';
+import { db, schema } from '@/lib/db';
 import { nearestCorpus, nearestSubmissions, setSubmissionEmbedding } from '@/lib/db/queries';
+import { eq, sql } from 'drizzle-orm';
+import { inngest } from '../client';
 
 const NOVELTY_THRESHOLD = Number(process.env.NOVELTY_THRESHOLD ?? '0.75');
 const CORROBORATION_MIN = Number(process.env.CORROBORATION_MIN ?? '2');
@@ -189,7 +189,10 @@ export const processSubmissionFn = inngest.createFunction(
       const [row] = await db
         .select({ id: schema.discoveries.id })
         .from(schema.discoveries)
-        .innerJoin(schema.discoveryTriggers, eq(schema.discoveryTriggers.discoveryId, schema.discoveries.id))
+        .innerJoin(
+          schema.discoveryTriggers,
+          eq(schema.discoveryTriggers.discoveryId, schema.discoveries.id),
+        )
         .where(
           sql`${schema.discoveryTriggers.submissionId} IN (${sql.join(
             triggerIds.map((id) => sql`${id}`),
@@ -261,9 +264,9 @@ export const processSubmissionFn = inngest.createFunction(
         .returning({ id: schema.discoveries.id });
 
       await db.insert(schema.discoveryTriggers).values([
-        { discoveryId: d!.id, submissionId, role: 'trigger' },
+        { discoveryId: d?.id, submissionId, role: 'trigger' },
         ...corroboration.corroborators.map((c) => ({
-          discoveryId: d!.id,
+          discoveryId: d?.id,
           submissionId: c.id,
           role: 'corroboration' as const,
         })),
@@ -274,7 +277,7 @@ export const processSubmissionFn = inngest.createFunction(
         .set({ status: 'promoted' })
         .where(eq(schema.submissions.id, submissionId));
 
-      return d!.id;
+      return d?.id;
     });
 
     /* 12. Emit downstream event */

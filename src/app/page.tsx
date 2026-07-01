@@ -1,8 +1,8 @@
-import Link from 'next/link';
+import { LiveDiscoveryFeed } from '@/components/discovery/live-feed';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LiveDiscoveryFeed } from '@/components/discovery/live-feed';
 import { recentDiscoveries } from '@/lib/db/queries';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +17,14 @@ export default async function HomePage() {
             Open · Reproducible · Agent-augmented
           </div>
           <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-            Discover by testing.<br />
+            Discover by testing.
+            <br />
             <span className="text-muted-foreground">Vulgarize what you just found.</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             OpenDiscover is a citizen-science platform for in-silico biology. You run a short,
-            reproducible experiment on public data. A multi-agent pipeline (Claude Opus + UniProt
-            + Europe PMC tool-use) watches for unexpected patterns across thousands of submissions,
+            reproducible experiment on public data. A multi-agent pipeline (Claude Opus + UniProt +
+            Europe PMC tool-use) watches for unexpected patterns across thousands of submissions,
             scores their novelty against the live literature, and auto-generates a Discovery Card
             the moment a signal emerges — in your name.
           </p>
@@ -73,14 +74,32 @@ export default async function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-              <Tech name="Vercel AI Gateway" detail="Opus 4.7 · Sonnet 4.6 · Haiku 4.5 · text-embedding-3-large" />
+              <Tech
+                name="Vercel AI Gateway"
+                detail="Opus 4.7 · Sonnet 4.6 · Haiku 4.5 · text-embedding-3-large"
+              />
               <Tech name="Inngest" detail="Durable, replayable pipeline with per-step traces" />
-              <Tech name="Drizzle + pgvector" detail="Native HNSW kNN, edge-compatible, typed joins" />
-              <Tech name="Vercel Sandbox" detail="Isolated Python execution for canary replication" />
-              <Tech name="MCP server" detail="Agents (Claude Code, Cursor) contribute alongside humans" />
+              <Tech
+                name="Drizzle + pgvector"
+                detail="Native HNSW kNN, edge-compatible, typed joins"
+              />
+              <Tech
+                name="Vercel Sandbox"
+                detail="Isolated Python execution for canary replication"
+              />
+              <Tech
+                name="MCP server"
+                detail="Agents (Claude Code, Cursor) contribute alongside humans"
+              />
               <Tech name="Better Auth" detail="GitHub · ORCID · magic link · Sign in with Vercel" />
-              <Tech name="Mol* + Vega-Lite" detail="3D protein structures + auto-generated visualizations" />
-              <Tech name="BotID + Upstash RL" detail="Rate limiting and adversarial-bot filtering" />
+              <Tech
+                name="Mol* + Vega-Lite"
+                detail="3D protein structures + auto-generated visualizations"
+              />
+              <Tech
+                name="BotID + Upstash RL"
+                detail="Rate limiting and adversarial-bot filtering"
+              />
             </div>
           </CardContent>
         </Card>
@@ -99,7 +118,9 @@ export default async function HomePage() {
             </p>
             <p>
               We start with{' '}
-              <strong className="text-foreground">small ORF mining in understudied bacterial genomes</strong>{' '}
+              <strong className="text-foreground">
+                small ORF mining in understudied bacterial genomes
+              </strong>{' '}
               — a domain with a known long tail of undocumented coding sequences and
               well-characterized validation pathways. Every promoted Discovery has at least two
               independent disjoint contributors and a Claude Opus literature-grounded novelty

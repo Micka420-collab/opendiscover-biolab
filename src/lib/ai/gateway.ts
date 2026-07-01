@@ -11,13 +11,15 @@
  *   - Embeddings       → openai/text-embedding-3-large (3072-d)
  */
 
-import { generateText, generateObject, embed, type LanguageModel } from 'ai';
+import { embed, generateObject, generateText } from 'ai';
 
 export const MODELS = {
   triage: 'anthropic/claude-haiku-4-5',
   novelty: 'anthropic/claude-opus-4-7',
   vulgarize: 'anthropic/claude-sonnet-4-6',
   visualize: 'anthropic/claude-sonnet-4-6',
+  /** Autonomous BioLab scientist — hardest reasoning, longest horizon. */
+  scientist: 'anthropic/claude-opus-4-8',
   embed: 'openai/text-embedding-3-large',
 } as const;
 
@@ -32,7 +34,20 @@ export const SYSTEM_PROMPTS = {
 
   vulgarize: `You are a science communicator writing a Discovery Card for a citizen-science platform. Your audience is mixed: amateurs, students, researchers. Write a clear, factual, exciting summary of what was just observed, why it might matter, and what it does NOT yet prove. Always disclose: "This is a provisional in-silico signal, not a clinical or applied claim."`,
 
-  visualize: `You produce Vega-Lite JSON specifications. Output a single, valid spec — no markdown, no commentary. Schema: https://vega.github.io/schema/vega-lite/v5.json`,
+  visualize:
+    'You produce Vega-Lite JSON specifications. Output a single, valid spec — no markdown, no commentary. Schema: https://vega.github.io/schema/vega-lite/v5.json',
+
+  scientist: `You are an autonomous computational biologist running experiments in an in-silico biotechnology lab. You have a set of deterministic simulation engines (molecular biology, protein biophysics, systems biology, population genetics, bioprocess, epidemiology, drug discovery).
+
+Work like a rigorous scientist:
+  1. State a specific, falsifiable hypothesis for the campaign goal.
+  2. Inspect the available engines (list_engines / describe_engine) before using one.
+  3. Design experiments — vary ONE thing at a time, or sweep a parameter to find a maximum, transition, or sensitivity.
+  4. Read the numeric results critically. Distinguish signal from artifact. Note when a result contradicts your hypothesis.
+  5. Iterate: let each result inform the next experiment. Do not run redundant experiments.
+  6. Respect the run budget. When it runs low, stop and synthesize.
+
+Every claim you make must be grounded in an experiment you actually ran. Never fabricate numbers. When you conclude, be honest about what the in-silico result does and does not establish — these are models, not wet-lab proof.`,
 } as const;
 
 export type ModelKey = keyof typeof MODELS;

@@ -17,15 +17,15 @@
  * available via `pnpm mcp:dev` for local development.
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-// @ts-nocheck
-import { z } from 'zod';
-import { desc, eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
 import { recentDiscoveries } from '@/lib/db/queries';
+import { inngest } from '@/lib/inngest';
 import { runProtocol } from '@/lib/science/runners/dispatch';
 import { canonicalHash } from '@/lib/util/hash';
-import { inngest } from '@/lib/inngest';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { desc, eq } from 'drizzle-orm';
+// @ts-nocheck
+import { z } from 'zod';
 
 export function buildMcpServer() {
   const server = new McpServer({ name: 'opendiscover', version: '0.2.0' });
@@ -147,7 +147,7 @@ export function buildMcpServer() {
         .orderBy(desc(schema.protocols.version))
         .limit(1);
       if (!proto || proto.version !== version) {
-        return { content: [{ type: 'text', text: `protocol_version_mismatch` }], isError: true };
+        return { content: [{ type: 'text', text: 'protocol_version_mismatch' }], isError: true };
       }
       const sliceKey = String(
         (input as { sliceKey?: unknown }).sliceKey ?? JSON.stringify(input).slice(0, 64),
@@ -166,10 +166,10 @@ export function buildMcpServer() {
         })
         .returning({ id: schema.submissions.id });
 
-      await inngest.send({ name: 'submission/received', data: { submissionId: sub!.id } });
+      await inngest.send({ name: 'submission/received', data: { submissionId: sub?.id } });
       return {
         content: [
-          { type: 'text', text: JSON.stringify({ submissionId: sub!.id, status: 'accepted' }) },
+          { type: 'text', text: JSON.stringify({ submissionId: sub?.id, status: 'accepted' }) },
         ],
       };
     },

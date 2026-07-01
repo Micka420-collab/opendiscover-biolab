@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { recentDiscoveries } from '@/lib/db/queries';
+import { NextResponse } from 'next/server';
 
 export const revalidate = 30;
 

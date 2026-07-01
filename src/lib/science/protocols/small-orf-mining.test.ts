@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runSmallOrfMining, hashOutput } from './small-orf-mining';
+import { hashOutput, runSmallOrfMining } from './small-orf-mining';
 
 const TEST_SEQ =
   // A small synthetic sequence containing one easy ORF: ATG ... TAA, 25 aa.
@@ -26,10 +26,18 @@ describe('small-orf-mining', () => {
 
   it('is deterministic across runs', async () => {
     const a = runSmallOrfMining({
-      genomeId: 'TEST', sequence: TEST_SEQ, windowStart: 1, sliceKey: 'TEST:1', zThreshold: -10,
+      genomeId: 'TEST',
+      sequence: TEST_SEQ,
+      windowStart: 1,
+      sliceKey: 'TEST:1',
+      zThreshold: -10,
     });
     const b = runSmallOrfMining({
-      genomeId: 'TEST', sequence: TEST_SEQ, windowStart: 1, sliceKey: 'TEST:1', zThreshold: -10,
+      genomeId: 'TEST',
+      sequence: TEST_SEQ,
+      windowStart: 1,
+      sliceKey: 'TEST:1',
+      zThreshold: -10,
     });
     expect(await hashOutput(a)).toEqual(await hashOutput(b));
   });

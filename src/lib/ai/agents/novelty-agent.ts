@@ -22,10 +22,10 @@
 import { Experimental_Agent as Agent, stepCountIs } from 'ai';
 import { z } from 'zod';
 import { MODELS, SYSTEM_PROMPTS } from '../gateway';
-import { searchInternalCorpus } from '../tools/internal-corpus';
-import { searchEuropePMC } from '../tools/europe-pmc';
-import { searchUniProt } from '../tools/uniprot-search';
 import type { CorpusNeighbor, NoveltyJudgment } from '../novelty';
+import { searchEuropePMC } from '../tools/europe-pmc';
+import { searchInternalCorpus } from '../tools/internal-corpus';
+import { searchUniProt } from '../tools/uniprot-search';
 
 const judgmentSchema = z.object({
   novel: z.boolean(),
@@ -112,9 +112,7 @@ Judge whether this claim is materially novel. Use your tools to widen the search
   const llm = judgment.novel ? judgment.confidence : 1 - judgment.confidence;
 
   const score =
-    weights.similarity * distance +
-    weights.corroboration * corroboration +
-    weights.llm * llm;
+    weights.similarity * distance + weights.corroboration * corroboration + weights.llm * llm;
 
   return { score, judgment };
 }

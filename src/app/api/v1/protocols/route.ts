@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 

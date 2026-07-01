@@ -1,13 +1,13 @@
-import { serve } from 'inngest/next';
 import {
-  inngest,
-  processSubmissionFn,
-  notifyDiscoveryFn,
   canaryReplicateFn,
-  recheckCorroborationFn,
+  inngest,
   mintDoiFn,
+  notifyDiscoveryFn,
   peerReviewFunction,
+  processSubmissionFn,
+  recheckCorroborationFn,
 } from '@/lib/inngest';
+import { serve } from 'inngest/next';
 
 export const { GET, POST, PUT } = serve({
   client: inngest,

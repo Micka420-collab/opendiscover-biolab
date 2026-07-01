@@ -94,7 +94,7 @@ const CONCERNING_CONCEPT_DESCRIPTIONS: ReadonlyArray<string> = [
 ];
 
 const BLOCK_SIMILARITY_THRESHOLD = 0.82;
-const REVIEW_SIMILARITY_THRESHOLD = 0.70;
+const REVIEW_SIMILARITY_THRESHOLD = 0.7;
 
 /* ─── Result type ────────────────────────────────────────────────────── */
 

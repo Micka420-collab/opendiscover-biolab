@@ -1,10 +1,10 @@
-import Link from 'next/link';
-import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
+import { DiscoveryFilters } from '@/components/discovery/discovery-filters';
+import { LiveDiscoveryFeed } from '@/components/discovery/live-feed';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LiveDiscoveryFeed } from '@/components/discovery/live-feed';
-import { DiscoveryFilters } from '@/components/discovery/discovery-filters';
+import { db, schema } from '@/lib/db';
+import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +63,9 @@ async function fetchDiscoveries(params: SearchParams) {
   }
 
   if (status) {
-    conditions.push(eq(schema.discoveries.status, status as typeof schema.discoveries.status._.data));
+    conditions.push(
+      eq(schema.discoveries.status, status as typeof schema.discoveries.status._.data),
+    );
   }
 
   const orderBy =
@@ -166,7 +168,9 @@ export default async function DiscoveriesPage({
                       novelty {d.noveltyScore.toFixed(3)}
                     </span>
                   </div>
-                  <CardTitle className="group-hover:text-accent transition-colors">{d.title}</CardTitle>
+                  <CardTitle className="group-hover:text-accent transition-colors">
+                    {d.title}
+                  </CardTitle>
                   <CardDescription>{d.summary}</CardDescription>
                 </CardHeader>
                 <CardContent>

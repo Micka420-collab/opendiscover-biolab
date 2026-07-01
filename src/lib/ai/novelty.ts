@@ -19,7 +19,7 @@
  */
 
 import { z } from 'zod';
-import { generateObject, MODELS, SYSTEM_PROMPTS } from './gateway';
+import { MODELS, SYSTEM_PROMPTS, generateObject } from './gateway';
 
 const noveltyJudgment = z.object({
   novel: z.boolean(),
@@ -46,8 +46,8 @@ export interface CorpusNeighbor {
 
 export interface NoveltyInput {
   claimSummary: string;
-  neighbors: CorpusNeighbor[];           // already top-K by similarity, sorted desc
-  corroborationCount: number;            // independent submissions with matching signal
+  neighbors: CorpusNeighbor[]; // already top-K by similarity, sorted desc
+  corroborationCount: number; // independent submissions with matching signal
   weights?: { similarity: number; corroboration: number; llm: number };
 }
 
@@ -69,9 +69,7 @@ export async function scoreNovelty(input: NoveltyInput): Promise<{
   const llm = judgment.novel ? judgment.confidence : 1 - judgment.confidence;
 
   const score =
-    weights.similarity * distance +
-    weights.corroboration * corroboration +
-    weights.llm * llm;
+    weights.similarity * distance + weights.corroboration * corroboration + weights.llm * llm;
 
   return { score, judgment };
 }

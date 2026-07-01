@@ -6,11 +6,11 @@
  * The actual re-run happens in Vercel Sandbox for isolation.
  */
 
-import { eq } from 'drizzle-orm';
 import { db, schema } from '@/lib/db';
-import { inngest } from '../client';
 import { runProtocolInSandbox } from '@/lib/sandbox/protocol-runner';
 import { canonicalHash } from '@/lib/util/hash';
+import { eq } from 'drizzle-orm';
+import { inngest } from '../client';
 
 export const canaryReplicateFn = inngest.createFunction(
   { id: 'canary-replicate', name: 'Canary replication check', retries: 2 },
@@ -33,9 +33,9 @@ export const canaryReplicateFn = inngest.createFunction(
 
     const result = await step.run('run-in-sandbox', () =>
       runProtocolInSandbox({
-        protocolSlug: protocol!.slug,
-        protocolVersion: protocol!.version,
-        runnerKind: protocol!.runnerKind as 'js' | 'pyodide' | 'sandbox',
+        protocolSlug: protocol?.slug,
+        protocolVersion: protocol?.version,
+        runnerKind: protocol?.runnerKind as 'js' | 'pyodide' | 'sandbox',
         input: submission.inputSlice as Record<string, unknown>,
       }),
     );
@@ -68,7 +68,7 @@ export const canaryReplicateFn = inngest.createFunction(
         await db
           .update(schema.protocols)
           .set({ status: 'restricted' })
-          .where(eq(schema.protocols.id, protocol!.id));
+          .where(eq(schema.protocols.id, protocol?.id));
       });
     }
 

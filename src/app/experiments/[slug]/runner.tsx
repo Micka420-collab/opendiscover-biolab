@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { runSmallOrfMining, type SmallOrfOutput } from '@/lib/science/protocols/small-orf-mining';
-import { fetchProtocolPython, runPyodideProtocol } from '@/lib/science/runners/pyodide-browser';
-import { canonicalHash } from '@/lib/util/hash';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { type SmallOrfOutput, runSmallOrfMining } from '@/lib/science/protocols/small-orf-mining';
+import { fetchProtocolPython, runPyodideProtocol } from '@/lib/science/runners/pyodide-browser';
+import { canonicalHash } from '@/lib/util/hash';
+import { useState } from 'react';
 
 /**
  * Two runner modes side-by-side:
@@ -242,9 +242,7 @@ export function ProtocolRunner({
           </CardContent>
         </Card>
       )}
-      {status.kind === 'error' && (
-        <p className="text-sm text-red-400">Error: {status.message}</p>
-      )}
+      {status.kind === 'error' && <p className="text-sm text-red-400">Error: {status.message}</p>}
     </div>
   );
 }

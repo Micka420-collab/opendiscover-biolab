@@ -1,8 +1,8 @@
-import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
-import { eq, desc } from 'drizzle-orm';
 import { getAppSession, isGuestSession } from '@/lib/auth';
 import { db, schema } from '@/lib/db';
+import { desc, eq } from 'drizzle-orm';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { AdminActions } from './admin-actions';
 
 export const dynamic = 'force-dynamic';
@@ -33,8 +33,8 @@ export default async function ReviewQueuePage() {
         <div>
           <h1 className="text-2xl font-bold">Review Queue</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Pending submissions awaiting pipeline processing.{' '}
-            {rows.length} item{rows.length !== 1 ? 's' : ''}.
+            Pending submissions awaiting pipeline processing. {rows.length} item
+            {rows.length !== 1 ? 's' : ''}.
           </p>
         </div>
       </div>
@@ -70,8 +70,7 @@ export default async function ReviewQueuePage() {
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground max-w-xs">
                     {row.claimSummary
-                      ? row.claimSummary.slice(0, 120) +
-                        (row.claimSummary.length > 120 ? '…' : '')
+                      ? row.claimSummary.slice(0, 120) + (row.claimSummary.length > 120 ? '…' : '')
                       : '—'}
                   </td>
                   <td className="px-4 py-3">

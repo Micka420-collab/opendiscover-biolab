@@ -5,18 +5,18 @@
  * Returns 202 with the submission id so clients can poll status.
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { desc, eq } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
-import { setSubmissionEmbedding } from '@/lib/db/queries';
-import { canonicalHash } from '@/lib/util/hash';
 import { buildClaimSummary, embedClaim } from '@/lib/ai/embeddings';
-import { inngest } from '@/lib/inngest';
-import { limitSubmission } from '@/lib/security/rate-limit';
 import { track } from '@/lib/analytics/posthog';
 import { getAppSession } from '@/lib/auth';
+import { db, schema } from '@/lib/db';
+import { setSubmissionEmbedding } from '@/lib/db/queries';
+import { inngest } from '@/lib/inngest';
 import { screenClaimSummary } from '@/lib/safety/dual-use-screen';
+import { limitSubmission } from '@/lib/security/rate-limit';
+import { canonicalHash } from '@/lib/util/hash';
+import { desc, eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const maxDuration = 60;
 export const runtime = 'nodejs';
@@ -47,7 +47,10 @@ export async function POST(req: NextRequest) {
   /* Parse */
   const parsed = submissionInput.safeParse(await req.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: 'invalid_input', details: parsed.error.format() }, { status: 400 });
+    return NextResponse.json(
+      { error: 'invalid_input', details: parsed.error.format() },
+      { status: 400 },
+    );
   }
   const body = parsed.data;
 
@@ -65,10 +68,7 @@ export async function POST(req: NextRequest) {
   /* Determinism gate */
   const serverHash = await canonicalHash(body.rawOutput);
   if (serverHash !== body.clientOutputHash) {
-    return NextResponse.json(
-      { error: 'hash_mismatch', expected: serverHash },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'hash_mismatch', expected: serverHash }, { status: 400 });
   }
 
   /* Dual-use safety screen */
@@ -79,10 +79,7 @@ export async function POST(req: NextRequest) {
       protocolSlug: protocol.slug,
       reason: screen.reason,
     });
-    return NextResponse.json(
-      { error: 'dual_use_concern', reason: screen.reason },
-      { status: 451 },
-    );
+    return NextResponse.json({ error: 'dual_use_concern', reason: screen.reason }, { status: 451 });
   }
 
   /* Persist */
@@ -104,7 +101,7 @@ export async function POST(req: NextRequest) {
   /* Embed (fast — keep inline so cluster queries work for this submission too) */
   try {
     const embedding = await embedClaim(claim);
-    await setSubmissionEmbedding(submission!.id, embedding);
+    await setSubmissionEmbedding(submission?.id, embedding);
   } catch (e) {
     console.warn('[submissions] embedding failed, pipeline will retry', e);
   }
@@ -113,15 +110,15 @@ export async function POST(req: NextRequest) {
   if (screen.level === 'review') {
     track(session.user.id, 'submission_flagged_dual_use', {
       protocolSlug: protocol.slug,
-      submissionId: submission!.id,
+      submissionId: submission?.id,
       reason: screen.reason,
     });
     return NextResponse.json(
       {
-        id: submission!.id,
+        id: submission?.id,
         status: 'pending_review',
         message: 'Submission held for biosafety review before pipeline proceeds.',
-        track: `/api/submissions/${submission!.id}`,
+        track: `/api/submissions/${submission?.id}`,
       },
       { status: 202 },
     );
@@ -129,19 +126,19 @@ export async function POST(req: NextRequest) {
 
   await inngest.send({
     name: 'submission/received',
-    data: { submissionId: submission!.id },
+    data: { submissionId: submission?.id },
   });
 
   track(session.user.id, 'submission_received', {
     protocolSlug: protocol.slug,
-    submissionId: submission!.id,
+    submissionId: submission?.id,
   });
 
   return NextResponse.json(
     {
-      id: submission!.id,
+      id: submission?.id,
       status: 'accepted',
-      track: `/api/submissions/${submission!.id}`,
+      track: `/api/submissions/${submission?.id}`,
     },
     { status: 202 },
   );

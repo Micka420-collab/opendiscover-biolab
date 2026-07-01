@@ -10,11 +10,11 @@
  * identical input. No time, no random, no network inside protocol code.
  */
 
-import { runSmallOrfMining } from '@/lib/science/protocols/small-orf-mining';
+import { runProtocolInSandbox } from '@/lib/sandbox/protocol-runner';
+import { runAlphaFoldDisorder } from '@/lib/science/protocols/alphafold-disorder';
 import { runCodonBiasHgt } from '@/lib/science/protocols/codon-bias-hgt';
 import { runMotifConservation } from '@/lib/science/protocols/motif-conservation';
-import { runAlphaFoldDisorder } from '@/lib/science/protocols/alphafold-disorder';
-import { runProtocolInSandbox } from '@/lib/sandbox/protocol-runner';
+import { runSmallOrfMining } from '@/lib/science/protocols/small-orf-mining';
 
 export type RunnerKind = 'js' | 'pyodide' | 'sandbox';
 

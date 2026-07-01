@@ -1,7 +1,7 @@
 import './globals.css';
+import { NavAuth } from '@/components/layout/nav-auth';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { NavAuth } from '@/components/layout/nav-auth';
 
 export const metadata: Metadata = {
   title: 'OpenDiscover — Citizen Science Discovery Engine',
@@ -21,10 +21,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-muted-foreground">/citizen-science</span>
             </Link>
             <nav className="flex items-center gap-6 text-sm">
-              <Link href="/experiments" className="hover:text-accent">Experiments</Link>
-              <Link href="/discoveries" className="hover:text-accent">Discoveries</Link>
-              <Link href="/dashboard" className="hover:text-accent">Dashboard</Link>
-              <Link href="/about" className="hover:text-accent">About</Link>
+              <Link href="/experiments" className="hover:text-accent">
+                Experiments
+              </Link>
+              <Link href="/discoveries" className="hover:text-accent">
+                Discoveries
+              </Link>
+              <Link href="/dashboard" className="hover:text-accent">
+                Dashboard
+              </Link>
+              <Link href="/about" className="hover:text-accent">
+                About
+              </Link>
               <NavAuth />
             </nav>
           </div>

@@ -9,10 +9,10 @@
  * We verify the bearer token on every request.
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { sql } from 'drizzle-orm';
-import { db, schema } from '@/lib/db';
 import { embedClaim } from '@/lib/ai/embeddings';
+import { db, schema } from '@/lib/db';
+import { sql } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;

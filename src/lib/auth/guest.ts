@@ -1,4 +1,4 @@
-import { createHmac, randomUUID, timingSafeEqual } from 'crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const GUEST_COOKIE_NAME = 'opendiscover.guest_session';
 const GUEST_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -45,7 +45,9 @@ function decodePayload(payload: string): GuestSessionPayload {
 export function createGuestSessionToken(handle: string) {
   const safeHandle = handle.trim();
   if (safeHandle.length < GUEST_HANDLE_MIN_LENGTH || safeHandle.length > GUEST_HANDLE_MAX_LENGTH) {
-    throw new Error(`Guest handle must be ${GUEST_HANDLE_MIN_LENGTH}-${GUEST_HANDLE_MAX_LENGTH} characters.`);
+    throw new Error(
+      `Guest handle must be ${GUEST_HANDLE_MIN_LENGTH}-${GUEST_HANDLE_MAX_LENGTH} characters.`,
+    );
   }
 
   const payload: GuestSessionPayload = {
@@ -124,7 +126,9 @@ export function parseGuestSessionToken(token: string): GuestSession | null {
   };
 }
 
-export function getGuestSession(headers: Headers | Request['headers'] | HeadersInit | undefined): GuestSession | null {
+export function getGuestSession(
+  headers: Headers | Request['headers'] | HeadersInit | undefined,
+): GuestSession | null {
   const cookieHeader = getCookieHeader(headers);
   const cookies = parseCookieHeader(cookieHeader);
   const token = cookies?.get(GUEST_COOKIE_NAME);

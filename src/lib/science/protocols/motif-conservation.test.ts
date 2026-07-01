@@ -31,9 +31,7 @@ describe('motif-conservation', () => {
   it('is deterministic across runs', async () => {
     const inp = {
       motif: 'WSPNGGS',
-      genomes: [
-        { genomeId: 'G1', proteins: [{ proteinId: 'p1', sequence: 'WSPNGGS' }] },
-      ],
+      genomes: [{ genomeId: 'G1', proteins: [{ proteinId: 'p1', sequence: 'WSPNGGS' }] }],
       maxMismatches: 0,
       sliceKey: 'demo',
     };

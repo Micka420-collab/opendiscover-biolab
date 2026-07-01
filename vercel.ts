@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { routes, type VercelConfig } from '@vercel/config/v1';
+import { type VercelConfig, routes } from '@vercel/config/v1';
 
 /**
  * Vercel project configuration.

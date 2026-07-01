@@ -12,11 +12,11 @@
  * status reaches CONFIRMED.
  */
 
+import { type GuestSession, getGuestSession } from '@/lib/auth/guest';
+import { db, schema } from '@/lib/db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { magicLink } from 'better-auth/plugins';
-import { db, schema } from '@/lib/db';
-import { getGuestSession, type GuestSession } from '@/lib/auth/guest';
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET ?? 'dev-secret',
@@ -69,7 +69,9 @@ export type Auth = typeof auth;
 export type Session = typeof auth.$Infer.Session;
 export type AppSession = Session | GuestSession;
 
-export async function getAppSession(options: { headers: Headers | Request['headers'] | HeadersInit }) {
+export async function getAppSession(options: {
+  headers: Headers | Request['headers'] | HeadersInit;
+}) {
   const session = await auth.api.getSession(options as any);
   if (session?.user) return session as Session;
   return getGuestSession(options.headers);

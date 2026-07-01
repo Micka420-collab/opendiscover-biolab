@@ -26,7 +26,13 @@ function axpy(y: number[], k: number[], h: number): number[] {
 }
 
 /** Fixed-step explicit Euler. */
-export function euler(f: Derivative, y0: number[], t0: number, t1: number, steps: number): OdeTrajectory {
+export function euler(
+  f: Derivative,
+  y0: number[],
+  t0: number,
+  t1: number,
+  steps: number,
+): OdeTrajectory {
   const h = (t1 - t0) / steps;
   const t: number[] = [t0];
   const y: number[][] = [[...y0]];
@@ -42,7 +48,13 @@ export function euler(f: Derivative, y0: number[], t0: number, t1: number, steps
 }
 
 /** Fixed-step classic 4th-order Runge–Kutta. */
-export function rk4(f: Derivative, y0: number[], t0: number, t1: number, steps: number): OdeTrajectory {
+export function rk4(
+  f: Derivative,
+  y0: number[],
+  t0: number,
+  t1: number,
+  steps: number,
+): OdeTrajectory {
   const h = (t1 - t0) / steps;
   const t: number[] = [t0];
   const y: number[][] = [[...y0]];
@@ -92,7 +104,10 @@ export function rk45(
   const b5 = [35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84, 0];
   const b4 = [5179 / 57600, 0, 7571 / 16695, 393 / 640, -92097 / 339200, 187 / 2100, 1 / 40];
 
-  const sampleTimes = Array.from({ length: outputPoints + 1 }, (_, i) => t0 + ((t1 - t0) * i) / outputPoints);
+  const sampleTimes = Array.from(
+    { length: outputPoints + 1 },
+    (_, i) => t0 + ((t1 - t0) * i) / outputPoints,
+  );
   const outT: number[] = [];
   const outY: number[][] = [];
 

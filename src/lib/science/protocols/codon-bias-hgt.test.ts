@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { hashCodonBiasOutput, runCodonBiasHgt } from './codon-bias-hgt';
 
 const HOST_BULK = { ATG: 0.04, TAA: 0.03, GCA: 0.05, GCC: 0.05 };
-const DONOR_A = { ATG: 0.04, TAA: 0.03, GCA: 0.10, GCC: 0.02 }; // shifted
+const DONOR_A = { ATG: 0.04, TAA: 0.03, GCA: 0.1, GCC: 0.02 }; // shifted
 const DONOR_B = { ATG: 0.04, TAA: 0.03, GCA: 0.05, GCC: 0.05 }; // matches host
 
 describe('codon-bias-hgt', () => {
