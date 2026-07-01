@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Series } from '../sim/core/types';
-import { seriesToRows, seriesToVegaLiteSpec } from './charts';
+import { distributionToVegaLiteSpec, seriesToRows, seriesToVegaLiteSpec } from './charts';
 
 describe('seriesToRows', () => {
   it('reshapes column-oriented series into tidy (x, series, y) rows', () => {
@@ -72,5 +72,33 @@ describe('seriesToVegaLiteSpec', () => {
     const x = Array.from({ length: 61 }, (_, i) => i);
     const spec = seriesToVegaLiteSpec({ x, y: { v: x } });
     expect(spec.mark).toEqual({ type: 'line', point: false });
+  });
+});
+
+describe('distributionToVegaLiteSpec', () => {
+  it('builds a bar-mark spec with the given rows as data.values, unmodified', () => {
+    const rows = [
+      { label: 'Round, Yellow', probability: 9 / 16 },
+      { label: 'Round, Green', probability: 3 / 16 },
+      { label: 'Wrinkled, Yellow', probability: 3 / 16 },
+      { label: 'Wrinkled, Green', probability: 1 / 16 },
+    ];
+    const spec = distributionToVegaLiteSpec(rows, 'Dihybrid F2');
+    expect(spec.title).toBe('Dihybrid F2');
+    expect(spec.mark).toBe('bar');
+    expect((spec.data as { values: unknown[] }).values).toEqual(rows);
+  });
+
+  it('encodes label on x (nominal, sorted by descending y) and probability on y (quantitative)', () => {
+    const spec = distributionToVegaLiteSpec([{ label: 'A', probability: 1 }]);
+    expect(spec.encoding).toMatchObject({
+      x: { field: 'label', type: 'nominal', sort: '-y' },
+      y: { field: 'probability', type: 'quantitative' },
+    });
+  });
+
+  it('handles an empty distribution without throwing', () => {
+    const spec = distributionToVegaLiteSpec([]);
+    expect((spec.data as { values: unknown[] }).values).toEqual([]);
   });
 });

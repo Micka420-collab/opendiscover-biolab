@@ -4,7 +4,7 @@ import { VegaLiteEmbed } from '@/components/charts/vega-lite-embed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { seriesToVegaLiteSpec } from '@/lib/lab/charts';
+import { distributionToVegaLiteSpec, seriesToVegaLiteSpec } from '@/lib/lab/charts';
 import {
   type GraphEdge,
   type StoichiometryEdge,
@@ -59,6 +59,55 @@ function extractMetabolicNetwork(
     reactions: d.reactions as string[],
     edges: d.stoichiometryEdges as StoichiometryEdge[],
   };
+}
+
+/**
+ * Detects any top-level `detail` field shaped like a categorical probability
+ * distribution — an array of objects each carrying a `probability: number`
+ * plus exactly one other string field (the class label), e.g. `breeding`'s
+ * `phenotypeDistribution: { phenotype: string; probability: number }[]` or
+ * `genotypeDistribution: { genotype: string; probability: number }[]`. Works
+ * for any engine exposing this shape, not just `breeding` — same duck-typed
+ * pattern as `extractNetwork`/`extractMetabolicNetwork` above.
+ *
+ * Requires the probabilities to sum to ~1: that's what distinguishes a real
+ * partition of outcomes (chartable as one distribution) from a list of
+ * independent per-item scores that merely happen to be named "probability"
+ * (e.g. `secondary-structure`'s `turns[].probability`, one bend likelihood
+ * per candidate tetrapeptide — those don't sum to 1 and aren't mutually
+ * exclusive classes, so they must NOT be picked up here).
+ */
+function extractDistributions(
+  detail: unknown,
+): { key: string; title: string; rows: { label: string; probability: number }[] }[] {
+  if (!detail || typeof detail !== 'object') return [];
+  const charts: { key: string; title: string; rows: { label: string; probability: number }[] }[] =
+    [];
+  for (const [key, value] of Object.entries(detail as Record<string, unknown>)) {
+    if (!Array.isArray(value) || value.length === 0) continue;
+    const isRow = (v: unknown): v is Record<string, unknown> =>
+      typeof v === 'object' &&
+      v !== null &&
+      typeof (v as Record<string, unknown>).probability === 'number';
+    if (!value.every(isRow)) continue;
+    const rows = value as Record<string, unknown>[];
+    const labelKey = Object.keys(rows[0]).find(
+      (k) => k !== 'probability' && typeof rows[0][k] === 'string',
+    );
+    if (!labelKey) continue;
+    if (!rows.every((r) => typeof r[labelKey] === 'string')) continue;
+    const sum = rows.reduce((s, r) => s + (r.probability as number), 0);
+    if (Math.abs(sum - 1) > 1e-6) continue;
+    charts.push({
+      key,
+      title: key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()),
+      rows: rows.map((r) => ({
+        label: r[labelKey] as string,
+        probability: r.probability as number,
+      })),
+    });
+  }
+  return charts;
 }
 
 interface EngineView {
@@ -298,6 +347,10 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
         : null,
     [metabolicNetwork],
   );
+  const distributions = useMemo(
+    () => extractDistributions(state.result.detail),
+    [state.result.detail],
+  );
 
   return (
     <Card>
@@ -340,6 +393,13 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
             <VegaLiteEmbed spec={metabolicSpec} />
           </div>
         )}
+
+        {distributions.map(({ key, title, rows }) => (
+          <div key={key}>
+            <div className="text-xs text-muted-foreground mb-2">{title}</div>
+            <VegaLiteEmbed spec={distributionToVegaLiteSpec(rows, title)} />
+          </div>
+        ))}
 
         {specs.map(({ i, spec }) => (
           <VegaLiteEmbed key={i} spec={spec} />

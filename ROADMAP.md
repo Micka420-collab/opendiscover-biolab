@@ -55,6 +55,15 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       or F1 x starter. Round-trip fidelity and a genuine Mendelian invariant are both tested (a
       homozygous GG parent can never pass on a "Faint" allele — verified live against the running
       dev server, not just vitest, matching the exact predicted 50/50 Radiant/Radiant-Faint split).
+      **Expected phenotype ratio chart**: a bar chart (`lib/lab/charts.ts`'s new
+      `distributionToVegaLiteSpec`) renders the full theoretical Punnett-square prediction next to
+      each litter, so players can compare their actual draw against the exact Mendelian ratio, not
+      just read a `9:3:3:1`-style string. Verified live against the running dev server's real
+      `/api/lab/run` response (not mocked). The underlying chart-spec builder is generic (any
+      engine's `{ <label>: string; probability: number }[]` detail field that sums to ~1 gets
+      auto-charted in the `/lab/[engine]` playground too — `extractDistributions` deliberately
+      requires the probabilities to sum to 1 so it doesn't misfire on unrelated per-item scores
+      like `secondary-structure`'s independent beta-turn bend probabilities). 3 new chart tests.
 - [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
       (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
       Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).

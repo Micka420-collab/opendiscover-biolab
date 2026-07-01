@@ -1,5 +1,6 @@
 'use client';
 
+import { VegaLiteEmbed } from '@/components/charts/vega-lite-embed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import {
   rarityScore,
   rarityTier,
 } from '@/lib/lab/breeding-game';
+import { distributionToVegaLiteSpec } from '@/lib/lab/charts';
 import { useMemo, useState } from 'react';
 
 interface Offspring {
@@ -39,6 +41,9 @@ export function BreedingGame() {
   const [bId, setBId] = useState(STARTER_SPECIMENS[3].id);
   const [litter, setLitter] = useState<Offspring[]>([]);
   const [ratio, setRatio] = useState<string>('');
+  const [phenotypeDistribution, setPhenotypeDistribution] = useState<
+    { phenotype: string; probability: number }[]
+  >([]);
   const [dex, setDex] = useState<string[]>([]);
   const [justFound, setJustFound] = useState<string[]>([]);
   const [crosses, setCrosses] = useState(0);
@@ -101,6 +106,7 @@ export function BreedingGame() {
       );
       setLitter(offspring);
       setRatio(detail.phenotypicRatio);
+      setPhenotypeDistribution(detail.phenotypeDistribution);
       setDex((prev) => [...prev, ...fresh]);
       setJustFound(fresh);
       setCrosses((c) => c + 1);
@@ -181,6 +187,30 @@ export function BreedingGame() {
               );
             })}
           </div>
+        </section>
+      )}
+
+      {/* Theoretical phenotype ratio (the full Punnett-square prediction, not just this litter) */}
+      {phenotypeDistribution.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">
+            Expected phenotype ratio{' '}
+            <span className="text-muted-foreground text-sm font-normal">
+              (theoretical, {ratio})
+            </span>
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            The exact Punnett-square prediction for {parentA.name} × {parentB.name} — compare it
+            against the {litter.length}-offspring litter actually drawn above.
+          </p>
+          <VegaLiteEmbed
+            spec={distributionToVegaLiteSpec(
+              phenotypeDistribution.map((d) => ({
+                label: d.phenotype,
+                probability: d.probability,
+              })),
+            )}
+          />
         </section>
       )}
 

@@ -54,3 +54,43 @@ export function seriesToVegaLiteSpec(series: Series, title?: string): Record<str
     height: 260,
   };
 }
+
+/** One labelled class with its probability — a categorical distribution row. */
+export interface DistributionRow {
+  label: string;
+  probability: number;
+}
+
+/**
+ * A Vega-Lite bar-chart spec for a categorical probability distribution, e.g.
+ * `breeding`'s `phenotypeDistribution`/`genotypeDistribution` (a generalised
+ * Punnett square) — any engine's `{ <name>: string; probability: number }[]`
+ * detail field, reshaped by the caller into `DistributionRow[]`. Bars are
+ * sorted descending by probability so the most likely class reads first.
+ */
+export function distributionToVegaLiteSpec(
+  rows: DistributionRow[],
+  title?: string,
+): Record<string, unknown> {
+  return {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    title,
+    data: { values: rows },
+    mark: 'bar',
+    encoding: {
+      x: { field: 'label', type: 'nominal', title: 'Class', sort: '-y' },
+      y: {
+        field: 'probability',
+        type: 'quantitative',
+        title: 'Probability',
+        axis: { format: '.0%' },
+      },
+      tooltip: [
+        { field: 'label', type: 'nominal' },
+        { field: 'probability', type: 'quantitative', format: '.2%' },
+      ],
+    },
+    width: 'container',
+    height: 220,
+  };
+}
