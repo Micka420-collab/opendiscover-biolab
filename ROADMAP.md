@@ -24,8 +24,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       `/lab/campaigns` live viewer is still open — tracked below.
 - [ ] **Lab campaigns live viewer** — `/lab/campaigns` page streaming a running autonomous
       campaign's notebook (builds on the durable Inngest campaign below)
-- [ ] **SIMULATION_ENGINES.md** — full catalog: each engine's model, params, references,
-      worked example + an "authoring an engine" guide
+- [x] **SIMULATION_ENGINES.md** — full catalog GENERATED from the registry
+      (`scripts/gen-engines-doc.ts`, `pnpm docs:engines`): per-engine model, params table,
+      references, worked example JSON + an "authoring an engine" guide. Can never drift.
 - [ ] **MCP tools** — expose `list_engines` / `run_experiment` / `run_campaign` so external
       agents drive the lab through the same gates
 - [ ] **Campaign persistence + Inngest** — durable `run-campaign` function; notebook streamed

@@ -22,6 +22,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "corpus:ingest": "tsx scripts/ingest-reference-corpus.ts",
+    "docs:engines": "tsx scripts/gen-engines-doc.ts",
     "protocols:seed": "tsx scripts/seed-protocols.ts",
     "mcp:dev": "tsx src/lib/mcp/stdio-server.ts"
   },
