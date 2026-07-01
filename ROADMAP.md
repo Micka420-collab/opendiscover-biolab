@@ -40,7 +40,7 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       to the UI via the existing SSE channel
 - [ ] **Bridge to discovery pipeline** — a novel campaign finding becomes a Discovery Card
       (reuse triage → novelty → vulgarize), canary-replicated via the deterministic hash
-- [~] **More engines** — done: `alignment` (Needleman–Wunsch + Smith–Waterman), `hodgkin-huxley`
+- [x] **More engines** — done: `alignment` (Needleman–Wunsch + Smith–Waterman), `hodgkin-huxley`
       (new neuroscience domain; a real ODE-discontinuity truncation bug in the shared solver's
       usage was found and fixed while building it), `mass-spec` (peptide MS/MS b/y fragment-ion
       prediction; residue masses derived from CODATA atomic masses rather than a copied table,
@@ -48,10 +48,15 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       literature figures), `docking` (geometric rigid-body pose ranking via Lennard-Jones scoring;
       LJ minimum/root and Rodrigues-rotation orthogonality verified by hand-derivation, not memory),
       `branching-growth` (Galton-Watson cell-population growth/extinction; the extinction-probability
-      theorem verified on 3 hand-solved edge cases before being trusted for the general formula).
-      Next: metabolic pathway explorer. Thermodynamic RNA (Zuker) deprioritized — its real nearest-
-      neighbour free-energy tables (Turner parameters) are too extensive to safely hand-verify
-      rather than risk copying a misremembered figure; revisit only with a citable primary source.
+      theorem verified on 3 hand-solved edge cases before being trusted for the general formula),
+      `metabolic-pathway` (kinetic ODE complement to fba.ts's steady-state LP: a linear
+      Michaelis-Menten chain reaches uniform flux at steady state, or backs up without bound past a
+      genuine capacity bottleneck — both regimes hand-derived/verified, including a closed-form
+      two-step steady state solved algebraically before trusting the ODE integration against it).
+      This closes the "more engines" backlog item at 25 engines. Thermodynamic RNA (Zuker)
+      deprioritized — its real nearest-neighbour free-energy tables (Turner parameters) are too
+      extensive to safely hand-verify rather than risk copying a misremembered figure; revisit
+      only with a citable primary source.
 - [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,

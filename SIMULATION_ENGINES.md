@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **24 deterministic simulation engines** across
+The OpenDiscover BioLab ships **25 deterministic simulation engines** across
 9 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -20,7 +20,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
-- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba)
+- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
@@ -601,6 +601,52 @@ Constraint-based optimisation of a metabolic network at steady state. Given a st
 ```
 
 _Run it: `POST /api/lab/run { "engine": "fba", "params": … }` or interactively at `/lab/fba`._
+
+---
+
+### `metabolic-pathway` — Kinetic Metabolic Pathway
+
+Simulates the time-dependent dynamics of a linear enzymatic pathway (S0 -> S1 -> ... -> Sn), each step following Michaelis-Menten kinetics, integrated with adaptive RK45. The upstream substrate S0 is held at a fixed reservoir concentration. The complement to fba.ts's steady-state optimization: this reports the actual transient approach to steady state, the uniform pathway-wide flux once there, and which step is rate-limiting (the lowest Vmax).
+
+**References**
+- Heinrich R, Schuster S. The Regulation of Cellular Systems (1996) — flux uniformity.
+- Fell D. Understanding the Control of Metabolism (1997).
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `sourceConcentration` | number | `10` | ≥ 0 |  |
+| `steps` | json | **required** |  |  |
+| `initialIntermediates` | json | — |  |  |
+| `tEnd` | number | `200` | ≥ 0 |  |
+| `outputPoints` | integer | `300` | ≥ 0, ≤ 5000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+
+**Example**
+
+```json
+{
+  "sourceConcentration": 10,
+  "steps": [
+    {
+      "vmax": 5,
+      "km": 2
+    },
+    {
+      "vmax": 6,
+      "km": 3
+    },
+    {
+      "vmax": 8,
+      "km": 1.5
+    }
+  ],
+  "tEnd": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "metabolic-pathway", "params": … }` or interactively at `/lab/metabolic-pathway`._
 
 
 ## 🌱 Population genetics

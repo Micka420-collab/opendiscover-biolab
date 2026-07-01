@@ -162,6 +162,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Peptide PEPTIDE (7 residues): neutral mass 799.3600 Da, [M+2H]2+ = 400.6873; 12 fragment ions predicted.",
   },
+  "metabolic-pathway": {
+    "metrics": {
+      "bottleneckStepIndex": 1,
+      "finalProduct": 824.885,
+      "fluxUniformityError": 0,
+      "steadyStateFlux": 4.16667,
+    },
+    "summary": "3-step pathway: steady-state flux ≈ 4.1667, bottleneck at step 1 (Vmax=5), final product S3 = 824.885.",
+  },
   "pcr": {
     "metrics": {
       "ampliconLength": 100,
