@@ -196,6 +196,67 @@ export function recombinantGametes(
   ];
 }
 
+// ---------------------------------------------------------------------------
+// X-linked (sex-linked) inheritance — a standalone helper, like
+// `recombinantGametes` above, not wired into `run()`'s autosomal Punnett-
+// square machinery (a fundamentally different transmission mechanism).
+// ---------------------------------------------------------------------------
+
+export type Sex = 'female' | 'male';
+
+export interface XLinkedOffspringClass {
+  sex: Sex;
+  /** Daughters: 2-character diploid genotype (e.g. "Aa"). Sons: the single
+   * hemizygous allele they carry (e.g. "a") — they have no second X allele. */
+  genotype: string;
+  phenotype: string;
+  /** Probability of this (sex, genotype) class, out of 1 across ALL classes. */
+  probability: number;
+}
+
+/**
+ * Cross one X-linked locus. The mother (XX) contributes one of her two
+ * alleles, chosen with equal 50% probability, to EVERY offspring regardless
+ * of sex. The father (XY) contributes his single X allele to every daughter
+ * and his Y (no allele at this locus) to every son. A son therefore expresses
+ * whatever single allele he receives directly (hemizygous — there is no
+ * second copy to be dominant or recessive against), independent of the
+ * gene's declared dominance `mode`.
+ *
+ * This reproduces the textbook X-linked recessive pattern (e.g. red-green
+ * colour blindness, haemophilia): a carrier mother (heterozygous) crossed
+ * with an unaffected father never has an affected daughter (every daughter
+ * gets the father's normal allele), but 50% of her sons are affected.
+ *
+ * References:
+ *   - Morgan TH (1910). "Sex limited inheritance in Drosophila." Science 32:120
+ *     — the original white-eye X-linkage discovery.
+ *   - Griffiths et al. "Introduction to Genetic Analysis" — X-linked inheritance.
+ */
+export function crossXLinked(
+  gene: Gene,
+  motherAlleles: readonly [string, string],
+  fatherAllele: string,
+): XLinkedOffspringClass[] {
+  const merged = new Map<string, XLinkedOffspringClass>();
+  const add = (sex: Sex, genotype: string, phenotype: string, probability: number) => {
+    const key = `${sex}|${genotype}`;
+    const existing = merged.get(key);
+    if (existing) existing.probability += probability;
+    else merged.set(key, { sex, genotype, phenotype, probability });
+  };
+
+  for (const motherAllele of motherAlleles) {
+    // Daughter: [father's X, this maternal X] — normal diploid dominance applies.
+    const daughterPair = orderPair(gene, fatherAllele, motherAllele);
+    add('female', daughterPair.join(''), genePhenotype(gene, daughterPair), 0.25);
+    // Son: just this maternal X (hemizygous) — expressed directly, no masking.
+    add('male', motherAllele, alleleLabel(gene, motherAllele), 0.25);
+  }
+
+  return [...merged.values()].sort((a, b) => b.probability - a.probability);
+}
+
 /** Reduce a set of probabilities to an approximate small-integer ratio string. */
 function ratioString(probs: number[]): string {
   const min = Math.min(...probs.filter((p) => p > 1e-9));
@@ -314,13 +375,18 @@ export const spec: EngineSpec<BreedingParams, BreedingDetail> = {
   description:
     'Cross two diploid parents across independent gene loci and get the full offspring genotype ' +
     'and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete ' +
-    'offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance ' +
-    "(1:2:1) under independent assortment (Mendel's second law). A separate standalone helper, " +
-    '`recombinantGametes`, computes two-locus linked-gene gamete frequencies for test-cross ' +
-    'analysis; it is not used by this cross calculator, which always treats loci as unlinked.',
+    'offspring, with an optional per-allele mutation rate perturbing the sampled individuals shown ' +
+    '(never the theoretical distribution). Supports complete dominance (3:1, 9:3:3:1), incomplete ' +
+    "dominance and codominance (1:2:1) under independent assortment (Mendel's second law). A " +
+    'separate standalone helper, `recombinantGametes`, computes two-locus linked-gene gamete ' +
+    'frequencies for test-cross analysis; it is not used by this cross calculator, which always ' +
+    'treats loci as unlinked. Another standalone helper, `crossXLinked`, computes X-linked/sex-' +
+    'linked inheritance (sons are hemizygous — a fundamentally different transmission mechanism ' +
+    'from the autosomal loci above); it is likewise not used by this cross calculator.',
   references: [
     'Mendel G. (1866). Versuche über Pflanzen-Hybriden.',
     'Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage.',
+    'Morgan TH (1910). Science 32:120 — X-linked inheritance (Drosophila white-eye).',
   ],
   tags: ['genetics', 'mendel', 'punnett', 'breeding', 'cross', 'game'],
   paramsSchema: breedingParams,

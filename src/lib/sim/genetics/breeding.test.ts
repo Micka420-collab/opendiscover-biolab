@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { breedingParams, genePhenotype, recombinantGametes, spec } from './breeding';
+import { breedingParams, crossXLinked, genePhenotype, recombinantGametes, spec } from './breeding';
 
 type Gene = (typeof breedingParams._output)['genes'][number];
 
@@ -301,5 +301,84 @@ describe('breeding — mutationRate (illustrative, sampled offspring only)', () 
       seed: 'mut-determinism',
     };
     expect(spec.run(params)).toEqual(spec.run(params));
+  });
+});
+
+describe('crossXLinked — sex-linked (X-linked) inheritance', () => {
+  // A=Normal (dominant), a=Affected (recessive) -- the classic X-linked
+  // recessive setup (colour blindness, haemophilia).
+  const xGene: Gene = {
+    symbol: 'X',
+    name: 'X-linked trait',
+    mode: 'complete',
+    dominant: 'A',
+    alleles: [
+      { symbol: 'A', label: 'Normal' },
+      { symbol: 'a', label: 'Affected' },
+    ],
+  };
+
+  it('carrier mother (Aa) x unaffected father (A): no affected daughters, 50% of sons affected', () => {
+    // Hand-derived: the mother's two alleles each go to a daughter (paired
+    // with the father's obligate 'A') and to a son (expressed directly),
+    // each combination at 0.25. This is the textbook pattern taught for
+    // colour-blindness/haemophilia pedigrees.
+    const classes = crossXLinked(xGene, ['A', 'a'], 'A');
+    expect(classes).toHaveLength(4);
+    const byKey = new Map(classes.map((c) => [`${c.sex}|${c.genotype}`, c]));
+    expect(byKey.get('female|AA')).toMatchObject({ phenotype: 'Normal', probability: 0.25 });
+    expect(byKey.get('female|Aa')).toMatchObject({ phenotype: 'Normal', probability: 0.25 });
+    expect(byKey.get('male|A')).toMatchObject({ phenotype: 'Normal', probability: 0.25 });
+    expect(byKey.get('male|a')).toMatchObject({ phenotype: 'Affected', probability: 0.25 });
+
+    // No daughter is ever affected (both her possible genotypes show Normal).
+    const daughters = classes.filter((c) => c.sex === 'female');
+    expect(daughters.every((c) => c.phenotype === 'Normal')).toBe(true);
+    // Exactly half of sons are affected.
+    const sons = classes.filter((c) => c.sex === 'male');
+    const sonAffectedProb = sons
+      .filter((c) => c.phenotype === 'Affected')
+      .reduce((s, c) => s + c.probability, 0);
+    const sonTotalProb = sons.reduce((s, c) => s + c.probability, 0);
+    expect(sonAffectedProb / sonTotalProb).toBeCloseTo(0.5, 10);
+  });
+
+  it('affected father (a) x homozygous-normal mother (AA): all daughters are carriers, no affected sons', () => {
+    // The father's X (carrying 'a') goes to EVERY daughter; his Y (nothing)
+    // goes to every son. Sons only ever get the mother's 'A'.
+    const classes = crossXLinked(xGene, ['A', 'A'], 'a');
+    expect(classes).toHaveLength(2); // mother's two alleles are identical -> merges to 2 classes
+    const byKey = new Map(classes.map((c) => [`${c.sex}|${c.genotype}`, c]));
+    expect(byKey.get('female|Aa')).toMatchObject({ phenotype: 'Normal', probability: 0.5 });
+    expect(byKey.get('male|A')).toMatchObject({ phenotype: 'Normal', probability: 0.5 });
+    // No son is ever affected from this cross (father's 'a' can't reach a son).
+    expect(classes.some((c) => c.sex === 'male' && c.phenotype === 'Affected')).toBe(false);
+  });
+
+  it('both parents affected (aa mother x a father): every offspring is affected', () => {
+    const classes = crossXLinked(xGene, ['a', 'a'], 'a');
+    expect(classes).toHaveLength(2);
+    for (const c of classes) {
+      expect(c.phenotype).toBe('Affected');
+      expect(c.probability).toBeCloseTo(0.5, 10);
+    }
+  });
+
+  it('probabilities always sum to 1', () => {
+    for (const [mother, father] of [
+      [['A', 'a'], 'A'],
+      [['A', 'A'], 'a'],
+      [['a', 'a'], 'A'],
+    ] as const) {
+      const classes = crossXLinked(xGene, mother, father);
+      const total = classes.reduce((s, c) => s + c.probability, 0);
+      expect(total).toBeCloseTo(1, 10);
+    }
+  });
+
+  it('is a pure function: identical inputs give identical output', () => {
+    const a = crossXLinked(xGene, ['A', 'a'], 'A');
+    const b = crossXLinked(xGene, ['A', 'a'], 'A');
+    expect(a).toEqual(b);
   });
 });

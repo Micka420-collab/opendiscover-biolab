@@ -23,6 +23,12 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       AA pre-mutation) at mutationRate=1 forces every sampled offspring to "aa", checked both in
       vitest and live against the running dev server — plus a Monte-Carlo statistical check
       (empirical rate ≈ 1−(1−rate)² for the two independent per-allele rolls).
+      **X-linked (sex-linked) inheritance**: a standalone `crossXLinked(gene, motherAlleles,
+      fatherAllele)` helper models hemizygous males (sons get their single X from the mother only;
+      daughters get one X from each parent) — deliberately not wired into `run()`'s autosomal
+      Punnett machinery, same pattern as `recombinantGametes`. Verified against the classic
+      textbook carrier-mother × normal-father cross (no affected daughters, exactly 50% of sons
+      affected) before writing any test; 5 tests including probability-sums-to-1 and purity.
 - [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
       offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
       Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 9 tests).

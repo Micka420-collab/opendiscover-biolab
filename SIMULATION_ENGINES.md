@@ -741,11 +741,12 @@ _Run it: `POST /api/lab/run { "engine": "phylogenetics", "params": … }` or int
 
 ### `breeding` — Mendelian Breeding & Genetic Crossing
 
-Cross two diploid parents across independent gene loci and get the full offspring genotype and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete offspring. Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance (1:2:1) under independent assortment (Mendel's second law). A separate standalone helper, `recombinantGametes`, computes two-locus linked-gene gamete frequencies for test-cross analysis; it is not used by this cross calculator, which always treats loci as unlinked.
+Cross two diploid parents across independent gene loci and get the full offspring genotype and phenotype distributions (a generalised Punnett square) plus a seeded sample of concrete offspring, with an optional per-allele mutation rate perturbing the sampled individuals shown (never the theoretical distribution). Supports complete dominance (3:1, 9:3:3:1), incomplete dominance and codominance (1:2:1) under independent assortment (Mendel's second law). A separate standalone helper, `recombinantGametes`, computes two-locus linked-gene gamete frequencies for test-cross analysis; it is not used by this cross calculator, which always treats loci as unlinked. Another standalone helper, `crossXLinked`, computes X-linked/sex-linked inheritance (sons are hemizygous — a fundamentally different transmission mechanism from the autosomal loci above); it is likewise not used by this cross calculator.
 
 **References**
 - Mendel G. (1866). Versuche über Pflanzen-Hybriden.
 - Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage.
+- Morgan TH (1910). Science 32:120 — X-linked inheritance (Drosophila white-eye).
 
 **Parameters**
 
