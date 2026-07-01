@@ -7,6 +7,7 @@
  * result can be content-hashed and reproduced.
  */
 
+import { type ParamField, describeParamFields } from './core/param-fields';
 import type { EngineSpec, SimResult } from './core/types';
 
 export class EngineError extends Error {
@@ -69,6 +70,7 @@ export function describeEngine(spec: EngineSpec): {
   references: string[];
   tags: string[];
   example: unknown;
+  fields: ParamField[];
 } {
   return {
     slug: spec.slug,
@@ -79,5 +81,6 @@ export function describeEngine(spec: EngineSpec): {
     references: spec.references ?? [],
     tags: spec.tags ?? [],
     example: spec.example,
+    fields: describeParamFields(spec.paramsSchema),
   };
 }

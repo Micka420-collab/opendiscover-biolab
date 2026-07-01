@@ -83,4 +83,6 @@ export function runEngine(slug: string, params: unknown): SimResult {
 }
 
 export { execute, describeEngine } from './kernel';
+export { describeParamFields } from './core/param-fields';
+export type { ParamField } from './core/param-fields';
 export type { EngineSpec, SimResult, Metric, Series, SimDomain } from './core/types';

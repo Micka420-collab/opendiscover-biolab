@@ -56,6 +56,8 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | 🔬 Structural | `rna-fold` | RNA secondary structure via the Nussinov DP algorithm |
 
 > Full catalog with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
+> Run any engine interactively — a param form generated from its Zod schema, Vega-Lite result
+> charts, no account needed — at `/lab`.
 
 ---
 
@@ -88,6 +90,7 @@ Browser / Agent / MCP client
 Vercel Edge — BotID · rate limit · request-ID
         ▼
 Vercel Functions (Fluid Compute)
+   /lab/*             → engine catalog + interactive playground (param form, Vega-Lite charts)
    /api/lab/*         → run engines, launch campaigns
    /api/submissions   → citizen-science discovery pipeline
    /api/mcp           → agents contribute through the same gates
