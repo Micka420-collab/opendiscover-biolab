@@ -362,3 +362,34 @@ describe('engine spec metadata', () => {
     }
   });
 });
+
+describe('detail.edges — the resolved network topology, by gene name', () => {
+  it('the repressilator is exactly the 3-cycle of repressors g0 -> g1 -> g2 -> g0', () => {
+    const r = spec.run({ preset: 'repressilator' });
+    const edges = r.detail?.edges ?? [];
+    expect(edges).toHaveLength(3);
+    expect(edges.every((e) => e.sign === -1)).toBe(true);
+    const asPairs = new Set(edges.map((e) => `${e.from}->${e.to}`));
+    expect(asPairs).toEqual(new Set(['g0->g1', 'g1->g2', 'g2->g0']));
+  });
+
+  it('the toggle switch is exactly the 2 mutual-repression edges', () => {
+    const r = spec.run({ preset: 'toggleSwitch' });
+    const edges = r.detail?.edges ?? [];
+    expect(edges).toHaveLength(2);
+    expect(edges.every((e) => e.sign === -1)).toBe(true);
+    const asPairs = new Set(edges.map((e) => `${e.from}->${e.to}`));
+    expect(asPairs).toEqual(new Set(['A->B', 'B->A']));
+  });
+
+  it('an explicit custom network round-trips to the same edge list', () => {
+    const r = spec.run({
+      network: {
+        genes: [{ name: 'X' }, { name: 'Y' }],
+        edges: [{ from: 'X', to: 'Y', sign: 1 }],
+        logic: 'additive',
+      },
+    });
+    expect(r.detail?.edges).toEqual([{ from: 'X', to: 'Y', sign: 1 }]);
+  });
+});

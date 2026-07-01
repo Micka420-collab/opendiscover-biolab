@@ -5,8 +5,26 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { seriesToVegaLiteSpec } from '@/lib/lab/charts';
+import { type GraphEdge, networkGraphSpec } from '@/lib/lab/network-chart';
 import type { Metric, ParamField, SimResult } from '@/lib/sim';
 import { useMemo, useState } from 'react';
+
+/** Detects the `{ genes: string[], edges: {from,to,sign}[] }` shape some
+ * engines (e.g. `grn`) expose in `detail`, without assuming every engine has it. */
+function extractNetwork(detail: unknown): { genes: string[]; edges: GraphEdge[] } | null {
+  if (!detail || typeof detail !== 'object') return null;
+  const d = detail as Record<string, unknown>;
+  if (!Array.isArray(d.genes) || !Array.isArray(d.edges)) return null;
+  if (!d.genes.every((g) => typeof g === 'string')) return null;
+  const validEdge = (e: unknown): e is GraphEdge =>
+    typeof e === 'object' &&
+    e !== null &&
+    typeof (e as GraphEdge).from === 'string' &&
+    typeof (e as GraphEdge).to === 'string' &&
+    ((e as GraphEdge).sign === 1 || (e as GraphEdge).sign === -1);
+  if (!d.edges.every(validEdge)) return null;
+  return { genes: d.genes as string[], edges: d.edges as GraphEdge[] };
+}
 
 interface EngineView {
   slug: string;
@@ -225,6 +243,11 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
     () => (state.result.series ?? []).map((s, i) => ({ i, spec: seriesToVegaLiteSpec(s) })),
     [state.result.series],
   );
+  const network = useMemo(() => extractNetwork(state.result.detail), [state.result.detail]);
+  const networkSpec = useMemo(
+    () => (network ? networkGraphSpec(network.genes, network.edges) : null),
+    [network],
+  );
 
   return (
     <Card>
@@ -249,6 +272,13 @@ function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
                 {m.note && <div className="text-xs text-muted-foreground mt-1">{m.note}</div>}
               </div>
             ))}
+          </div>
+        )}
+
+        {networkSpec && (
+          <div>
+            <div className="text-xs text-muted-foreground mb-2">Regulatory network topology</div>
+            <VegaLiteEmbed spec={networkSpec} />
           </div>
         )}
 

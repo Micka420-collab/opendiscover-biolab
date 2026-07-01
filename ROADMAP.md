@@ -57,7 +57,14 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       deprioritized — its real nearest-neighbour free-energy tables (Turner parameters) are too
       extensive to safely hand-verify rather than risk copying a misremembered figure; revisit
       only with a citable primary source.
-- [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
+- [~] **3D/visual** — done: `grn`'s regulatory network topology is now visualized in the `/lab/[engine]`
+      playground (`lib/lab/network-chart.ts`) — a deterministic circular layout (exact trig, hand-
+      verified: node i at angle -π/2+i·2π/n) rendered as a Vega-Lite node-link diagram, color-coded
+      activation/repression. `grn`'s `detail` now exposes the resolved edge list by gene name
+      (additive, non-breaking). Verified live: `/lab/grn` renders, and `POST /api/lab/run` for the
+      repressilator returns the exact 3-cycle g0→g1→g2→g0. Still open: an FBA reaction-network view,
+      and a real Mol* 3D view (needs actual 3D coordinates — hp-folding's are a 2D lattice, not real
+      protein structure, so this needs a genuine PDB-shaped output first, not a forced fit).
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,
       cross-platform snapshot (summary + metrics @ 6 sig figs) so any science change is caught.

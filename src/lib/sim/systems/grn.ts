@@ -467,6 +467,12 @@ export function analyzeSeries(
 // Engine detail & run
 // ---------------------------------------------------------------------------
 
+export interface GrnEdgeSummary {
+  from: string;
+  to: string;
+  sign: 1 | -1;
+}
+
 export interface GrnDetail {
   preset?: string;
   behavior: 'oscillatory' | 'toggle' | 'steady-state';
@@ -474,6 +480,23 @@ export interface GrnDetail {
   logic: 'additive' | 'multiplicative';
   analyses: SeriesAnalysis[];
   finalState: number[];
+  /** The resolved regulatory network topology, by gene name (for visualization). */
+  edges: GrnEdgeSummary[];
+}
+
+/** Flatten a resolved network's index-based `inputs` into a named edge list. */
+export function networkEdgeList(net: ResolvedNetwork): GrnEdgeSummary[] {
+  const edges: GrnEdgeSummary[] = [];
+  net.inputs.forEach((incoming, targetIndex) => {
+    for (const e of incoming) {
+      edges.push({
+        from: net.genes[e.fromIndex].name,
+        to: net.genes[targetIndex].name,
+        sign: e.sign,
+      });
+    }
+  });
+  return edges;
 }
 
 /** Assemble the network + initial conditions from either a preset or an explicit spec. */
@@ -638,6 +661,7 @@ export function run(params: GrnParams): SimResult<GrnDetail> {
     logic: net.logic,
     analyses,
     finalState,
+    edges: networkEdgeList(net),
   };
 
   return {
