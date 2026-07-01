@@ -38,8 +38,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       alignment, Hodgkin–Huxley neuron, mass-spec fragmentation, thermodynamic RNA (Zuker),
       agent-based tissue growth, metabolic pathway explorer
 - [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
-- [ ] **Seeded reproducibility harness** — CI job that re-runs every engine example and asserts
-      the output hash is stable across machines
+- [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
+      (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,
+      cross-platform snapshot (summary + metrics @ 6 sig figs) so any science change is caught.
 
 ### Later
 - [ ] Multi-agent lab: a PI agent decomposing a grand goal into parallel bench-agent campaigns

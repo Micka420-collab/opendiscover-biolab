@@ -1,0 +1,180 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`engine reproducibility harness > pins every engine example to a stable summary + metrics snapshot 1`] = `
+{
+  "admet": {
+    "metrics": {
+      "hba": 4,
+      "hbd": 1,
+      "lipinskiViolations": 0,
+      "logP": 0.51,
+      "mw": 180.159,
+      "qed": 0.647854,
+      "tpsa": 71.44,
+    },
+    "summary": "C9H8O4 MW 180.2 Da, logP 0.51, HBD 1, HBA 4; Lipinski 0 violations (drug-like); QED 0.648; 3/3 rule sets pass.",
+  },
+  "bioreactor": {
+    "metrics": {
+      "criticalDilutionRate": 0.380952,
+      "productivity": 0.95,
+      "simulatedBiomass": 4.75,
+      "simulatedSubstrate": 0.5,
+      "steadyStateBiomass": 4.75,
+      "steadyStateSubstrate": 0.5,
+      "washout": 0,
+    },
+    "summary": "Chemostat steady state: X*=4.75 g/L, S*=0.500 g/L, productivity 0.950 g/L/h.",
+  },
+  "cloning": {
+    "metrics": {
+      "fragmentCount": 3,
+      "largestFragment": 11,
+      "siteCount": 2,
+      "smallestFragment": 5,
+    },
+    "summary": "EcoRI + BamHI digest of a 25 bp linear template -> 2 sites, 3 fragments.",
+  },
+  "compartmental": {
+    "metrics": {
+      "finalSize": 0.892646,
+      "herdImmunityThreshold": 0.6,
+      "peakDay": 39.6,
+      "peakInfected": 233387,
+      "r0": 2.5,
+    },
+    "summary": "SIR: R0=2.50 ⇒ epidemic. Herd-immunity threshold 60.0%, attack rate 89.3%, peak prevalence 23.3% on day 39.6.",
+  },
+  "crispr": {
+    "metrics": {
+      "bestOnTarget": 0.715042,
+      "bestSpecificity": 1,
+      "guideCount": 5,
+    },
+    "summary": "5 SpCas9 guide(s); best on-target 0.72, best specificity 1.00.",
+  },
+  "dose-response": {
+    "metrics": {
+      "ec50": 50,
+      "emax": 100,
+      "hillSlope": 1,
+      "ic50": 50,
+    },
+    "summary": "Hill dose-response: EC50 50 (n=1), effect 0 -> 100.",
+  },
+  "enzyme-kinetics": {
+    "metrics": {
+      "apparentVmax": 10,
+      "halfSaturation": 5,
+      "km": 5,
+      "vAtKm": 5,
+      "vmax": 10,
+    },
+    "summary": "Michaelis–Menten: Vmax=10.0, Km=5.00 → apparent Vmax=10.0, half-saturation at [S]=5.00.",
+  },
+  "fba": {
+    "metrics": {
+      "activeReactions": 3,
+      "objectiveValue": 20,
+    },
+    "summary": "Optimal objective flux 20.000 with 3 of 3 reactions active.",
+  },
+  "gillespie": {
+    "metrics": {
+      "endTime": 50,
+      "final_X": 8,
+      "meanPopulation": 9.152,
+      "numReactions": 950,
+    },
+    "summary": "birth–death process: 950 reaction events over t=50.0; mean X ≈ 9.15.",
+  },
+  "grn": {
+    "metrics": {
+      "amplitude": 11.123,
+      "cycles": 7.33333,
+      "estimatedPeriod": 8.41404,
+      "final_g0": 1.31788,
+      "final_g1": 2.34709,
+      "final_g2": 16.989,
+      "oscillatingGenes": 3,
+    },
+    "summary": "repressilator oscillates with period ≈ 8.41 time units across 3 genes.",
+  },
+  "hp-folding": {
+    "metrics": {
+      "acceptanceRate": 0.149883,
+      "bestEnergy": -8,
+      "hhContacts": 8,
+    },
+    "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
+  },
+  "pcr": {
+    "metrics": {
+      "ampliconLength": 100,
+      "fwdTm": 53.83,
+      "productGcPercent": 51,
+      "revTm": 51.78,
+    },
+    "summary": "PCR on a 120 nt template yields a 100 bp product (GC 51%); primer Tm 53.8/51.8 °C.",
+  },
+  "phylogenetics": {
+    "metrics": {
+      "taxaCount": 4,
+      "totalBranchLength": 0.216877,
+      "treeDepth": 2,
+      "treeHeight": 0.113695,
+    },
+    "summary": "Neighbor-Joining tree of 4 taxa (Jukes–Cantor distances), depth 2.",
+  },
+  "properties": {
+    "metrics": {
+      "extinction280": 6990,
+      "gravy": -0.16,
+      "instabilityIndex": 34.445,
+      "length": 40,
+      "molecularWeightDa": 4777.53,
+      "theoreticalPI": 10.6182,
+    },
+    "summary": "40-residue protein: 4777.5 Da, pI 10.62, GRAVY -0.16, instability 34.4 (stable).",
+  },
+  "rna-fold": {
+    "metrics": {
+      "basePairs": 4,
+      "pairedFraction": 0.666667,
+      "sequenceLength": 12,
+      "stackingEnergy": -9,
+    },
+    "summary": "4 base pairs over 12 nt (67% paired, 3 stacks, ΔG≈-9.0 kcal/mol): ((((....))))",
+  },
+  "secondary-structure": {
+    "metrics": {
+      "coilFraction": 0,
+      "helixFraction": 0.5,
+      "length": 22,
+      "sheetFraction": 0.5,
+      "turnCount": 1,
+    },
+    "summary": "50% helix, 50% sheet, 0% coil over 22 residues (1 β-turn)",
+  },
+  "sequence": {
+    "metrics": {
+      "gcPercent": 42.2535,
+      "length": 71,
+      "meltingTempC": 72.7535,
+      "molecularWeightDa": 22017.4,
+      "orfCount": 1,
+    },
+    "summary": "Longest ORF: frame +2 (+), 20 aa — MASKDLFWHPVMEKLSDFWH",
+  },
+  "wright-fisher": {
+    "metrics": {
+      "fixationProbability": 0.265,
+      "lossProbability": 0.19,
+      "meanAbsorptionTime": 128.198,
+      "meanFinalFreq": 0.527975,
+      "meanTimeToFixation": 125.717,
+    },
+    "summary": "Wright-Fisher: N=100 (2N=200), p0=0.5, 200 replicates × 200 gens → fixation P(A)≈0.265, mean final freq=0.528.",
+  },
+}
+`;
