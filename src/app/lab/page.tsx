@@ -30,6 +30,22 @@ export default function LabPage() {
         </p>
       </header>
 
+      <Link href="/lab/breeding" className="block group">
+        <Card className="border-fuchsia-500/40 bg-fuchsia-500/5 hover:border-fuchsia-500/70 transition-colors">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              🧬 Breeding Lab
+              <Badge variant="outline">game</Badge>
+            </CardTitle>
+            <CardDescription>
+              Cross <em>Glowzoa</em> specimens, watch real Mendelian ratios play out, and hunt rare
+              phenotypes to fill your dex. A playful way into genetics — powered by the
+              deterministic <code>breeding</code> engine.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </Link>
+
       {domains.map((domain) => (
         <section key={domain} className="space-y-4">
           <h2 className="text-lg font-semibold">{DOMAIN_LABELS[domain] ?? domain}</h2>

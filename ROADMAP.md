@@ -17,8 +17,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 - [x] **Breeding / genetic-crossing engine** — `sim/genetics/breeding.ts`: generalised Punnett
       distributions, complete/incomplete/codominant dominance (3:1, 9:3:3:1, 1:2:1), two-locus
       linkage + recombination, seeded offspring sampling. 11 tests vs classical ratios.
-- [ ] **Breeding game UI** — `/lab/breeding`: pick two parents, cross them, reveal offspring
-      cards + a "phenotype dex" of discovered traits with rarity scoring (playful discovery loop)
+- [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
+      offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
+      Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 6 tests).
 - [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
       (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
       Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).
