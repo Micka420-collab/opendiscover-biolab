@@ -79,7 +79,7 @@ export const breedingParams = z.object({
 });
 
 export type BreedingParams = z.input<typeof breedingParams>;
-type Gene = z.infer<typeof geneSchema>;
+export type Gene = z.infer<typeof geneSchema>;
 
 export interface BreedingDetail {
   phenotypeDistribution: { phenotype: string; probability: number }[];

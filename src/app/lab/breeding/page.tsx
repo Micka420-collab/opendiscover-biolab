@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AdvancedGenetics } from './advanced-genetics';
 import { BreedingGame } from './breeding-game';
 
 export const metadata = { title: 'Breeding Lab — OpenDiscover BioLab' };
@@ -23,6 +24,8 @@ export default function BreedingPage() {
       </header>
 
       <BreedingGame />
+
+      <AdvancedGenetics />
 
       <footer className="text-xs text-muted-foreground border-t border-border pt-4">
         Powered by the{' '}
