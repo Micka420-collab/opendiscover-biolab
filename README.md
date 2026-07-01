@@ -57,6 +57,8 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 
 > Full catalog with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
 
+Every engine also has an interactive playground at `/lab/<slug>` — a parameter form generated straight from its Zod schema (typed number/enum/boolean controls, JSON fallback for nested params), wired to `/api/lab/run`, rendering metrics, Vega-Lite charts, and the reproducibility hash.
+
 ---
 
 ## The autonomous scientist
@@ -88,6 +90,7 @@ Browser / Agent / MCP client
 Vercel Edge — BotID · rate limit · request-ID
         ▼
 Vercel Functions (Fluid Compute)
+   /lab/*             → catalog + interactive engine playground (Vega-Lite)
    /api/lab/*         → run engines, launch campaigns
    /api/submissions   → citizen-science discovery pipeline
    /api/mcp           → agents contribute through the same gates

@@ -27,6 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/discoveries" className="hover:text-accent">
                 Discoveries
               </Link>
+              <Link href="/lab" className="hover:text-accent">
+                Lab
+              </Link>
               <Link href="/dashboard" className="hover:text-accent">
                 Dashboard
               </Link>
