@@ -17,8 +17,13 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 - [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
       (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
       Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).
-- [ ] **Lab workbench UI** — `/lab` catalog, `/lab/[engine]` interactive playground
-      (param form from Zod schema + Vega-Lite result charts), `/lab/campaigns` live viewer
+- [x] **Lab workbench UI (catalog + playground)** — `/lab` catalog grouped by domain, `/lab/[engine]`
+      interactive playground with a param form generated from each engine's Zod schema
+      (`sim/core/param-fields.ts`, `describeEngine().fields`) and Vega-Lite result charts
+      (`lib/lab/charts.ts` + shared `components/charts/vega-lite-embed.tsx`). 16 new tests.
+      `/lab/campaigns` live viewer is still open — tracked below.
+- [ ] **Lab campaigns live viewer** — `/lab/campaigns` page streaming a running autonomous
+      campaign's notebook (builds on the durable Inngest campaign below)
 - [ ] **SIMULATION_ENGINES.md** — full catalog: each engine's model, params, references,
       worked example + an "authoring an engine" guide
 - [ ] **MCP tools** — expose `list_engines` / `run_experiment` / `run_campaign` so external

@@ -21,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-muted-foreground">/citizen-science</span>
             </Link>
             <nav className="flex items-center gap-6 text-sm">
+              <Link href="/lab" className="hover:text-accent">
+                Lab
+              </Link>
               <Link href="/experiments" className="hover:text-accent">
                 Experiments
               </Link>
