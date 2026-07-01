@@ -26,9 +26,13 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { desc, eq } from 'drizzle-orm';
 // @ts-nocheck
 import { z } from 'zod';
+import { registerLabTools } from './lab-tools';
 
 export function buildMcpServer() {
   const server = new McpServer({ name: 'opendiscover', version: '0.2.0' });
+
+  // BioLab simulation engines: list_engines / describe_engine / run_engine.
+  registerLabTools(server);
 
   /* ── list_protocols ─────────────────────────────────────────────── */
   server.tool(

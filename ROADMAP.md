@@ -27,8 +27,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
 - [x] **SIMULATION_ENGINES.md** — full catalog GENERATED from the registry
       (`scripts/gen-engines-doc.ts`, `pnpm docs:engines`): per-engine model, params table,
       references, worked example JSON + an "authoring an engine" guide. Can never drift.
-- [ ] **MCP tools** — expose `list_engines` / `run_experiment` / `run_campaign` so external
-      agents drive the lab through the same gates
+- [x] **MCP tools** — `list_engines` / `describe_engine` / `run_engine` added to the MCP server
+      (`src/lib/mcp/lab-tools.ts`, wired in `server.ts`). DB-free, secret-free, reproducible hash.
+      7 tests. (`run_campaign` over MCP waits on the durable Inngest campaign below.)
 - [ ] **Campaign persistence + Inngest** — durable `run-campaign` function; notebook streamed
       to the UI via the existing SSE channel
 - [ ] **Bridge to discovery pipeline** — a novel campaign finding becomes a Discovery Card
