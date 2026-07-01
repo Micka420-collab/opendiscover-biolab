@@ -40,9 +40,11 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       to the UI via the existing SSE channel
 - [ ] **Bridge to discovery pipeline** — a novel campaign finding becomes a Discovery Card
       (reuse triage → novelty → vulgarize), canary-replicated via the deterministic hash
-- [~] **More engines** — done: `alignment` (Needleman–Wunsch + Smith–Waterman). Next:
-      molecular docking (geometric), Hodgkin–Huxley neuron, mass-spec fragmentation,
-      thermodynamic RNA (Zuker), agent-based tissue growth, metabolic pathway explorer
+- [~] **More engines** — done: `alignment` (Needleman–Wunsch + Smith–Waterman), `hodgkin-huxley`
+      (new neuroscience domain; a real ODE-discontinuity truncation bug in the shared solver's
+      usage was found and fixed while building it). Next: molecular docking (geometric),
+      mass-spec fragmentation, thermodynamic RNA (Zuker), agent-based tissue growth,
+      metabolic pathway explorer
 - [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,
