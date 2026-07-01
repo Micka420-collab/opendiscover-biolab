@@ -22,6 +22,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:sim
 
+  # Guards a real regression class: a `next build` must never require a live
+  # database. Deliberately runs with NO postgres service and NO DATABASE_URL —
+  # any API route that isn't correctly marked `dynamic` and gets statically
+  # executed at build time will fail here exactly as it would on a fresh
+  # deploy target before the database is reachable.
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # A syntactically valid but unreachable placeholder. The postgres.js
+      # driver connects lazily on first query, so this satisfies the module's
+      # "DATABASE_URL is required" guard without ever opening a socket during
+      # the build — exactly like a fresh deploy target before a DB is wired up.
+      DATABASE_URL: postgresql://build:build@localhost:5432/build_placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
   ci:
     runs-on: ubuntu-latest
     services:

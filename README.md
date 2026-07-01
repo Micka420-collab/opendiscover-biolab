@@ -130,6 +130,24 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 
 ---
 
+## Project status — what's actually verified
+
+Honesty about what has and hasn't been run for real:
+
+**Verified, hands-on:**
+- All 20 engines + the lab layer: **500+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
+- `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
+- `pnpm typecheck` and `pnpm lint` (Biome) are both clean.
+
+**Not verified (needs infrastructure this repo doesn't provision):**
+- The discovery pipeline, peer review, DOI minting, auth, and the autonomous `runCampaign` scientist agent all need a real Postgres + pgvector instance and a Vercel AI Gateway key — neither is running against this codebase yet. The code compiles and is typed against real schemas, but its runtime behavior with live data is unverified.
+- No load testing, no security audit, no production deployment yet.
+
+**Scientific accuracy — models, not lab results.** Every engine reproduces the textbook/analytical case it's tested against, but several use documented simplifications rather than state-of-the-art methods: see each engine's `references` and the caveats noted in its test file (e.g. the ADMET logP is a crude atom-contribution estimate, not a calibrated model; CRISPR on/off-target scoring is a documented heuristic, not the trained Doench/CFD models; HP lattice folding is a teaching model, not a real force field). Treat outputs as illustrative, not as a substitute for wet-lab or peer-reviewed computational results.
+
+---
+
 ## Why deterministic?
 
 Reproducibility is the whole thesis. Every engine run is canonically hashed (stable key order, no whitespace). Re-running the same engine with the same params anywhere reproduces the same `outputHash`. This means:

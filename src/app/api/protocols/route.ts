@@ -2,7 +2,10 @@ import { db, schema } from '@/lib/db';
 import { desc, eq, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 60;
+// Dynamic (not statically generated): this reads live data on every request,
+// so it must never be executed at build time (when the database may not yet
+// be reachable). Edge caching is still achieved via the Cache-Control header.
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const protocols = await db
@@ -22,5 +25,8 @@ export async function GET() {
     .where(eq(schema.protocols.enabled, true))
     .orderBy(desc(schema.protocols.createdAt));
 
-  return NextResponse.json({ protocols });
+  return NextResponse.json(
+    { protocols },
+    { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' } },
+  );
 }
