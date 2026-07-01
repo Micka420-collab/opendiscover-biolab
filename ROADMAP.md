@@ -39,6 +39,14 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       the smallest class" integer-ratio reduction is unsound once classes don't share a common
       unit, e.g. 9:3:4 has no common denominator other than 1/16 itself) — replaced with direct
       exact-fraction assertions. 5 tests, all passing on exact /16 fractions.
+      **Lethal alleles**: a standalone `applyLethality(genotypeDistribution, isLethal)` helper
+      removes genotype classes that never survive to be observed and renormalizes the rest —
+      post-processes `run()`'s own output rather than needing new params on it. Verified against
+      the classic Cuenot (1905) mouse yellow-coat lethal (Y dominant for yellow but homozygous-
+      lethal): Ya × Ya gives the standard 1:2:1 genotype ratio at conception, but exactly 2:1 among
+      survivors once YY is removed — confirmed via a throwaway script against the real engine
+      output before any test was written. Also asserts the "every class lethal" case throws rather
+      than silently returning a broken distribution. 5 tests.
 - [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
       offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
       Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 9 tests).

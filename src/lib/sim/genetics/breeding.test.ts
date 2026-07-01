@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyLethality,
   breedingParams,
   crossEpistatic,
   crossXLinked,
@@ -479,6 +480,87 @@ describe('crossEpistatic — two-locus gene interaction (classical epistasis rat
   it('is a pure function: identical inputs give identical output', () => {
     const a = crossEpistatic(locusA, locusB, dihybridParents, 'recessive');
     const b = crossEpistatic(locusA, locusB, dihybridParents, 'recessive');
+    expect(a).toEqual(b);
+  });
+});
+
+describe('applyLethality — recessive/dominant lethal alleles modify the naive Mendelian ratio', () => {
+  // Cuenot (1905) mouse yellow-coat allele: Y dominant for yellow coat, but
+  // homozygous lethal (YY dies in utero). Ya x Ya gives the standard 1:2:1
+  // genotype ratio at conception (YY 0.25, Ya 0.5, aa 0.25) -- verified via a
+  // throwaway script against the real engine before writing this test (see
+  // scratchpad/lethality-verify.ts) -- but among LIVE offspring the ratio is
+  // exactly 2:1 (Ya 2/3, aa 1/3), not 3:1, once YY is removed and the rest
+  // renormalized.
+  const geneY: Gene = {
+    symbol: 'Y',
+    name: 'Coat colour',
+    mode: 'complete',
+    dominant: 'Y',
+    alleles: [
+      { symbol: 'Y', label: 'Yellow' },
+      { symbol: 'a', label: 'Agouti' },
+    ],
+  };
+
+  it('Ya x Ya pre-lethality genotype ratio is the standard 1:2:1', () => {
+    const r = spec.run({
+      genes: [geneY],
+      parentA: { Y: ['Y', 'a'] },
+      parentB: { Y: ['Y', 'a'] },
+      offspringCount: 0,
+    });
+    const dist = r.detail?.genotypeDistribution ?? [];
+    expect(dist).toHaveLength(3);
+    const byGenotype = new Map(dist.map((d) => [d.genotype, d.probability]));
+    expect(byGenotype.get('YY')).toBeCloseTo(0.25, 10);
+    expect(byGenotype.get('Ya')).toBeCloseTo(0.5, 10);
+    expect(byGenotype.get('aa')).toBeCloseTo(0.25, 10);
+  });
+
+  it('removing the homozygous-lethal YY class gives the classic 2:1 ratio among survivors', () => {
+    const r = spec.run({
+      genes: [geneY],
+      parentA: { Y: ['Y', 'a'] },
+      parentB: { Y: ['Y', 'a'] },
+      offspringCount: 0,
+    });
+    const survivors = applyLethality(r.detail?.genotypeDistribution ?? [], (g) => g === 'YY');
+    expect(survivors).toHaveLength(2);
+    const byGenotype = new Map(survivors.map((d) => [d.genotype, d.probability]));
+    expect(byGenotype.get('Ya')).toBeCloseTo(2 / 3, 10);
+    expect(byGenotype.get('aa')).toBeCloseTo(1 / 3, 10);
+    // Exactly 2:1, not an approximation.
+    expect((byGenotype.get('Ya') ?? 0) / (byGenotype.get('aa') ?? 1)).toBeCloseTo(2, 10);
+    // Survivor probabilities still sum to 1 (conditional probability, renormalized).
+    expect(survivors.reduce((s, d) => s + d.probability, 0)).toBeCloseTo(1, 10);
+  });
+
+  it('a fully penetrant lethal allele (YY x YY, all offspring lethal) throws rather than silently returning garbage', () => {
+    const r = spec.run({
+      genes: [geneY],
+      parentA: { Y: ['Y', 'Y'] },
+      parentB: { Y: ['Y', 'Y'] },
+      offspringCount: 0,
+    });
+    expect(() => applyLethality(r.detail?.genotypeDistribution ?? [], (g) => g === 'YY')).toThrow();
+  });
+
+  it('a non-lethal cross (isLethal always false) is a no-op on probabilities', () => {
+    const r = spec.run(breedingParams.parse(spec.example));
+    const dist = r.detail?.genotypeDistribution ?? [];
+    const survivors = applyLethality(dist, () => false);
+    expect(survivors).toEqual(dist);
+  });
+
+  it('is a pure function: identical inputs give identical output', () => {
+    const dist = [
+      { genotype: 'YY', probability: 0.25 },
+      { genotype: 'Ya', probability: 0.5 },
+      { genotype: 'aa', probability: 0.25 },
+    ];
+    const a = applyLethality(dist, (g) => g === 'YY');
+    const b = applyLethality(dist, (g) => g === 'YY');
     expect(a).toEqual(b);
   });
 });

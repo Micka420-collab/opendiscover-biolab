@@ -364,6 +364,47 @@ export function crossEpistatic(
     .sort((a, b) => b.probability - a.probability);
 }
 
+// ---------------------------------------------------------------------------
+// Lethal alleles — a standalone helper, like `recombinantGametes`,
+// `crossXLinked` and `crossEpistatic` above, not wired into `run()`. Some
+// genotype classes never survive to be observed (embryonic/prenatal lethality);
+// the remaining classes are renormalized to sum to 1 (probability conditional
+// on survival), which is what actually distorts a naive Mendelian ratio.
+// ---------------------------------------------------------------------------
+
+export interface GenotypeClass {
+  genotype: string;
+  probability: number;
+}
+
+/**
+ * Remove genotype classes for which `isLethal` returns true, then renormalize
+ * the remaining ("surviving") classes so their probabilities sum to 1 again.
+ *
+ * Classic example: Cuenot's (1905) mouse yellow-coat allele Y is dominant for
+ * yellow coat colour but homozygous lethal (YY dies in utero). A Ya × Ya
+ * cross produces the standard 1:2:1 genotype ratio (YY 0.25, Ya 0.5, aa 0.25)
+ * at conception, but among LIVE offspring — after removing YY and
+ * renormalizing — the ratio is exactly 2:1 (Ya 2/3, aa 1/3), not 3:1.
+ *
+ * References:
+ *   - Cuénot L. (1905). "Les races pures et leurs combinaisons chez les
+ *     souris." Arch. Zool. Exp. Gén. — the original yellow-lethal discovery.
+ *   - Griffiths et al. "Introduction to Genetic Analysis" — lethal alleles
+ *     and modified Mendelian ratios.
+ */
+export function applyLethality(
+  distribution: GenotypeClass[],
+  isLethal: (genotype: string) => boolean,
+): GenotypeClass[] {
+  const survivors = distribution.filter((d) => !isLethal(d.genotype));
+  const total = survivors.reduce((s, d) => s + d.probability, 0);
+  if (total <= 0) {
+    throw new Error('applyLethality: every genotype class is lethal — no survivors.');
+  }
+  return survivors.map((d) => ({ ...d, probability: d.probability / total }));
+}
+
 /** Reduce a set of probabilities to an approximate small-integer ratio string. */
 function ratioString(probs: number[]): string {
   const min = Math.min(...probs.filter((p) => p > 1e-9));
@@ -493,11 +534,15 @@ export const spec: EngineSpec<BreedingParams, BreedingDetail> = {
     'standalone helper, `crossEpistatic`, re-groups a two-locus dihybrid cross into the four ' +
     'classical epistasis ratios (9:3:4 recessive, 12:3:1 dominant, 9:7 duplicate-recessive, 15:1 ' +
     "duplicate-dominant) — cross-locus gene interaction, distinct from this calculator's per-locus " +
-    'independent phenotype reporting, and likewise not used by it.',
+    'independent phenotype reporting, and likewise not used by it. A fourth standalone helper, ' +
+    '`applyLethality`, removes genotype classes that never survive to be observed and renormalizes ' +
+    'the rest — the mechanism behind lethal-allele ratios (e.g. 2:1 instead of 3:1) — and, like the ' +
+    'others, is not used by this cross calculator.',
   references: [
     'Mendel G. (1866). Versuche über Pflanzen-Hybriden.',
     'Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage, epistasis.',
     'Morgan TH (1910). Science 32:120 — X-linked inheritance (Drosophila white-eye).',
+    'Cuénot L. (1905). Arch. Zool. Exp. Gén. — mouse yellow-coat homozygous-lethal allele.',
   ],
   tags: ['genetics', 'mendel', 'punnett', 'breeding', 'cross', 'game'],
   paramsSchema: breedingParams,
