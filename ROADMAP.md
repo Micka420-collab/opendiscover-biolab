@@ -1,4 +1,46 @@
-# Roadmap — OpenDiscover
+# Roadmap — OpenDiscover BioLab
+
+## 🧬 BioLab backlog (autonomous build queue)
+
+This is the live queue the autonomous heartbeat works through. Each item must land
+with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed + pushed.
+
+### Done
+- [x] Deterministic simulation core (PRNG, ODE RK4/RK45, linalg) — 14 tests
+- [x] 18 simulation engines across 7 domains — 422 tests, all vs known values
+- [x] Engine registry + kernel (validate/run/provenance by slug)
+- [x] Autonomous lab: runner, sweep, notebook, AI-SDK tools, `runCampaign`
+- [x] DB schema: campaigns / experiments / notebook_entries + queries
+- [x] Green build: 437 tests, tsc clean, biome clean; CI `engines` job
+
+### Next (priority order)
+- [ ] **Lab API routes** — `/api/lab/engines` (catalog), `/api/lab/run` (run engine),
+      `/api/lab/campaigns` (launch + poll autonomous campaign)
+- [ ] **Lab workbench UI** — `/lab` catalog, `/lab/[engine]` interactive playground
+      (param form from Zod schema + Vega-Lite result charts), `/lab/campaigns` live viewer
+- [ ] **SIMULATION_ENGINES.md** — full catalog: each engine's model, params, references,
+      worked example + an "authoring an engine" guide
+- [ ] **MCP tools** — expose `list_engines` / `run_experiment` / `run_campaign` so external
+      agents drive the lab through the same gates
+- [ ] **Campaign persistence + Inngest** — durable `run-campaign` function; notebook streamed
+      to the UI via the existing SSE channel
+- [ ] **Bridge to discovery pipeline** — a novel campaign finding becomes a Discovery Card
+      (reuse triage → novelty → vulgarize), canary-replicated via the deterministic hash
+- [ ] **More engines** — molecular docking (geometric), Smith–Waterman/Needleman–Wunsch
+      alignment, Hodgkin–Huxley neuron, mass-spec fragmentation, thermodynamic RNA (Zuker),
+      agent-based tissue growth, metabolic pathway explorer
+- [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
+- [ ] **Seeded reproducibility harness** — CI job that re-runs every engine example and asserts
+      the output hash is stable across machines
+
+### Later
+- [ ] Multi-agent lab: a PI agent decomposing a grand goal into parallel bench-agent campaigns
+- [ ] Public "discoveries from the autonomous lab" feed
+- [ ] Notebook export (JSON-LD / RO-Crate) for each campaign
+
+---
+
+# Roadmap — OpenDiscover (original discovery engine)
 
 ## Phase 0 — Foundations (weeks 1–2)
 - [x] Architecture document
