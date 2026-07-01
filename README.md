@@ -56,6 +56,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |
+| | `docking` | Geometric rigid-body docking — Lennard-Jones pose scoring & ranking |
 | | `dose-response` | Hill dose–response, IC₅₀/EC₅₀ fitting, drug-combination indices |
 | 🔬 Structural | `rna-fold` | RNA secondary structure via the Nussinov DP algorithm |
 

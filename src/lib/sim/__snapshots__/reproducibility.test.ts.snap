@@ -72,6 +72,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "5 SpCas9 guide(s); best on-target 0.72, best specificity 1.00.",
   },
+  "docking": {
+    "metrics": {
+      "bestContactDistance": 2.19545,
+      "bestEnergy": -0.195077,
+      "bestPoseIndex": 1,
+      "poseCount": 4,
+    },
+    "summary": "Scored 4 candidate poses; best pose #1 at energy -0.195 (closest contact 2.195).",
+  },
   "dose-response": {
     "metrics": {
       "ec50": 50,

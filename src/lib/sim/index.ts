@@ -14,6 +14,7 @@ type AnyEngine = import('./core/types').EngineSpec<any, any>;
 
 import { spec as bioreactor } from './bioprocess/bioreactor';
 import { spec as admet } from './drug/admet';
+import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as compartmental } from './epi/compartmental';
@@ -60,6 +61,7 @@ export const engines: AnyEngine[] = [
   bioreactor,
   compartmental,
   admet,
+  docking,
   doseResponse,
   rnaFold,
 ];

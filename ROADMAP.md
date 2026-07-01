@@ -45,8 +45,9 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       usage was found and fixed while building it), `mass-spec` (peptide MS/MS b/y fragment-ion
       prediction; residue masses derived from CODATA atomic masses rather than a copied table,
       cross-checked both algebraically — b_i + y_(n-i) = M + 2·proton — and against the standard
-      literature figures). Next: molecular docking (geometric), thermodynamic RNA (Zuker),
-      agent-based tissue growth, metabolic pathway explorer
+      literature figures), `docking` (geometric rigid-body pose ranking via Lennard-Jones scoring;
+      LJ minimum/root and Rodrigues-rotation orthogonality verified by hand-derivation, not memory).
+      Next: thermodynamic RNA (Zuker), agent-based tissue growth, metabolic pathway explorer
 - [ ] **3D/visual** — Mol* protein view for folding/structure engines; network graphs for GRN/FBA
 - [x] **Seeded reproducibility harness** — `src/lib/sim/reproducibility.test.ts` runs in CI
       (`engines` job). Asserts strict intra-run hash determinism per engine + pins a robust,

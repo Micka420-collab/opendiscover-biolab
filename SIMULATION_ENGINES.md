@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **22 deterministic simulation engines** across
+The OpenDiscover BioLab ships **23 deterministic simulation engines** across
 9 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
-- **💊 Drug discovery** — [`admet`](#admet) · [`dose-response`](#dose-response)
+- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
 - **🔬 Structural** — [`rna-fold`](#rna-fold)
 
 ---
@@ -883,6 +883,127 @@ Screens a small molecule for oral drug-likeness. Accepts either explicit physico
 ```
 
 _Run it: `POST /api/lab/run { "engine": "admet", "params": … }` or interactively at `/lab/admet`._
+
+---
+
+### `docking` — Geometric Molecular Docking (Lennard-Jones Pose Scoring)
+
+Ranks a set of candidate rigid-body ligand poses (translation + rotation) against a fixed receptor by total pairwise Lennard-Jones 12-6 shape/contact energy, using Lorentz-Berthelot combining rules for unlike atoms. A simplified model of classical geometric docking (Kuntz et al. 1982) — no electrostatics, solvation, flexibility, or calibrated force field; scores are illustrative shape-complementarity energetics, not binding-affinity predictions.
+
+**References**
+- Kuntz ID et al. (1982). J. Mol. Biol. 161:269 — geometric docking.
+- Lennard-Jones JE (1924). Proc. R. Soc. Lond. A 106:463 — the 12-6 potential.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `receptor` | json | **required** |  |  |
+| `ligand` | json | **required** |  |  |
+| `poses` | json | **required** |  |  |
+
+**Example**
+
+```json
+{
+  "receptor": [
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "sigma": 1.7,
+      "epsilon": 0.1
+    },
+    {
+      "position": [
+        3,
+        0,
+        0
+      ],
+      "sigma": 1.7,
+      "epsilon": 0.1
+    },
+    {
+      "position": [
+        0,
+        3,
+        0
+      ],
+      "sigma": 1.7,
+      "epsilon": 0.1
+    }
+  ],
+  "ligand": [
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "sigma": 1.7,
+      "epsilon": 0.15
+    }
+  ],
+  "poses": [
+    {
+      "translation": [
+        1,
+        1,
+        0
+      ],
+      "rotationAxis": [
+        0,
+        0,
+        1
+      ],
+      "rotationDeg": 0
+    },
+    {
+      "translation": [
+        1.9,
+        1.9,
+        0
+      ],
+      "rotationAxis": [
+        0,
+        0,
+        1
+      ],
+      "rotationDeg": 0
+    },
+    {
+      "translation": [
+        0.5,
+        0.5,
+        0
+      ],
+      "rotationAxis": [
+        0,
+        0,
+        1
+      ],
+      "rotationDeg": 0
+    },
+    {
+      "translation": [
+        10,
+        10,
+        10
+      ],
+      "rotationAxis": [
+        0,
+        0,
+        1
+      ],
+      "rotationDeg": 0
+    }
+  ]
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "docking", "params": … }` or interactively at `/lab/docking`._
 
 ---
 
