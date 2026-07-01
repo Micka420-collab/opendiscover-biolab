@@ -44,6 +44,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | 🧬 Protein biophysics | `properties` | MW, theoretical pI, GRAVY, instability index, extinction coefficient |
 | | `secondary-structure` | Chou–Fasman helix/sheet/coil prediction |
 | | `hp-folding` | HP lattice-model folding via seeded Monte-Carlo energy minimization |
+| | `mass-spec` | Peptide MS/MS b/y fragment-ion prediction; residue masses derived from CODATA atomic masses |
 | ⚙️ Systems biology | `enzyme-kinetics` | Michaelis–Menten, competitive/non-competitive inhibition, Hill cooperativity |
 | | `grn` | Gene regulatory networks: repressilator, toggle switch, feed-forward loops |
 | | `gillespie` | Exact stochastic simulation (SSA) of the chemical master equation |

@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **21 deterministic simulation engines** across
+The OpenDiscover BioLab ships **22 deterministic simulation engines** across
 9 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -18,7 +18,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 ## Catalog
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
-- **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding)
+- **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`fba`](#fba)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
@@ -298,6 +298,38 @@ Two-dimensional square-lattice HP (hydrophobic-polar) protein folding — the cl
 ```
 
 _Run it: `POST /api/lab/run { "engine": "hp-folding", "params": … }` or interactively at `/lab/hp-folding`._
+
+---
+
+### `mass-spec` — Peptide Mass Spectrometry (b/y Fragment Ions)
+
+Predicts monoisotopic b/y fragment-ion m/z values for a peptide under CID/HCD tandem mass spectrometry, plus the precursor m/z at a given charge state. Residue masses are computed from each amino acid's elemental formula times CODATA atomic masses (not a hardcoded literature table), so every number is independently re-derivable. Includes a simple peak-matching utility for scoring a candidate sequence against an observed spectrum.
+
+**References**
+- Roepstorff P, Fohlman J (1984). Biomed. Mass Spectrom. 11:601 — ion nomenclature.
+- Steen H, Mann M (2004). Nat. Rev. Mol. Cell Biol. 5:699 — "The ABC's (and XYZ's) of peptide sequencing."
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `sequence` | string | **required** |  |  |
+| `precursorCharge` | integer | `2` | ≥ 1, ≤ 6 |  |
+| `fragmentCharges` | json | `[1]` |  |  |
+
+**Example**
+
+```json
+{
+  "sequence": "PEPTIDE",
+  "precursorCharge": 2,
+  "fragmentCharges": [
+    1
+  ]
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "mass-spec", "params": … }` or interactively at `/lab/mass-spec`._
 
 
 ## neuroscience

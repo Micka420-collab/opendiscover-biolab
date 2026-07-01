@@ -135,6 +135,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
   },
+  "mass-spec": {
+    "metrics": {
+      "complementarityMaxError": 1.13687e-13,
+      "fragmentCount": 12,
+      "neutralMass": 799.36,
+      "precursorMZ": 400.687,
+    },
+    "summary": "Peptide PEPTIDE (7 residues): neutral mass 799.3600 Da, [M+2H]2+ = 400.6873; 12 fragment ions predicted.",
+  },
   "pcr": {
     "metrics": {
       "ampliconLength": 100,

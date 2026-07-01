@@ -27,6 +27,7 @@ import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
 import { spec as phylogenetics } from './popgen/phylogenetics';
 import { spec as wrightFisher } from './popgen/wright-fisher';
 import { spec as hpFolding } from './protein/hp-folding';
+import { spec as massSpec } from './protein/mass-spec';
 import { spec as proteinProperties } from './protein/properties';
 import { spec as secondaryStructure } from './protein/secondary-structure';
 import { spec as rnaFold } from './structural/rna-fold';
@@ -47,6 +48,7 @@ export const engines: AnyEngine[] = [
   proteinProperties,
   secondaryStructure,
   hpFolding,
+  massSpec,
   hodgkinHuxley,
   enzymeKinetics,
   grn,
