@@ -257,6 +257,113 @@ export function crossXLinked(
   return [...merged.values()].sort((a, b) => b.probability - a.probability);
 }
 
+// ---------------------------------------------------------------------------
+// Epistasis — a standalone helper, like `recombinantGametes` and
+// `crossXLinked` above, not wired into `run()`. Two independent biallelic
+// complete-dominance loci are crossed via the existing `crossLocus` machinery,
+// then the four dihybrid genotype classes are re-grouped into phenotype
+// classes according to one of the four classical two-gene interaction
+// patterns (each is a hand-derivable re-grouping of the standard 9:3:3:1
+// dihybrid baseline: 9 A_B_ : 3 A_bb : 3 aaB_ : 1 aabb).
+// ---------------------------------------------------------------------------
+
+export type LocusExpression = 'dominant' | 'recessive';
+
+export type EpistasisKind = 'recessive' | 'dominant' | 'duplicate-recessive' | 'duplicate-dominant';
+
+export interface EpistasisClass {
+  phenotype: string;
+  probability: number;
+}
+
+function epistasisLabel(
+  kind: EpistasisKind,
+  aExpr: LocusExpression,
+  bExpr: LocusExpression,
+  domALabel: string,
+  recALabel: string,
+  domBLabel: string,
+  recBLabel: string,
+): string {
+  switch (kind) {
+    case 'recessive':
+      // aa is epistatic to B: a recessive-A offspring shows ONLY the A-recessive
+      // phenotype no matter what B is (9:3:4 — e.g. classic mouse albino epistasis).
+      return aExpr === 'recessive'
+        ? recALabel
+        : `${domALabel}, ${bExpr === 'dominant' ? domBLabel : recBLabel}`;
+    case 'dominant':
+      // A_ is epistatic to B: a dominant-A offspring shows ONLY the A-dominant
+      // phenotype no matter what B is (12:3:1 — e.g. summer squash fruit colour).
+      return aExpr === 'dominant'
+        ? domALabel
+        : `${recALabel}, ${bExpr === 'dominant' ? domBLabel : recBLabel}`;
+    case 'duplicate-recessive':
+      // Complementary gene action: both loci need a dominant allele to produce
+      // the combined phenotype; any recessive homozygote alone blocks it (9:7).
+      return aExpr === 'dominant' && bExpr === 'dominant'
+        ? `${domALabel} + ${domBLabel}`
+        : `neither (${recALabel}/${recBLabel} pathway blocked)`;
+    case 'duplicate-dominant':
+      // Either locus's dominant allele alone is sufficient; only the double
+      // recessive homozygote shows the alternate phenotype (15:1).
+      return aExpr === 'dominant' || bExpr === 'dominant'
+        ? `${domALabel} or ${domBLabel}`
+        : `${recALabel}, ${recBLabel}`;
+  }
+}
+
+/**
+ * Cross two independent biallelic, complete-dominance loci and re-group the
+ * resulting dihybrid genotype classes into phenotype classes under one of the
+ * four classical epistasis (gene-interaction) patterns.
+ *
+ * References:
+ *   - Griffiths et al. "Introduction to Genetic Analysis" — epistasis and
+ *     modified dihybrid ratios (9:3:4, 12:3:1, 9:7, 15:1).
+ */
+export function crossEpistatic(
+  geneA: Gene,
+  geneB: Gene,
+  parents: {
+    parentA: { A: [string, string]; B: [string, string] };
+    parentB: { A: [string, string]; B: [string, string] };
+  },
+  kind: EpistasisKind,
+): EpistasisClass[] {
+  const distA = crossLocus(geneA, parents.parentA.A, parents.parentB.A);
+  const distB = crossLocus(geneB, parents.parentA.B, parents.parentB.B);
+
+  const domA = geneA.dominant ?? geneA.alleles[0].symbol;
+  const domB = geneB.dominant ?? geneB.alleles[0].symbol;
+  const domALabel = alleleLabel(geneA, domA);
+  const domBLabel = alleleLabel(geneB, domB);
+  const recALabel = alleleLabel(
+    geneA,
+    geneA.alleles.find((a) => a.symbol !== domA)?.symbol ?? domA,
+  );
+  const recBLabel = alleleLabel(
+    geneB,
+    geneB.alleles.find((a) => a.symbol !== domB)?.symbol ?? domB,
+  );
+
+  const phenoMap = new Map<string, number>();
+  for (const [keyA, pA] of distA) {
+    const pairA = JSON.parse(keyA) as [string, string];
+    const aExpr: LocusExpression = pairA.includes(domA) ? 'dominant' : 'recessive';
+    for (const [keyB, pB] of distB) {
+      const pairB = JSON.parse(keyB) as [string, string];
+      const bExpr: LocusExpression = pairB.includes(domB) ? 'dominant' : 'recessive';
+      const label = epistasisLabel(kind, aExpr, bExpr, domALabel, recALabel, domBLabel, recBLabel);
+      phenoMap.set(label, (phenoMap.get(label) ?? 0) + pA * pB);
+    }
+  }
+
+  return [...phenoMap.entries()]
+    .map(([phenotype, probability]) => ({ phenotype, probability }))
+    .sort((a, b) => b.probability - a.probability);
+}
+
 /** Reduce a set of probabilities to an approximate small-integer ratio string. */
 function ratioString(probs: number[]): string {
   const min = Math.min(...probs.filter((p) => p > 1e-9));
@@ -382,10 +489,14 @@ export const spec: EngineSpec<BreedingParams, BreedingDetail> = {
     'frequencies for test-cross analysis; it is not used by this cross calculator, which always ' +
     'treats loci as unlinked. Another standalone helper, `crossXLinked`, computes X-linked/sex-' +
     'linked inheritance (sons are hemizygous — a fundamentally different transmission mechanism ' +
-    'from the autosomal loci above); it is likewise not used by this cross calculator.',
+    'from the autosomal loci above); it is likewise not used by this cross calculator. A third ' +
+    'standalone helper, `crossEpistatic`, re-groups a two-locus dihybrid cross into the four ' +
+    'classical epistasis ratios (9:3:4 recessive, 12:3:1 dominant, 9:7 duplicate-recessive, 15:1 ' +
+    "duplicate-dominant) — cross-locus gene interaction, distinct from this calculator's per-locus " +
+    'independent phenotype reporting, and likewise not used by it.',
   references: [
     'Mendel G. (1866). Versuche über Pflanzen-Hybriden.',
-    'Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage.',
+    'Griffiths et al. Introduction to Genetic Analysis — Punnett squares, dominance, linkage, epistasis.',
     'Morgan TH (1910). Science 32:120 — X-linked inheritance (Drosophila white-eye).',
   ],
   tags: ['genetics', 'mendel', 'punnett', 'breeding', 'cross', 'game'],

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { breedingParams, crossXLinked, genePhenotype, recombinantGametes, spec } from './breeding';
+import {
+  breedingParams,
+  crossEpistatic,
+  crossXLinked,
+  genePhenotype,
+  recombinantGametes,
+  spec,
+} from './breeding';
+import type { EpistasisClass } from './breeding';
 
 type Gene = (typeof breedingParams._output)['genes'][number];
 
@@ -379,6 +387,98 @@ describe('crossXLinked — sex-linked (X-linked) inheritance', () => {
   it('is a pure function: identical inputs give identical output', () => {
     const a = crossXLinked(xGene, ['A', 'a'], 'A');
     const b = crossXLinked(xGene, ['A', 'a'], 'A');
+    expect(a).toEqual(b);
+  });
+});
+
+describe('crossEpistatic — two-locus gene interaction (classical epistasis ratios)', () => {
+  // Two independent biallelic loci, both heterozygous x heterozygous (the
+  // standard 9:3:3:1 dihybrid F2 baseline before any epistatic re-grouping).
+  const locusA: Gene = {
+    symbol: 'A',
+    name: 'Locus A',
+    mode: 'complete',
+    dominant: 'A',
+    alleles: [
+      { symbol: 'A', label: 'Adom' },
+      { symbol: 'a', label: 'Arec' },
+    ],
+  };
+  const locusB: Gene = {
+    symbol: 'B',
+    name: 'Locus B',
+    mode: 'complete',
+    dominant: 'B',
+    alleles: [
+      { symbol: 'B', label: 'Bdom' },
+      { symbol: 'b', label: 'Brec' },
+    ],
+  };
+  const dihybridParents = {
+    parentA: { A: ['A', 'a'] as [string, string], B: ['B', 'b'] as [string, string] },
+    parentB: { A: ['A', 'a'] as [string, string], B: ['B', 'b'] as [string, string] },
+  };
+  // Every ratio below is a hand-derived re-grouping of the standard dihybrid
+  // F2 baseline (9 A_B_ : 3 A_bb : 3 aaB_ : 1 aabb, all sixteenths) — verified
+  // numerically against the real `crossLocus` output before being written here
+  // (see scratchpad/epistasis-verify.ts). Asserting the exact /16 fractions
+  // directly is safer than reducing to an integer ratio: these classes don't
+  // all share the same denominator once merged (e.g. 9:3:4 has no common unit
+  // other than 1/16 itself), so a naive "divide by the smallest class" integer
+  // reduction is unsound and was caught failing here before this fix.
+  const probOf = (classes: EpistasisClass[], phenotype: string) =>
+    classes.find((c) => c.phenotype === phenotype)?.probability;
+
+  it('recessive epistasis: aa masks locus B entirely -> 9:3:4', () => {
+    const classes = crossEpistatic(locusA, locusB, dihybridParents, 'recessive');
+    expect(classes).toHaveLength(3);
+    expect(probOf(classes, 'Adom, Bdom')).toBeCloseTo(9 / 16, 10);
+    expect(probOf(classes, 'Adom, Brec')).toBeCloseTo(3 / 16, 10);
+    // The two aa sub-genotypes (aaB_, aabb) must collapse into ONE class.
+    expect(probOf(classes, 'Arec')).toBeCloseTo(4 / 16, 10);
+  });
+
+  it('dominant epistasis: A_ masks locus B entirely -> 12:3:1', () => {
+    const classes = crossEpistatic(locusA, locusB, dihybridParents, 'dominant');
+    expect(classes).toHaveLength(3);
+    // The two A_ sub-genotypes (A_B_, A_bb) must collapse into ONE class.
+    expect(probOf(classes, 'Adom')).toBeCloseTo(12 / 16, 10);
+    expect(probOf(classes, 'Arec, Bdom')).toBeCloseTo(3 / 16, 10);
+    expect(probOf(classes, 'Arec, Brec')).toBeCloseTo(1 / 16, 10);
+  });
+
+  it('duplicate recessive epistasis (complementary gene action): need both dominants -> 9:7', () => {
+    const classes = crossEpistatic(locusA, locusB, dihybridParents, 'duplicate-recessive');
+    expect(classes).toHaveLength(2);
+    expect(probOf(classes, 'Adom + Bdom')).toBeCloseTo(9 / 16, 10);
+    // A_bb, aaB_, aabb (3+3+1=7/16) must all collapse into ONE blocked class.
+    expect(probOf(classes, 'neither (Arec/Brec pathway blocked)')).toBeCloseTo(7 / 16, 10);
+  });
+
+  it('duplicate dominant epistasis: either dominant allele suffices -> 15:1', () => {
+    const classes = crossEpistatic(locusA, locusB, dihybridParents, 'duplicate-dominant');
+    expect(classes).toHaveLength(2);
+    // A_B_, A_bb, aaB_ (9+3+3=15/16) must all collapse into ONE class.
+    expect(probOf(classes, 'Adom or Bdom')).toBeCloseTo(15 / 16, 10);
+    expect(probOf(classes, 'Arec, Brec')).toBeCloseTo(1 / 16, 10);
+  });
+
+  it('every epistasis kind conserves total probability at 1', () => {
+    for (const kind of [
+      'recessive',
+      'dominant',
+      'duplicate-recessive',
+      'duplicate-dominant',
+    ] as const) {
+      const classes = crossEpistatic(locusA, locusB, dihybridParents, kind);
+      const total = classes.reduce((s, c) => s + c.probability, 0);
+      expect(total).toBeCloseTo(1, 10);
+    }
+  });
+
+  it('is a pure function: identical inputs give identical output', () => {
+    const a = crossEpistatic(locusA, locusB, dihybridParents, 'recessive');
+    const b = crossEpistatic(locusA, locusB, dihybridParents, 'recessive');
     expect(a).toEqual(b);
   });
 });

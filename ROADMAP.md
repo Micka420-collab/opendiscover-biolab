@@ -29,6 +29,16 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       Punnett machinery, same pattern as `recombinantGametes`. Verified against the classic
       textbook carrier-mother × normal-father cross (no affected daughters, exactly 50% of sons
       affected) before writing any test; 5 tests including probability-sums-to-1 and purity.
+      **Epistasis (two-locus gene interaction)**: a standalone `crossEpistatic(geneA, geneB,
+      parents, kind)` helper re-groups a two-locus dihybrid cross into the four classical
+      epistasis ratios — recessive (9:3:4), dominant (12:3:1), duplicate-recessive/complementary
+      (9:7), duplicate-dominant (15:1) — again not wired into `run()`. Every ratio was hand-derived
+      from the known 9:3:3:1 dihybrid baseline (e.g. 9:3:4 = 9 A_B_ : 3 A_bb : (3 aaB_ + 1 aabb)
+      merged) and cross-checked against the real `crossLocus` output via a throwaway script before
+      any test was written; caught and fixed a flawed test-helper along the way (naive "divide by
+      the smallest class" integer-ratio reduction is unsound once classes don't share a common
+      unit, e.g. 9:3:4 has no common denominator other than 1/16 itself) — replaced with direct
+      exact-fraction assertions. 5 tests, all passing on exact /16 fractions.
 - [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
       offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
       Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 9 tests).
