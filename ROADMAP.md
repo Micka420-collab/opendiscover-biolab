@@ -19,7 +19,12 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       linkage + recombination, seeded offspring sampling. 11 tests vs classical ratios.
 - [x] **Breeding game UI** — `/lab/breeding`: pick two Glowzoa specimens, cross them, reveal
       offspring cards with rarity tiers, and fill a "phenotype dex" of discovered traits.
-      Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 6 tests).
+      Featured on `/lab`. Game rules unit-tested (`lib/lab/breeding-game.ts`, 9 tests).
+      **Multi-generation breeding**: a "🐣 Breed this one" button promotes any offspring card into
+      a real `Specimen` (`offspringToSpecimen`) selectable as a parent for the next cross — F1 x F1
+      or F1 x starter. Round-trip fidelity and a genuine Mendelian invariant are both tested (a
+      homozygous GG parent can never pass on a "Faint" allele — verified live against the running
+      dev server, not just vitest, matching the exact predicted 50/50 Radiant/Radiant-Faint split).
 - [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
       (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
       Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).

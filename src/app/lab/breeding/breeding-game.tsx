@@ -9,6 +9,7 @@ import {
   type Specimen,
   buildCrossParams,
   discoverNew,
+  offspringToSpecimen,
   rarityScore,
   rarityTier,
 } from '@/lib/lab/breeding-game';
@@ -43,9 +44,27 @@ export function BreedingGame() {
   const [crosses, setCrosses] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bredSpecimens, setBredSpecimens] = useState<Specimen[]>([]);
+  const [justBredId, setJustBredId] = useState<string | null>(null);
 
-  const parentA = useMemo(() => STARTER_SPECIMENS.find((s) => s.id === aId) as Specimen, [aId]);
-  const parentB = useMemo(() => STARTER_SPECIMENS.find((s) => s.id === bId) as Specimen, [bId]);
+  const allSpecimens = useMemo(() => [...STARTER_SPECIMENS, ...bredSpecimens], [bredSpecimens]);
+  const parentA = useMemo(
+    () => allSpecimens.find((s) => s.id === aId) ?? STARTER_SPECIMENS[0],
+    [allSpecimens, aId],
+  );
+  const parentB = useMemo(
+    () => allSpecimens.find((s) => s.id === bId) ?? STARTER_SPECIMENS[3],
+    [allSpecimens, bId],
+  );
+
+  function breedForward(o: Offspring) {
+    const id = `bred-${bredSpecimens.length}-${Date.now()}`;
+    const generation = bredSpecimens.length + 1;
+    const specimen = offspringToSpecimen(o, id, `F${generation}`, '🐣', GLOWZOA_GENES);
+    setBredSpecimens((prev) => [...prev, specimen]);
+    setAId(id); // immediately available to breed again as Parent A
+    setJustBredId(id);
+  }
 
   async function cross() {
     setLoading(true);
@@ -96,9 +115,9 @@ export function BreedingGame() {
     <div className="space-y-8">
       {/* Parent pickers */}
       <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-        <ParentPicker label="Parent A" value={aId} onChange={setAId} />
+        <ParentPicker label="Parent A" value={aId} onChange={setAId} pool={allSpecimens} />
         <div className="text-center text-2xl">✕</div>
-        <ParentPicker label="Parent B" value={bId} onChange={setBId} />
+        <ParentPicker label="Parent B" value={bId} onChange={setBId} pool={allSpecimens} />
       </div>
 
       <div className="flex items-center gap-3">
@@ -117,6 +136,12 @@ export function BreedingGame() {
         <div className="rounded-md border border-fuchsia-500/50 bg-fuchsia-500/10 px-4 py-3 text-sm">
           ✨ Discovered {justFound.length} new phenotype{justFound.length > 1 ? 's' : ''}:{' '}
           <span className="font-medium text-fuchsia-300">{justFound.join(', ')}</span>
+        </div>
+      )}
+
+      {justBredId && (
+        <div className="rounded-md border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-sm">
+          🐣 Promoted to Parent A — pick a second parent and cross again for the next generation.
         </div>
       )}
 
@@ -144,6 +169,13 @@ export function BreedingGame() {
                         {tier} · 1/{o.rarity}
                       </span>
                     </div>
+                    <Button
+                      variant="outline"
+                      className="w-full h-7 text-xs"
+                      onClick={() => breedForward(o)}
+                    >
+                      🐣 Breed this one
+                    </Button>
                   </CardContent>
                 </Card>
               );
@@ -179,12 +211,16 @@ function ParentPicker({
   label,
   value,
   onChange,
+  pool,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  pool: Specimen[];
 }) {
-  const specimen = STARTER_SPECIMENS.find((s) => s.id === value) as Specimen;
+  const specimen = pool.find((s) => s.id === value) ?? pool[0];
+  const starters = pool.filter((s) => STARTER_SPECIMENS.some((starter) => starter.id === s.id));
+  const bred = pool.filter((s) => !STARTER_SPECIMENS.some((starter) => starter.id === s.id));
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -198,11 +234,22 @@ function ParentPicker({
             onChange={(e) => onChange(e.target.value)}
             className="flex-1 bg-muted/30 border border-border rounded px-2 py-1 text-sm"
           >
-            {STARTER_SPECIMENS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.emoji} {s.name}
-              </option>
-            ))}
+            <optgroup label="Starters">
+              {starters.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.emoji} {s.name}
+                </option>
+              ))}
+            </optgroup>
+            {bred.length > 0 && (
+              <optgroup label="Bred">
+                {bred.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.emoji} {s.name} ({s.id})
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </select>
         </div>
         <div className="flex flex-wrap gap-1">

@@ -118,6 +118,38 @@ export function buildCrossParams(a: Specimen, b: Specimen, opts: CrossOptions = 
 }
 
 /**
+ * Promote one sampled offspring (the engine's space-joined "Bb Gg Pp Ff"
+ * genotype string, one 2-character token per locus, in `genes` order) into a
+ * full `Specimen` that can be bred again — multi-generation play (F1 x F1,
+ * or F1 x a starter). Safe because every Glowzoa allele symbol is a single
+ * character; this is NOT a general parser for arbitrary (possibly
+ * multi-character) allele symbols the underlying engine also supports.
+ */
+export function offspringToSpecimen(
+  offspring: { genotype: string; phenotype: string },
+  id: string,
+  name: string,
+  emoji: string,
+  genes: GameGene[] = GLOWZOA_GENES,
+): Specimen {
+  const tokens = offspring.genotype.split(' ');
+  if (tokens.length !== genes.length) {
+    throw new Error(
+      `genotype "${offspring.genotype}" has ${tokens.length} loci, expected ${genes.length}`,
+    );
+  }
+  const genotype: Record<string, [string, string]> = {};
+  genes.forEach((gene, i) => {
+    const token = tokens[i];
+    if (token.length !== 2) {
+      throw new Error(`locus "${gene.symbol}" token "${token}" is not exactly 2 characters`);
+    }
+    genotype[gene.symbol] = [token[0], token[1]];
+  });
+  return { id, name, emoji, genotype };
+}
+
+/**
  * Rarity score for a phenotype: the reciprocal of its probability, so a 1-in-16
  * offspring scores 16 and a common one scores low. Clamped to keep the UI sane.
  */
