@@ -40,6 +40,36 @@ describe('computeAchievements', () => {
     expect(unlocked(s, 'all-domains')).toBe(true);
   });
 
+  it('unlocks half-the-lab at ceil(total/2) engines and scales with the catalog', () => {
+    const half = (s: ReturnType<typeof computeAchievements>) =>
+      s.achievements.find((a) => a.id === 'half-the-lab');
+    // 5 engines → need ceil(5/2) = 3.
+    expect(half(computeAchievements(['a', 'b'], catalog))?.need).toBe(3);
+    expect(unlocked(computeAchievements(['a', 'b'], catalog), 'half-the-lab')).toBe(false);
+    expect(unlocked(computeAchievements(['a', 'b', 'c'], catalog), 'half-the-lab')).toBe(true);
+  });
+
+  it('unlocks domain-specialist only when a whole substantial (≥3) domain is finished', () => {
+    // A domain of 3 engines (eco) plus a one-engine domain (structural).
+    const deep: CatalogEntry[] = [
+      { slug: 'e1', domain: 'ecology' },
+      { slug: 'e2', domain: 'ecology' },
+      { slug: 'e3', domain: 'ecology' },
+      { slug: 's1', domain: 'structural' },
+    ];
+    const spec = (s: ReturnType<typeof computeAchievements>) =>
+      s.achievements.find((a) => a.id === 'domain-specialist');
+    // Ecology is the only substantial (≥3) domain, so the badge tracks it.
+    const partial = computeAchievements(['e1', 'e2'], deep);
+    expect(spec(partial)?.have).toBe(2);
+    expect(spec(partial)?.need).toBe(3);
+    expect(unlocked(partial, 'domain-specialist')).toBe(false);
+    // Finishing the whole 3-engine domain unlocks it.
+    expect(unlocked(computeAchievements(['e1', 'e2', 'e3'], deep), 'domain-specialist')).toBe(true);
+    // Finishing only the one-engine 'structural' domain does NOT (too small to count).
+    expect(unlocked(computeAchievements(['s1'], deep), 'domain-specialist')).toBe(false);
+  });
+
   it('caps progress `have` at the goal `need`', () => {
     const s = computeAchievements(['a', 'b', 'c', 'd', 'e'], catalog);
     const first = s.achievements.find((a) => a.id === 'first-run');
