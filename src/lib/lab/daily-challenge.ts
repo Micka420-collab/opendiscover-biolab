@@ -621,6 +621,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.99,
     hint: 'Plate height H = A + B/u + C·u is lowest (efficiency = 1.0) at u_opt = √(B/C). With B = 2 and C = 0.05 that is √40 ≈ 6.3 mm/s.',
   },
+  {
+    id: 'right-shift-oxygen-delivery',
+    engine: 'oxygen-hemoglobin',
+    title: 'Right-shift for more oxygen',
+    brief:
+      'Hard-working muscle is warm and acidic, which right-shifts hemoglobin (raises its P₅₀) so it dumps more oxygen exactly where it is needed. Tune the half-saturation pressure P₅₀ to unload the largest possible fraction of oxygen between the lungs (100 mmHg) and the tissues (40 mmHg).',
+    baseParams: { hillCoefficient: 2.7, arterialPO2: 100, venousPO2: 40 },
+    knob: {
+      param: 'p50',
+      label: 'Half-saturation P₅₀',
+      min: 20,
+      max: 90,
+      step: 0.5,
+      default: 26,
+      unit: 'mmHg',
+    },
+    metricKey: 'oxygenDelivered',
+    metricLabel: 'O₂ unloaded to tissues',
+    goal: 'maximize',
+    par: 0.5,
+    hint: 'Both lung and tissue saturation fall as P₅₀ rises, but tissue saturation falls faster at first — so delivery peaks at an intermediate P₅₀ around 60–65 mmHg before dropping off again.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

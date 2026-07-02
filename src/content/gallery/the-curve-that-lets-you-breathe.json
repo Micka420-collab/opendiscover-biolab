@@ -1,0 +1,16 @@
+{
+  "slug": "the-curve-that-lets-you-breathe",
+  "title": "The curve that lets you breathe",
+  "engine": "oxygen-hemoglobin",
+  "params": {
+    "p50": 26,
+    "hillCoefficient": 2.7,
+    "arterialPO2": 100,
+    "venousPO2": 40,
+    "pO2Max": 100,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "The single most important S-shaped curve in your body. Hemoglobin binds oxygen cooperatively — the first O₂ molecule to latch on makes the next one bind more easily — which bends the saturation-versus-pressure line into a sigmoid instead of a gentle hyperbola. That shape is the whole trick: in the lungs (~100 mmHg) hemoglobin loads to ~97%, but in the working tissues (~40 mmHg) it sits on the steep part of the curve and drops to ~76%, handing off about a fifth of its cargo where cells are burning it. A non-cooperative carrier like myoglobin (Hill n = 1) would be a flat hyperbola that clings to its oxygen and delivers far less. Run it and the metrics read arterial ~97%, venous ~76%, and ~21% of capacity unloaded — the quiet arithmetic behind every breath. Raise P₅₀ (the Bohr effect of exercise) and the curve shifts right to release even more."
+}
