@@ -5,6 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { recordEngineRun } from '@/lib/lab/achievements';
 import {
+  EMPTY_STREAK,
+  type StreakState,
+  getStreak,
+  registerClear,
+} from '@/lib/lab/challenge-streak';
+import {
   type Challenge,
   TARGET_TOLERANCE,
   challengeParams,
@@ -40,6 +46,12 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [best, setBest] = useState<Best | null>(null);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const [streak, setStreak] = useState<StreakState>(EMPTY_STREAK);
+
+  // Load the saved streak once on mount (localStorage is browser-only).
+  useEffect(() => {
+    setStreak(getStreak());
+  }, []);
 
   // Load today's personal best from localStorage, and keep it in sync when
   // another tab writes a better score for the same challenge/day.
@@ -82,6 +94,7 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
       const met = meetsBar(challenge, value);
       setAttempt({ knob, value, score, met });
       recordEngineRun(challenge.engine); // count toward the lab dex
+      if (met) setStreak(registerClear(date)); // extend the daily streak (idempotent per day)
 
       // Re-read the stored best so a concurrent tab's better score isn't clobbered.
       let stored: Best | null = best;
@@ -137,6 +150,12 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
 
   return (
     <div className="space-y-6">
+      {streak.current > 0 && (
+        <div className="flex items-center gap-2">
+          <Badge variant="muted">🔥 {streak.current}-day streak</Badge>
+          <span className="text-xs text-muted-foreground">best {streak.best}</span>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between flex-wrap gap-2">
