@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **48 deterministic simulation engines** across
+The OpenDiscover BioLab ships **49 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -25,7 +25,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
-- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment)
+- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
 
 ---
@@ -2015,6 +2015,44 @@ The classic two-compartment IV-bolus pharmacokinetic model: a drug distributes f
 ```
 
 _Run it: `POST /api/lab/run { "engine": "pk-two-compartment", "params": … }` or interactively at `/lab/pk-two-compartment`._
+
+---
+
+### `pk-oral-absorption` — Oral One-Compartment PK (first-order absorption)
+
+One-compartment oral pharmacokinetics with first-order absorption: the Bateman plasma curve C(t)=(F·Dose·ka)/(V(ka−ke))(e^(−ke t)−e^(−ka t)), rising from zero to a peak then declining. Reports Cmax and Tmax=ln(ka/ke)/(ka−ke), AUC(0→∞)=F·Dose/CL, the absorption/elimination rate constants, and the terminal half-life (governed by the slower rate — flip-flop kinetics when ka<ke). The ka=ke removable singularity is handled with its exact limit C=(F·Dose·ka/V)·t·e^(−ka t). Closed-form and deterministic; distinct from the IV-bolus two-compartment model.
+
+**References**
+- Gibaldi, M. & Perrier, D. (1982) Pharmacokinetics, 2nd ed. Marcel Dekker.
+- Rowland, M. & Tozer, T.N. (2011) Clinical Pharmacokinetics and Pharmacodynamics, 4th ed. Lippincott Williams & Wilkins.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `dose` | number | `100` | ≥ 0, ≤ 1000000 |  |
+| `bioavailability` | number | `1` | ≥ 0.01, ≤ 1 |  |
+| `ka` | number | `1` | ≥ 0, ≤ 10000 |  |
+| `cl` | number | `5` | ≥ 0, ≤ 100000 |  |
+| `v` | number | `20` | ≥ 0, ≤ 100000 |  |
+| `tEnd` | number | `24` | ≥ 0, ≤ 100000 |  |
+| `outputPoints` | integer | `300` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "dose": 100,
+  "bioavailability": 1,
+  "ka": 1,
+  "cl": 5,
+  "v": 20,
+  "tEnd": 24,
+  "outputPoints": 300
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "pk-oral-absorption", "params": … }` or interactively at `/lab/pk-oral-absorption`._
 
 
 ## 🔬 Structural

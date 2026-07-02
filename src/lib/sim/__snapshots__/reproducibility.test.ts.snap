@@ -335,6 +335,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Neighbor-Joining tree of 4 taxa (Jukes–Cantor distances), depth 2.",
   },
+  "pk-oral-absorption": {
+    "metrics": {
+      "auc": 20,
+      "bioavailability": 1,
+      "cmax": 3.1498,
+      "ka": 1,
+      "ke": 0.25,
+      "terminalHalfLife": 2.77259,
+      "tmax": 1.84839,
+    },
+    "summary": "Oral one-compartment PK: Cmax=3.15 mg/L at Tmax=1.85 h, terminal t½=2.77 h; AUC=20.0 mg·h/L.",
+  },
   "pk-two-compartment": {
     "metrics": {
       "alpha": 1.86603,
