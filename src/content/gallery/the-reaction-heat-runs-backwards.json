@@ -1,0 +1,17 @@
+{
+  "slug": "the-reaction-heat-runs-backwards",
+  "title": "The reaction heat runs backwards",
+  "engine": "gibbs-equilibrium",
+  "params": {
+    "deltaH": -40,
+    "deltaS": -100,
+    "temperatureC": 25,
+    "reactionQuotient": 1,
+    "tempPlotMinC": -20,
+    "tempPlotMaxC": 250,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Not every reaction likes to be heated. This one is exothermic (ΔH° = −40 kJ/mol, it gives off heat) but also entropy-lowering (ΔS° = −100 J/mol/K, it puts molecules into a more ordered state). At room temperature the enthalpy wins and ΔG° is negative, so it runs forward and sits ~98% product. But ΔG° = ΔH° − T·ΔS° puts temperature on the entropy term, so heating steadily eats away the drive — and at the crossover T = ΔH°/ΔS° ≈ 127°C the sign flips and the reaction starts running backwards. The plotted van't Hoff line (ln K versus temperature) shows K sliding from strongly forward to unfavourable. This enthalpy-versus-entropy tug of war is exactly why industrial ammonia synthesis (the Haber process that feeds half the planet) is run cool and squeezed to high pressure: heat would undo the very bond it is trying to make."
+}

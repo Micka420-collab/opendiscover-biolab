@@ -643,6 +643,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.5,
     hint: 'Both lung and tissue saturation fall as P₅₀ rises, but tissue saturation falls faster at first — so delivery peaks at an intermediate P₅₀ around 60–65 mmHg before dropping off again.',
   },
+  {
+    id: 'poise-a-reaction',
+    engine: 'gibbs-equilibrium',
+    title: 'Poise a reaction for the cell',
+    brief:
+      'Metabolism runs on reactions that are favourable but not runaway. Tune the reaction entropy ΔS° so that at body temperature (37°C) the standard free energy ΔG° lands at −20 kJ/mol — downhill enough to proceed, gentle enough for the cell to control.',
+    baseParams: { deltaH: -40, temperatureC: 37, reactionQuotient: 1 },
+    knob: {
+      param: 'deltaS',
+      label: 'Reaction entropy ΔS°',
+      min: -300,
+      max: 0,
+      step: 1,
+      default: -100,
+      unit: 'J/mol/K',
+    },
+    metricKey: 'deltaG0',
+    metricLabel: 'Standard free energy ΔG°',
+    unit: 'kJ/mol',
+    goal: 'target',
+    target: -20,
+    hint: 'ΔG° = ΔH° − T·ΔS°. With ΔH° = −40 kJ/mol at 310 K, ΔG° = −20 needs T·ΔS° = −20 kJ/mol, i.e. ΔS° ≈ −64 J/mol/K.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
