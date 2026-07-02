@@ -13,6 +13,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { HelpCardBody, HelpTip } from '@/components/ui/help-tip';
 import { recordEngineRun } from '@/lib/lab/achievements';
 import {
   EMPTY_STREAK,
@@ -27,6 +28,7 @@ import {
   challengeParams,
   meetsBar,
 } from '@/lib/lab/daily-challenge';
+import { helpForChallenge } from '@/lib/lab/help-content';
 import { experimentOverlayPath, experimentSharePath } from '@/lib/lab/share';
 import { runEngine } from '@/lib/sim';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -528,9 +530,15 @@ function Hud({
 }
 
 function RoundBanner({ challenge }: { challenge: Challenge }) {
+  const help = helpForChallenge(challenge.id);
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-lg font-semibold">{challenge.title}</span>
+      {help && (
+        <HelpTip title={challenge.title}>
+          <HelpCardBody card={help} />
+        </HelpTip>
+      )}
       <Badge variant="outline">{challenge.engine}</Badge>
       <Badge variant="muted">Goal: {goalText(challenge)}</Badge>
     </div>
