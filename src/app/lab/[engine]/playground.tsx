@@ -145,6 +145,26 @@ export function Playground({
     }
   }
 
+  /** Copy the transparent-overlay URL for pasting straight into an OBS Browser Source. */
+  async function copyOverlayUrl() {
+    const { params, error } = buildParams(engine.fields, values);
+    if (error) {
+      setState({ kind: 'error', message: error });
+      return;
+    }
+    const path = experimentOverlayPath({ engine: engine.slug, params });
+    const url =
+      typeof window !== 'undefined' ? new URL(path, window.location.origin).toString() : path;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareMsg(
+        'Overlay URL copied — add a Browser Source in OBS (1920×1080, transparent background).',
+      );
+    } catch {
+      setShareMsg(url);
+    }
+  }
+
   // Opened from a shared/remixed link: reproduce the run immediately so the
   // viewer lands on the result, not an unrun form. Runs once, on mount.
   const didAutoRun = useRef(false);
@@ -193,6 +213,9 @@ export function Playground({
             </Button>
             <Button variant="outline" onClick={openOverlay} disabled={state.kind === 'running'}>
               📺 OBS overlay
+            </Button>
+            <Button variant="outline" onClick={copyOverlayUrl} disabled={state.kind === 'running'}>
+              📋 Copy overlay URL
             </Button>
           </div>
           {shareMsg && <p className="text-sm text-accent break-all">{shareMsg}</p>}
