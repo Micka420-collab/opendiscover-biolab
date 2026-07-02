@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **51 deterministic simulation engines** across
+The OpenDiscover BioLab ships **52 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
@@ -1706,6 +1706,40 @@ Beer–Lambert absorption of a two-component mixture: each species is a Gaussian
 ```
 
 _Run it: `POST /api/lab/run { "engine": "beer-lambert", "params": … }` or interactively at `/lab/beer-lambert`._
+
+---
+
+### `acid-base-titration` — Acid–Base Titration Curve (weak acid)
+
+The titration curve of a weak monoprotic acid with strong base: pH versus titrant volume, computed from the exact charge balance [Na⁺]+[H⁺]=Kw/[H⁺]+[A⁻] solved for [H⁺] at each addition by bracketed bisection. Reports the equivalence volume Ca·Va/Cb, the pH at half-equivalence (= pKa, the buffer plateau), the equivalence-point pH (> 7 because the conjugate base is itself basic), the initial pH, and the pKa±1 buffer range. Deterministic and exact — the pedagogical burette experiment.
+
+**References**
+- Harris, D.C. (2015) Quantitative Chemical Analysis, 9th ed. W.H. Freeman.
+- Skoog, D.A., West, D.M., Holler, F.J. & Crouch, S.R. (2013) Fundamentals of Analytical Chemistry, 9th ed. Brooks/Cole.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `pKa` | number | `4.76` | ≥ 0, ≤ 14 |  |
+| `acidConc` | number | `0.1` | ≥ 0.000001, ≤ 10 |  |
+| `acidVolume` | number | `25` | ≥ 0, ≤ 100000 |  |
+| `baseConc` | number | `0.1` | ≥ 0.000001, ≤ 10 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "pKa": 4.76,
+  "acidConc": 0.1,
+  "acidVolume": 25,
+  "baseConc": 0.1,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "acid-base-titration", "params": … }` or interactively at `/lab/acid-base-titration`._
 
 
 ## 🦠 Epidemiology

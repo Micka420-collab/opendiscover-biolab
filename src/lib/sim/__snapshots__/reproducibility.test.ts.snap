@@ -2,6 +2,18 @@
 
 exports[`engine reproducibility harness > pins every engine example to a stable summary + metrics snapshot 1`] = `
 {
+  "acid-base-titration": {
+    "metrics": {
+      "bufferHigh": 5.76,
+      "bufferLow": 3.76,
+      "equivalenceVolume": 25,
+      "initialPH": 2.88286,
+      "pKa": 4.76,
+      "phAtEquivalence": 8.72954,
+      "phAtHalfEquivalence": 4.76045,
+    },
+    "summary": "Titration of 0.1 M weak acid (pKa 4.76) with 0.1 M base: buffers near pH 4.76 at half-equivalence, jumps through the equivalence point at 25.0 mL (pH 8.73).",
+  },
   "admet": {
     "metrics": {
       "hba": 4,
