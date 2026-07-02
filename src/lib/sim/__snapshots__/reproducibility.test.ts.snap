@@ -289,7 +289,7 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
   },
   "rock-paper-scissors": {
     "metrics": {
-      "conservedDriftPct": 1.50435e-8,
+      "conservedDriftPct": 1.5044e-8,
       "equilibriumFrequency": 0.333333,
       "lossPayoff": 1,
       "minFrequency": 0.177293,

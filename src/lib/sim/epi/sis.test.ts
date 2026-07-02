@@ -41,6 +41,13 @@ describe('sis', () => {
     }
   });
 
+  it('converges to i* even for large rates (adaptive integrator, no fixed-step instability)', () => {
+    // beta-gamma = 60 would blow a fixed RK4 step; adaptive RK45 stays accurate.
+    const r = run({ beta: 120, gamma: 60, i0: 0.01, tEnd: 2 });
+    expect(metric(r, 'endemicPrevalence')).toBeCloseTo(0.5, 10);
+    expect(metric(r, 'finalPrevalence')).toBeCloseTo(0.5, 3);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('sis', { beta: 0.4, gamma: 0.15 });
     const b = runEngine('sis', { beta: 0.4, gamma: 0.15 });

@@ -30,7 +30,7 @@
  */
 
 import { z } from 'zod';
-import { type Derivative, rk4 } from '../core/ode';
+import type { Derivative, OdeTrajectory } from '../core/ode';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -81,6 +81,52 @@ export function rpsDerivative(p: RockPaperScissorsParams): Derivative {
   };
 }
 
+/**
+ * Fixed-step RK4 that projects the state back onto the probability simplex
+ * (clamp ≥0, renormalize to sum 1) after every step. In the unstable a<b regime a
+ * plain step overshoots the boundary into negative frequencies where the quadratic
+ * replicator RHS blows up to ±Infinity/NaN; the projection keeps it feasible.
+ */
+function integrateOnSimplex(
+  f: Derivative,
+  y0: number[],
+  tEnd: number,
+  steps: number,
+): OdeTrajectory {
+  const h = tEnd / steps;
+  const t: number[] = [0];
+  const traj: number[][] = [[...y0]];
+  let y = [...y0];
+  for (let i = 0; i < steps; i++) {
+    const time = i * h;
+    const k1 = f(time, y);
+    const k2 = f(
+      time + h / 2,
+      y.map((v, j) => v + (h / 2) * (k1[j] ?? 0)),
+    );
+    const k3 = f(
+      time + h / 2,
+      y.map((v, j) => v + (h / 2) * (k2[j] ?? 0)),
+    );
+    const k4 = f(
+      time + h,
+      y.map((v, j) => v + h * (k3[j] ?? 0)),
+    );
+    y = y.map(
+      (v, j) => v + (h / 6) * ((k1[j] ?? 0) + 2 * (k2[j] ?? 0) + 2 * (k3[j] ?? 0) + (k4[j] ?? 0)),
+    );
+    let sum = 0;
+    for (let j = 0; j < y.length; j++) {
+      if (!(y[j] > 0)) y[j] = 0; // also maps NaN → 0
+      sum += y[j] ?? 0;
+    }
+    if (sum > 0) for (let j = 0; j < y.length; j++) y[j] = (y[j] ?? 0) / sum;
+    t.push((i + 1) * h);
+    traj.push([...y]);
+  }
+  return { t, y: traj };
+}
+
 function downsampleIndices(len: number, n: number): number[] {
   if (len <= n) return Array.from({ length: len }, (_, i) => i);
   const denom = Math.max(n - 1, 1);
@@ -90,7 +136,7 @@ function downsampleIndices(len: number, n: number): number[] {
 export function run(rawParams: Partial<RockPaperScissorsParams> = {}): SimResult {
   const p = paramsSchema.parse(rawParams);
   const s0 = 1 - p.rock0 - p.paper0;
-  const traj = rk4(rpsDerivative(p), [p.rock0, p.paper0, s0], 0, p.tEnd, p.steps);
+  const traj = integrateOnSimplex(rpsDerivative(p), [p.rock0, p.paper0, s0], p.tEnd, p.steps);
 
   const rock = traj.y.map((row) => row[0] ?? 0);
   const paper = traj.y.map((row) => row[1] ?? 0);

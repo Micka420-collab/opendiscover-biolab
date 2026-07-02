@@ -26,7 +26,7 @@
  */
 
 import { z } from 'zod';
-import { type Derivative, rk4 } from '../core/ode';
+import { type Derivative, rk45 } from '../core/ode';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -40,8 +40,8 @@ export const paramsSchema = z
     i0: z.number().gt(0).lt(1).default(0.01),
     /** Integration horizon. */
     tEnd: z.number().positive().max(100_000).default(120),
-    /** Fixed RK4 steps. */
-    steps: z.number().int().positive().max(200_000).default(2400),
+    /** Adaptive RK45 tolerance (stable for any beta/gamma, unlike a fixed step). */
+    tol: z.number().positive().default(1e-8),
     /** Points kept for the plotted series. */
     outputPoints: z.number().int().positive().max(2000).default(400),
   })
@@ -74,7 +74,10 @@ export function run(rawParams: Partial<SisParams> = {}): SimResult {
   const r0 = p.beta / p.gamma;
   const iStar = endemicPrevalence(p.beta, p.gamma);
 
-  const traj = rk4(sisDerivative(p), [p.i0], 0, p.tEnd, p.steps);
+  const traj = rk45(sisDerivative(p), [p.i0], 0, p.tEnd, {
+    tol: p.tol,
+    outputPoints: p.outputPoints,
+  });
   const infected = traj.y.map((row) => Math.min(Math.max(row[0] ?? 0, 0), 1));
   const finalPrevalence = infected[infected.length - 1] ?? 0;
   const endemic = r0 > 1;

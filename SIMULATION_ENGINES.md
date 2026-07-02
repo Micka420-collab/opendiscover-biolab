@@ -1323,7 +1323,7 @@ The SIS model for infections that confer no lasting immunity: the infected recov
 | `gamma` | number | `0.1` | ≥ 0 |  |
 | `i0` | number | `0.01` | ≥ 0, ≤ 1 |  |
 | `tEnd` | number | `120` | ≥ 0, ≤ 100000 |  |
-| `steps` | integer | `2400` | ≥ 0, ≤ 200000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
 | `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
 
 **Example**
@@ -1334,7 +1334,7 @@ The SIS model for infections that confer no lasting immunity: the infected recov
   "gamma": 0.1,
   "i0": 0.01,
   "tEnd": 120,
-  "steps": 2400,
+  "tol": 1e-8,
   "outputPoints": 400
 }
 ```

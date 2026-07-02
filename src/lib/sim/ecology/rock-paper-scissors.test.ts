@@ -42,6 +42,17 @@ describe('rock-paper-scissors', () => {
     expect(metric(r, 'minFrequency')).toBeLessThan(0.02);
   });
 
+  it('stays finite and on the simplex in the unstable a<b regime (no NaN/Inf)', () => {
+    const r = run({ winPayoff: 1, lossPayoff: 2, rock0: 0.5, paper0: 0.3, tEnd: 10000 });
+    for (const m of r.metrics) expect(Number.isFinite(m.value)).toBe(true);
+    expect(metric(r, 'minFrequency')).toBeGreaterThanOrEqual(0);
+    const s = (r.series ?? [])[0];
+    for (let k = 0; k < s.x.length; k++) {
+      expect((s.y.rock[k] ?? 0) + (s.y.paper[k] ?? 0) + (s.y.scissors[k] ?? 0)).toBeCloseTo(1, 6);
+      expect(s.y.rock[k] ?? 0).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('rock-paper-scissors', { winPayoff: 1, lossPayoff: 1.2 });
     const b = runEngine('rock-paper-scissors', { winPayoff: 1, lossPayoff: 1.2 });

@@ -64,7 +64,10 @@ export function nicholsonBaileyEquilibrium(
 ): { host: number; parasitoid: number } | null {
   if (r <= 1) return null;
   const lnR = Math.log(r);
-  return { parasitoid: lnR / a, host: (r * lnR) / (a * c * (r - 1)) };
+  // H* = R·lnR/(a·c·(R−1)) = lnR/(a·c·(1−1/R)); the second form avoids forming the
+  // R·lnR product, which would overflow to Infinity for astronomically large R even
+  // though the true H* is finite.
+  return { parasitoid: lnR / a, host: lnR / (a * c * (1 - 1 / r)) };
 }
 
 export function run(rawParams: Partial<NicholsonBaileyParams> = {}): SimResult {
@@ -79,8 +82,10 @@ export function run(rawParams: Partial<NicholsonBaileyParams> = {}): SimResult {
     const escaping = Math.exp(-p.searchEfficiency * pop);
     const hNext = p.reproduction * h * escaping;
     const pNext = p.parasitoidsPerHost * h * (1 - escaping);
-    h = Number.isFinite(hNext) ? Math.min(Math.max(hNext, 0), MAX_POP) : 0;
-    pop = Number.isFinite(pNext) ? Math.min(Math.max(pNext, 0), MAX_POP) : 0;
+    // On overflow to non-finite, clamp to the MAX_POP ceiling (a runaway outbreak),
+    // not 0 — clamping to 0 would falsely report extinction at the divergence peak.
+    h = Number.isFinite(hNext) ? Math.min(Math.max(hNext, 0), MAX_POP) : MAX_POP;
+    pop = Number.isFinite(pNext) ? Math.min(Math.max(pNext, 0), MAX_POP) : MAX_POP;
     hosts.push(h);
     parasitoids.push(pop);
   }

@@ -40,6 +40,21 @@ describe('nicholson-bailey', () => {
     }
   });
 
+  it('gives a finite equilibrium and a divergent (not zero) outbreak for astronomically large R', () => {
+    // R·lnR would overflow; the rearranged formula stays finite (~14184).
+    const eq = nicholsonBaileyEquilibrium(1e308, 0.05, 1);
+    expect(eq?.host).toBeCloseTo(Math.log(1e308) / 0.05, 5);
+    // The map's overflow clamps to the ceiling (not 0 = false extinction).
+    const r = run({
+      reproduction: 1e308,
+      searchEfficiency: 0.05,
+      parasitoidsPerHost: 1,
+      generations: 5,
+    });
+    expect(metric(r, 'peakHost')).toBeGreaterThan(1e11);
+    expect(metric(r, 'outbreakRatio')).toBeGreaterThan(1);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('nicholson-bailey', { reproduction: 2.5, searchEfficiency: 0.03 });
     const b = runEngine('nicholson-bailey', { reproduction: 2.5, searchEfficiency: 0.03 });
