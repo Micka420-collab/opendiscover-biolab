@@ -511,6 +511,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 15,
     hint: 'S_opt = √(Ks·Ki). With Ks = 1 that is just √Ki, so a peak at 15 g/L needs Ki ≈ 225.',
   },
+  {
+    id: 'reach-herd-immunity',
+    engine: 'vaccination',
+    title: 'Reach herd immunity',
+    brief:
+      'An outbreak stops growing the moment each case infects fewer than one other person — when the effective reproduction number R_eff = R₀·(1 − εv) hits 1. Dial the vaccination coverage until you land exactly on that herd-immunity threshold.',
+    baseParams: { r0: 4, efficacy: 0.9 },
+    knob: {
+      param: 'coverage',
+      label: 'Vaccination coverage',
+      min: 0,
+      max: 1,
+      step: 0.005,
+      default: 0.3,
+    },
+    metricKey: 'effectiveR',
+    metricLabel: 'Effective reproduction R_eff',
+    goal: 'target',
+    target: 1,
+    hint: 'R_eff = R₀·(1 − εv). With R₀ = 4 and ε = 0.9 you need 1 − 0.9v = 1/4, i.e. coverage v ≈ 0.83 (the critical coverage v_c = (1 − 1/R₀)/ε).',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

@@ -1,0 +1,9 @@
+{
+  "slug": "how-a-protein-buries-its-oily-core",
+  "title": "How a protein buries its oily core",
+  "engine": "hp-folding",
+  "params": { "sequence": "HPHPPHHPHPPHPHHPPHPH", "steps": 60000, "temperature": 2.0, "seed": 42 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Why does a protein fold at all? Ken Dill's HP model strips the question to its essence: every residue is just H (hydrophobic, oil-like) or P (polar, water-loving), and the chain wanders a square lattice looking for shapes that tuck the H residues away from water. Run the Monte-Carlo search and watch a floppy self-avoiding walk collapse into a compact blob with an oily core and a polar shell — the same hydrophobic effect that drives real proteins into shape. Because the walk is seeded, this fold is perfectly reproducible: seed 42 always finds the same low-energy structure, so anyone can replay and verify the discovery."
+}
