@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'OpenDiscover BioLab — deterministic in-silico biology lab',
   description:
-    'An open-source virtual biotechnology lab you run in the browser — no account, no database. 25 deterministic simulation engines where every run reproduces byte-for-byte and is a shareable, remixable link. Built for scientists, creators, and streamers.',
+    'An open-source virtual biotechnology lab you run in the browser — no account, no database. Dozens of deterministic simulation engines where every run reproduces byte-for-byte and is a shareable, remixable link. Built for scientists, creators, and streamers.',
   keywords: [
     'in-silico biology',
     'bioinformatics',

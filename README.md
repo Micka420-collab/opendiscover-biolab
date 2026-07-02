@@ -51,9 +51,11 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `fba` | Flux balance analysis via a built-in linear-programming solver |
 | | `branching-growth` | Galton-Watson branching process: cell-population growth & extinction probability |
 | | `metabolic-pathway` | Kinetic linear pathway (Michaelis-Menten steps, ODE) — flux uniformity & bottlenecks |
+| | `kuramoto` | Kuramoto synchronization: coupled phase oscillators, order parameter, critical coupling |
 | 🌱 Population genetics | `wright-fisher` | Genetic drift, selection, mutation, fixation probability |
 | | `phylogenetics` | Distance models (JC/K2P), Neighbor-Joining & UPGMA trees, Newick output |
 | | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes (loci always unlinked; `recombinantGametes` is a standalone helper, not wired into the cross) |
+| | `hardy-weinberg` | Hardy–Weinberg test: allele frequencies, expected p²:2pq:q², χ² goodness-of-fit, inbreeding F |
 | 🧠 Neuroscience | `hodgkin-huxley` | The 1952 action-potential model (Nobel Prize, 1963): spike threshold, repetitive firing |
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
@@ -61,6 +63,8 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `docking` | Geometric rigid-body docking — Lennard-Jones pose scoring & ranking |
 | | `dose-response` | Hill dose–response, IC₅₀/EC₅₀ fitting, drug-combination indices |
 | 🔬 Structural | `rna-fold` | RNA secondary structure via the Nussinov DP algorithm |
+| 🐺 Ecology | `lotka-volterra` | Predator–prey oscillations: conserved quantity, coexistence equilibrium, phase portrait |
+| | `logistic-map` | Robert May's map: fixed point → period-doubling → chaos, Lyapunov exponent, bifurcation diagram |
 
 > Full catalog with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
 > Run any engine interactively — a param form generated from its Zod schema, Vega-Lite result
@@ -168,7 +172,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 25 engines + the lab layer: **700+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 29 engines + the lab layer: **740+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.
