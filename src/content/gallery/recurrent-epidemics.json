@@ -1,0 +1,15 @@
+{
+  "slug": "recurrent-epidemics",
+  "title": "Measles-style recurrent epidemics",
+  "engine": "sir-endemic",
+  "params": {
+    "beta": 0.5,
+    "gamma": 0.1,
+    "mu": 0.01,
+    "i0": 0.001,
+    "tEnd": 2000
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Add births and deaths to an SIR epidemic and it no longer burns out - fresh susceptibles keep arriving, so the infection settles into a persistent endemic level through a series of damped oscillations. This is the classic mechanism behind the recurrent, wave-after-wave outbreaks of childhood diseases like measles before vaccination."
+}

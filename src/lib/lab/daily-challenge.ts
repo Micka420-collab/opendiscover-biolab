@@ -218,6 +218,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'Endemic prevalence i* = 1 − 1/R₀ with R₀ = β/γ. Half the population endemic means R₀ = 2, i.e. β = 2γ.',
   },
+  {
+    id: 'endemic-sir-target',
+    engine: 'sir-endemic',
+    title: 'Dial in a 5% endemic level',
+    brief:
+      'Tune the transmission rate β of an endemic SIR disease (with births and deaths, so it recurs like measles) so its long-run steady-state prevalence i* settles at 5% of the population.',
+    baseParams: { gamma: 0.1, mu: 0.01, i0: 0.001, tEnd: 20 },
+    knob: {
+      param: 'beta',
+      label: 'Transmission rate β',
+      min: 0.15,
+      max: 1,
+      step: 0.005,
+      default: 0.3,
+      unit: '1/day',
+    },
+    metricKey: 'endemicPrevalence',
+    metricLabel: 'Endemic prevalence i*',
+    goal: 'target',
+    target: 0.05,
+    hint: 'i* = μ(R₀−1)/β with R₀ = β/(γ+μ). It climbs with β toward a ceiling of μ/(γ+μ) ≈ 0.09; aim for a modest R₀ around 2.2.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
