@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **42 deterministic simulation engines** across
+The OpenDiscover BioLab ships **43 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -21,7 +21,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
@@ -982,6 +982,34 @@ The 1943 fluctuation test that proved mutations arise at random during growth, b
 ```
 
 _Run it: `POST /api/lab/run { "engine": "luria-delbruck", "params": … }` or interactively at `/lab/luria-delbruck`._
+
+---
+
+### `ewens-sampling` — Ewens Sampling Formula
+
+The Ewens sampling formula for a neutral sample of n genes under the infinite-alleles model with scaled mutation θ = 4Nμ. Reports the expected number of distinct alleles E[K] = Σθ/(θ+i), the expected homozygosity F = 1/(1+θ) (and effective allele number 1+θ), the expected singleton count, and the full expected allele-frequency spectrum E[a_j]. Closed-form and deterministic — a cornerstone of the neutral theory and the basis of the Ewens–Watterson neutrality test.
+
+**References**
+- Ewens, W.J. (1972) The sampling theory of selectively neutral alleles. Theoretical Population Biology 3:87-112.
+- Crow, J.F. & Kimura, M. (1970) An Introduction to Population Genetics Theory. Harper & Row.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `sampleSize` | integer | `50` | ≥ 2, ≤ 2000 |  |
+| `theta` | number | `1` | ≥ 0, ≤ 10000 |  |
+
+**Example**
+
+```json
+{
+  "sampleSize": 50,
+  "theta": 1
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "ewens-sampling", "params": … }` or interactively at `/lab/ewens-sampling`._
 
 ---
 

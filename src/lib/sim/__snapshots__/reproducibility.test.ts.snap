@@ -120,6 +120,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Michaelis–Menten: Vmax=10.0, Km=5.00 → apparent Vmax=10.0, half-saturation at [S]=5.00.",
   },
+  "ewens-sampling": {
+    "metrics": {
+      "effectiveAlleles": 2,
+      "expectedAlleles": 4.49921,
+      "expectedHomozygosity": 0.5,
+      "expectedSingletons": 1,
+      "sampleSize": 50,
+      "theta": 1,
+    },
+    "summary": "Ewens sampling (n=50, θ=1): expect 4.50 distinct alleles, homozygosity 0.500, ~1.0 singletons.",
+  },
   "fba": {
     "metrics": {
       "activeReactions": 3,
