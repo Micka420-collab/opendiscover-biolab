@@ -1,0 +1,18 @@
+{
+  "slug": "the-primate-family-tree",
+  "title": "The primate family tree from DNA",
+  "engine": "phylogenetics",
+  "params": {
+    "method": "nj",
+    "model": "jc",
+    "sequences": [
+      { "name": "Human", "seq": "AAGCTTCACCGGCGCAGTCA" },
+      { "name": "Chimp", "seq": "AAGCTTCACCGGCGCAATTA" },
+      { "name": "Gorilla", "seq": "AAGCTTCACCGGCGCAGTTG" },
+      { "name": "Orangutan", "seq": "AAGCTTCACCGGCGCAGGCA" }
+    ]
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Give it four DNA sequences and it reconstructs who is related to whom. The Jukes–Cantor model turns raw sequence differences into evolutionary distances (correcting for repeat mutations at the same site), then neighbor-joining assembles the tree that best fits those distances. From these short mitochondrial snippets it recovers the textbook primate topology — human and chimp as closest cousins, gorilla next, orangutan the outgroup. The same method builds trees of viruses, bacteria and cancer lineages."
+}

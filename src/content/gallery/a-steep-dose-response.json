@@ -1,0 +1,16 @@
+{
+  "slug": "a-steep-dose-response",
+  "title": "A steep dose-response",
+  "engine": "dose-response",
+  "params": {
+    "e0": 0,
+    "emax": 100,
+    "ec50": 50,
+    "hill": 2,
+    "logConcMin": -1,
+    "logConcMax": 4
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Almost every drug obeys a sigmoid: nothing happens, then over a narrow window of concentration the effect switches from off to full. The Hill equation E = Emax·Cⁿ/(EC50ⁿ+Cⁿ) draws it, with EC50 the concentration for half-maximal effect (here 50) and the Hill coefficient n its steepness. n=2 means cooperativity — the curve snaps rather than eases, so a small dose change flips the response. This is the shape behind potency, therapeutic windows, and IC50 tables."
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "why-identical-cells-differ",
+  "title": "Why identical cells differ",
+  "engine": "gillespie",
+  "params": {
+    "preset": "geneExpressionBursting",
+    "tMax": 100,
+    "seed": 7
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Genes don't transcribe in a smooth stream — they fire in bursts. A promoter flickers between OFF and ON, and while it's ON a flurry of mRNAs is made, then decays. Because molecule counts are small and every reaction fires at a random time, the Gillespie algorithm (exact stochastic simulation of the chemical master equation) shows protein levels jumping and sagging. Run it again with a different seed and you get a different cell — genetically identical, yet noticeably unlike. This intrinsic noise is why a clonal population is never truly uniform."
+}

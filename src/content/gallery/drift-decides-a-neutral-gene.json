@@ -1,0 +1,15 @@
+{
+  "slug": "drift-decides-a-neutral-gene",
+  "title": "Drift decides a neutral gene",
+  "engine": "wright-fisher",
+  "params": {
+    "popSize": 100,
+    "initFreq": 0.5,
+    "generations": 200,
+    "replicates": 200,
+    "seed": 1
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "No selection, no mutation, no advantage — just chance. Start 200 identical populations at a 50/50 allele split and let each drift for 200 generations of random sampling. They fan out, and one by one an allele hits 100% (fixation) or 0% (loss); in a finite population, pure luck eventually wins. Smaller populations drift faster. This Wright–Fisher process is the null model of evolution — the baseline against which real selection has to prove itself."
+}

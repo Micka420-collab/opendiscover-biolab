@@ -1,0 +1,14 @@
+{
+  "slug": "the-most-famous-curve-in-biochemistry",
+  "title": "The most famous curve in biochemistry",
+  "engine": "enzyme-kinetics",
+  "params": {
+    "vmax": 12,
+    "km": 4,
+    "sMax": 100,
+    "mode": "mm"
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Add more substrate and an enzyme speeds up — but only so far. The Michaelis–Menten equation v = Vmax·[S]/(Km+[S]) bends from a near-linear rise into a flat ceiling as every active site saturates. Km (here 4) is the substrate level giving half of Vmax — a direct read-out of the enzyme's affinity: low Km, tight binding. It is the single most-taught relationship in all of biochemistry, and the reason drug and enzyme assays are run the way they are."
+}
