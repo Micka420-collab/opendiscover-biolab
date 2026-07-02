@@ -335,6 +335,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 8,
     hint: 'A bigger tissue reservoir (V2) makes the drug linger longer, lengthening the terminal half-life. It reaches 8 h at about V2 = 34 L.',
   },
+  {
+    id: 'folding-max-stability',
+    engine: 'two-state-folding',
+    title: 'Engineer a protein stable at room temperature',
+    brief:
+      'A protein is most folded at 25°C not when its melting temperature is highest, but when its stability maximum sits right at 25°C. Tune the melting temperature Tm to maximise the fraction folded at 25°C — push it too high and cold denaturation creeps in; too low and it starts to melt.',
+    baseParams: { deltaHm: 250, deltaCp: 8, tMinCelsius: -20, tMaxCelsius: 100 },
+    knob: {
+      param: 'tmCelsius',
+      label: 'Melting temperature Tm',
+      min: 30,
+      max: 90,
+      step: 0.5,
+      default: 40,
+      unit: '°C',
+    },
+    metricKey: 'fractionFolded25',
+    metricLabel: 'Fraction folded at 25°C',
+    goal: 'maximize',
+    par: 0.985,
+    hint: 'Fraction folded at 25°C peaks when the stability maximum T_maxstab lands on 25°C — near Tm ≈ 55°C for these ΔHm/ΔCp. Both a lower and a higher Tm reduce it.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

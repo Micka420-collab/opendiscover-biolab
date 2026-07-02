@@ -1,0 +1,9 @@
+{
+  "slug": "tracing-genes-to-their-ancestor",
+  "title": "Tracing genes to their ancestor",
+  "engine": "coalescent",
+  "params": { "sampleSize": 20, "theta": 5 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Take 20 copies of a gene and walk their family tree backwards in time until they all meet at one common ancestor. The Kingman coalescent says the waiting times explode as lineages run out: with 20 left they merge fast, but the final pair (T₂) alone takes on average half the total — the plotted waiting-time curve rockets up at the end. Expected time to the MRCA is 2(1−1/n) ≈ 1.9 coalescent units; total branch length 2·Σ1/k. Under θ=4Nμ=5 those branches carry ~θ·Σ1/k segregating sites, the raw material behind Watterson's estimator and every test for selection."
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "the-protein-stability-curve",
+  "title": "The protein stability curve",
+  "engine": "two-state-folding",
+  "params": { "deltaHm": 250, "tmCelsius": 60, "deltaCp": 8 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A protein is only marginally stable — a few tens of kJ/mol, the energy of a couple of hydrogen bonds. Plot its free energy of unfolding ΔG against temperature and you get the famous stability curve: a downward arch that is positive (folded) only over a window. Cross the top edge and it melts (heat denaturation, here Tm=60°C); cross the bottom edge and — counter-intuitively — it unfolds again in the cold. The fraction-folded curve is the sigmoid you measure in a CD or DSC melt. Marginal stability is why a few degrees of fever, or a point mutation, can tip a protein over the edge."
+}
