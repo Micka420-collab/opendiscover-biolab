@@ -276,6 +276,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "4 base pairs over 12 nt (67% paired, 3 stacks, ΔG≈-9.0 kcal/mol): ((((....))))",
   },
+  "rock-paper-scissors": {
+    "metrics": {
+      "conservedDriftPct": 1.50435e-8,
+      "equilibriumFrequency": 0.333333,
+      "lossPayoff": 1,
+      "minFrequency": 0.177293,
+      "stabilityIndex": 0,
+      "winPayoff": 1,
+    },
+    "summary": "Rock–Paper–Scissors replicator (a=1, b=1): neutral closed orbits (V conserved); conserved-V drift 0.000%.",
+  },
   "rosenzweig-macarthur": {
     "metrics": {
       "carryingCapacity": 6,

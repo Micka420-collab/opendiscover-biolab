@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **33 deterministic simulation engines** across
+The OpenDiscover BioLab ships **34 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1113,6 +1113,45 @@ A realistic predator–prey model: logistic (self-limiting) prey and a saturatin
 ```
 
 _Run it: `POST /api/lab/run { "engine": "rosenzweig-macarthur", "params": … }` or interactively at `/lab/rosenzweig-macarthur`._
+
+---
+
+### `rock-paper-scissors` — Rock–Paper–Scissors (replicator dynamics)
+
+Evolutionary game theory of cyclic dominance — Rock beats Scissors beats Paper beats Rock — under the replicator equation on the simplex. Real biology (side-blotched lizards, E. coli colicins). The uniform mix (1/3,1/3,1/3) is the interior fixed point; with win payoff a and loss magnitude b the dynamics are neutral closed orbits with an exactly conserved product V = x_R·x_P·x_S when a=b, spiral to the center when a>b, and cycle out toward the edges when a<b.
+
+**References**
+- Hofbauer, J. & Sigmund, K. (1998) Evolutionary Games and Population Dynamics.
+- Nowak, M.A. (2006) Evolutionary Dynamics, ch. 4.
+- Sinervo, B. & Lively, C.M. (1996) The rock-paper-scissors game and the evolution of alternative male strategies. Nature 380:240-243.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `winPayoff` | number | `1` | ≥ 0 |  |
+| `lossPayoff` | number | `1` | ≥ 0 |  |
+| `rock0` | number | `0.5` | ≥ 0, ≤ 1 |  |
+| `paper0` | number | `0.3` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `100` | ≥ 0, ≤ 10000 |  |
+| `steps` | integer | `4000` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `500` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "winPayoff": 1,
+  "lossPayoff": 1,
+  "rock0": 0.5,
+  "paper0": 0.3,
+  "tEnd": 100,
+  "steps": 4000,
+  "outputPoints": 500
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "rock-paper-scissors", "params": … }` or interactively at `/lab/rock-paper-scissors`._
 
 
 ## 🏭 Bioprocess
