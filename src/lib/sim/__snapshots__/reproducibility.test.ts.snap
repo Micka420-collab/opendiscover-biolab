@@ -116,6 +116,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Optimal objective flux 20.000 with 3 of 3 reactions active.",
   },
+  "fitzhugh-nagumo": {
+    "metrics": {
+      "current": 0.5,
+      "firingRate": 0.03,
+      "fixedPointV": -0.804848,
+      "fixedPointW": -0.13106,
+      "oscillationAmplitude": 3.82252,
+      "spiking": 1,
+    },
+    "summary": "Repetitive firing at I=0.5 (v amplitude 3.82, 0.030 spikes/time).",
+  },
   "gillespie": {
     "metrics": {
       "endTime": 50,

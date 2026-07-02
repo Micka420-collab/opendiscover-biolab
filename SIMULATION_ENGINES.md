@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **29 deterministic simulation engines** across
+The OpenDiscover BioLab ships **30 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -19,7 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
-- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
+- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map)
@@ -374,6 +374,49 @@ The classic biophysical model of the neuronal action potential (Nobel Prize, 196
 ```
 
 _Run it: `POST /api/lab/run { "engine": "hodgkin-huxley", "params": … }` or interactively at `/lab/hodgkin-huxley`._
+
+---
+
+### `fitzhugh-nagumo` — FitzHugh–Nagumo Neuron
+
+A two-variable reduction of Hodgkin–Huxley capturing neural excitability: a fast voltage-like variable v and a slow recovery variable w. At low input current I the rest state is stable but excitable; past a Hopf bifurcation the neuron fires a periodic relaxation-oscillation spike train. Reports the fixed point, steady-state spike amplitude, firing rate, and both the time course and the (v, w) phase portrait.
+
+**References**
+- FitzHugh, R. (1961) Impulses and physiological states in theoretical models of nerve membrane. Biophys. J. 1:445-466.
+- Nagumo, J., Arimoto, S., Yoshizawa, S. (1962) An active pulse transmission line simulating nerve axon. Proc. IRE 50:2061-2070.
+- Izhikevich, E.M. (2007) Dynamical Systems in Neuroscience, ch. 4.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `current` | number | `0.5` |  |  |
+| `a` | number | `0.7` |  |  |
+| `b` | number | `0.8` | ≥ 0 |  |
+| `epsilon` | number | `0.08` | ≥ 0 |  |
+| `v0` | number | `-1` |  |  |
+| `w0` | number | `-0.6` |  |  |
+| `tEnd` | number | `200` | ≥ 0, ≤ 10000 |  |
+| `steps` | integer | `4000` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `800` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "current": 0.5,
+  "a": 0.7,
+  "b": 0.8,
+  "epsilon": 0.08,
+  "v0": -1,
+  "w0": -0.6,
+  "tEnd": 200,
+  "steps": 4000,
+  "outputPoints": 800
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "fitzhugh-nagumo", "params": … }` or interactively at `/lab/fitzhugh-nagumo`._
 
 
 ## ⚙️ Systems biology

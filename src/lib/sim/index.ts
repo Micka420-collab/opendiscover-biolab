@@ -26,6 +26,7 @@ import { cloningSpec as cloning } from './molbio/cloning';
 import { spec as crispr } from './molbio/crispr';
 import { spec as pcr } from './molbio/pcr';
 import { spec as sequence } from './molbio/sequence';
+import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
 import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
 import { spec as hardyWeinberg } from './popgen/hardy-weinberg';
 import { spec as phylogenetics } from './popgen/phylogenetics';
@@ -57,6 +58,7 @@ export const engines: AnyEngine[] = [
   hpFolding,
   massSpec,
   hodgkinHuxley,
+  fitzHughNagumo,
   enzymeKinetics,
   grn,
   gillespie,
