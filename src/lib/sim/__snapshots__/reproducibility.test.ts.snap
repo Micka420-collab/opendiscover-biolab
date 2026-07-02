@@ -226,6 +226,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "3-step pathway: steady-state flux ≈ 4.1667, bottleneck at step 1 (Vmax=5), final product S3 = 824.885.",
   },
+  "moran-process": {
+    "metrics": {
+      "analyticFixationProbability": 0.5,
+      "empiricalFixationProbability": 0.514,
+      "exampleFixed": 1,
+      "meanAbsorptionTime": 302.76,
+      "populationSize": 50,
+      "relativeFitness": 2,
+    },
+    "summary": "Moran process (N=50, r=2): fixation probability 50.0% (analytic) vs 51.4% over 500 runs.",
+  },
   "pcr": {
     "metrics": {
       "ampliconLength": 100,
