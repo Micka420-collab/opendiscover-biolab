@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **41 deterministic simulation engines** across
+The OpenDiscover BioLab ships **42 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -25,7 +25,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
-- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
+- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment)
 - **🔬 Structural** — [`rna-fold`](#rna-fold)
 
 ---
@@ -1807,6 +1807,44 @@ Sigmoidal Hill dose-response modelling: E = E0 + (Emax-E0)*C^n/(EC50^n+C^n). Gen
 ```
 
 _Run it: `POST /api/lab/run { "engine": "dose-response", "params": … }` or interactively at `/lab/dose-response`._
+
+---
+
+### `pk-two-compartment` — Two-Compartment Pharmacokinetics (IV bolus)
+
+The classic two-compartment IV-bolus pharmacokinetic model: a drug distributes from blood (central, V1) into tissue (peripheral, V2) and back while being cleared (CL), giving the exact bi-exponential plasma curve C(t)=(Dose/V1)[(α−k21)/(α−β)·e^(−αt)+(k21−β)/(α−β)·e^(−βt)]. Reports the hybrid rate constants α/β, distribution and terminal half-lives, AUC=Dose/CL, steady-state volume, and the peripheral (tissue) concentration. Evaluated in closed form — exact and deterministic.
+
+**References**
+- Gibaldi, M. & Perrier, D. (1982) Pharmacokinetics, 2nd ed. Marcel Dekker.
+- Rowland, M. & Tozer, T.N. (2011) Clinical Pharmacokinetics and Pharmacodynamics, 4th ed. Lippincott Williams & Wilkins.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `dose` | number | `100` | ≥ 0 |  |
+| `v1` | number | `10` | ≥ 0 |  |
+| `cl` | number | `5` | ≥ 0 |  |
+| `q` | number | `10` | ≥ 0 |  |
+| `v2` | number | `20` | ≥ 0 |  |
+| `tEnd` | number | `24` | ≥ 0, ≤ 100000 |  |
+| `outputPoints` | integer | `300` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "dose": 100,
+  "v1": 10,
+  "cl": 5,
+  "q": 10,
+  "v2": 20,
+  "tEnd": 24,
+  "outputPoints": 300
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "pk-two-compartment", "params": … }` or interactively at `/lab/pk-two-compartment`._
 
 
 ## 🔬 Structural

@@ -302,6 +302,19 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Neighbor-Joining tree of 4 taxa (Jukes–Cantor distances), depth 2.",
   },
+  "pk-two-compartment": {
+    "metrics": {
+      "alpha": 1.86603,
+      "auc": 20,
+      "beta": 0.133975,
+      "cmax": 10,
+      "distributionHalfLife": 0.371456,
+      "peripheralTmax": 1.52069,
+      "terminalHalfLife": 5.17372,
+      "vss": 30,
+    },
+    "summary": "Two-compartment IV bolus: Cmax=10.00 mg/L, distributes with t½α=0.37 h then clears with terminal t½β=5.17 h; AUC=20.0 mg·h/L.",
+  },
   "properties": {
     "metrics": {
       "extinction280": 6990,

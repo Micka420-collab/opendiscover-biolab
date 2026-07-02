@@ -68,6 +68,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |
 | | `docking` | Geometric rigid-body docking — Lennard-Jones pose scoring & ranking |
 | | `dose-response` | Hill dose–response, IC₅₀/EC₅₀ fitting, drug-combination indices |
+| | `pk-two-compartment` | IV-bolus pharmacokinetics: bi-exponential plasma curve, α/β half-lives, AUC=Dose/CL |
 | 🔬 Structural | `rna-fold` | RNA secondary structure via the Nussinov DP algorithm |
 | 🐺 Ecology | `lotka-volterra` | Predator–prey oscillations: conserved quantity, coexistence equilibrium, phase portrait |
 | | `logistic-map` | Robert May's map: fixed point → period-doubling → chaos, Lyapunov exponent, bifurcation diagram |
@@ -184,7 +185,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 41 engines + the lab layer: **855+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 42 engines + the lab layer: **865+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

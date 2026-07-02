@@ -16,6 +16,7 @@ import { spec as bioreactor } from './bioprocess/bioreactor';
 import { spec as admet } from './drug/admet';
 import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
+import { spec as pkTwoCompartment } from './drug/pk-two-compartment';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as chemostatCompetition } from './ecology/chemostat-competition';
 import { spec as levinsMetapopulation } from './ecology/levins-metapopulation';
@@ -99,6 +100,7 @@ export const engines: AnyEngine[] = [
   admet,
   docking,
   doseResponse,
+  pkTwoCompartment,
   rnaFold,
 ];
 
