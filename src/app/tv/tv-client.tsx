@@ -5,16 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-interface PlaylistItem {
-  engine: string;
-  params: Record<string, unknown>;
-  title: string;
-  author: string;
-  blurb: string;
-  engineTitle: string;
-  sharePath: string;
-}
+import type { PlaylistItem } from './playlist';
 
 type Phase =
   | { kind: 'loading' }

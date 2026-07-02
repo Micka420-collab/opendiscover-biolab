@@ -1,5 +1,7 @@
 import { galleryEntries } from '@/content/gallery';
+import { engines } from '@/lib/sim';
 import Link from 'next/link';
+import { buildPlaylist } from './playlist';
 import { TvClient } from './tv-client';
 
 export const metadata = {
@@ -8,17 +10,10 @@ export const metadata = {
     'A hands-off, auto-cycling showcase of community experiments running live. Leave it on stream.',
 };
 
-// The playlist IS the community gallery — as it grows, so does Lab TV.
+// Curated gallery runs lead; every remaining engine follows via its example — so
+// Lab TV cycles the whole catalog, and grows automatically as either does.
 export default function TvPage() {
-  const playlist = galleryEntries.map((e) => ({
-    engine: e.engine,
-    params: e.params,
-    title: e.title,
-    author: e.author,
-    blurb: e.blurb,
-    engineTitle: e.engineTitle,
-    sharePath: e.sharePath,
-  }));
+  const playlist = buildPlaylist(galleryEntries, engines);
 
   if (playlist.length === 0) {
     return (
