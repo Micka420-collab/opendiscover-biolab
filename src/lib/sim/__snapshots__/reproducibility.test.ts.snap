@@ -153,6 +153,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
   },
+  "logistic-map": {
+    "metrics": {
+      "attractorPeriod": 0,
+      "chaotic": 1,
+      "fixedPoint": 0.72973,
+      "lyapunovExponent": 0.349084,
+    },
+    "summary": "Logistic map at r=3.70: λ=0.349 — chaotic.",
+  },
   "lotka-volterra": {
     "metrics": {
       "conservedDriftPct": 0.00000119028,

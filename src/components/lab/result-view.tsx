@@ -200,6 +200,10 @@ export function ResultView({ result: state }: { result: RunResult }) {
           </div>
         ))}
 
+        {/* An engine-recommended custom chart (e.g. a scatter the generic line
+            builder can't express, like a bifurcation diagram). */}
+        {state.result.vizSpec && <VegaLiteEmbed spec={state.result.vizSpec} />}
+
         {specs.map(({ i, spec }) => (
           <VegaLiteEmbed key={i} spec={spec} />
         ))}

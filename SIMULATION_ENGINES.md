@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **26 deterministic simulation engines** across
+The OpenDiscover BioLab ships **27 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -869,6 +869,51 @@ The classic two-species predator–prey ODE. Prey grow exponentially and are cro
 ```
 
 _Run it: `POST /api/lab/run { "engine": "lotka-volterra", "params": … }` or interactively at `/lab/lotka-volterra`._
+
+---
+
+### `logistic-map` — Logistic Map (deterministic chaos)
+
+Robert May's logistic map x → r·x·(1−x): a one-line discrete population model whose long-run behaviour period-doubles into chaos as the growth parameter r rises. Reports the non-trivial fixed point x*=1−1/r, the Lyapunov exponent (exactly ln 2 at r=4), the attractor period, and the full bifurcation diagram.
+
+**References**
+- May, R.M. (1976) Simple mathematical models with very complicated dynamics. Nature 261:459-467.
+- Feigenbaum, M.J. (1978) Quantitative universality for a class of nonlinear transformations. J. Stat. Phys. 19:25-52.
+- Strogatz, S.H. (2015) Nonlinear Dynamics and Chaos, 2nd ed., ch. 10.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `r` | number | `3.7` | ≥ 0, ≤ 4 |  |
+| `x0` | number | `0.4` | ≥ 0, ≤ 1 |  |
+| `iterations` | integer | `120` | ≥ 0, ≤ 5000 |  |
+| `transient` | integer | `1000` | ≥ 0, ≤ 100000 |  |
+| `analysisIterations` | integer | `4000` | ≥ 0, ≤ 200000 |  |
+| `rMin` | number | `2.5` | ≥ 0, ≤ 4 |  |
+| `rMax` | number | `4` | ≥ 0, ≤ 4 |  |
+| `rSteps` | integer | `200` | ≥ 0, ≤ 1000 |  |
+| `bifTransient` | integer | `400` | ≥ 0, ≤ 100000 |  |
+| `bifSamples` | integer | `40` | ≥ 0, ≤ 400 |  |
+
+**Example**
+
+```json
+{
+  "r": 3.7,
+  "x0": 0.4,
+  "iterations": 120,
+  "transient": 1000,
+  "analysisIterations": 4000,
+  "rMin": 2.5,
+  "rMax": 4,
+  "rSteps": 200,
+  "bifTransient": 400,
+  "bifSamples": 40
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "logistic-map", "params": … }` or interactively at `/lab/logistic-map`._
 
 
 ## 🏭 Bioprocess
