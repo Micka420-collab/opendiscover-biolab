@@ -577,6 +577,50 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 10,
     hint: 'D = kB·T/(6πηr) falls as 1/r. A measured D of 10 µm²/s in water at 20°C means a radius of about 21.5 nm.',
   },
+  {
+    id: 'isotonic-iv-drip',
+    engine: 'osmotic-pressure',
+    title: 'Mix a safe IV drip',
+    brief:
+      'An intravenous drip must match the osmolarity of blood, or the red cells it meets burst or shrivel. Dial the salt concentration of a saline drip until its tonicity ratio against blood plasma reads exactly 1.00 — isotonic, the only safe drip to run into a vein.',
+    baseParams: { vantHoffFactor: 2, temperatureC: 37, referenceOsmolarity: 0.3 },
+    knob: {
+      param: 'molarity',
+      label: 'Salt concentration',
+      min: 0.05,
+      max: 0.3,
+      step: 0.005,
+      default: 0.1,
+      unit: 'mol/L',
+    },
+    metricKey: 'tonicityRatio',
+    metricLabel: 'Tonicity ratio vs blood',
+    goal: 'target',
+    target: 1,
+    hint: 'Tonicity ratio = i·M / reference. With table salt (i = 2, two ions per unit) against blood’s 0.30 Osm/L, you need M = 0.15 mol/L — exactly physiological (“normal”) saline, 0.9% w/v.',
+  },
+  {
+    id: 'van-deemter-optimal-flow',
+    engine: 'van-deemter',
+    title: 'Find the chromatography sweet spot',
+    brief:
+      'Run a separation column too slow and diffusion smears the peaks; too fast and mass transfer does. Tune the mobile-phase velocity to the sweet spot that makes the peaks as sharp as physically possible — push the efficiency versus the optimum up to its ceiling of 1.0.',
+    baseParams: { aTerm: 0.5, bTerm: 2, cTerm: 0.05, columnLength: 100 },
+    knob: {
+      param: 'velocity',
+      label: 'Mobile-phase velocity u',
+      min: 1,
+      max: 12,
+      step: 0.1,
+      default: 2,
+      unit: 'mm/s',
+    },
+    metricKey: 'efficiencyVsOptimum',
+    metricLabel: 'Efficiency vs optimum',
+    goal: 'maximize',
+    par: 0.99,
+    hint: 'Plate height H = A + B/u + C·u is lowest (efficiency = 1.0) at u_opt = √(B/C). With B = 2 and C = 0.05 that is √40 ≈ 6.3 mm/s.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

@@ -1,0 +1,17 @@
+{
+  "slug": "the-sweet-spot-of-a-separation",
+  "title": "The sweet spot of a separation column",
+  "engine": "van-deemter",
+  "params": {
+    "aTerm": 0.5,
+    "bTerm": 2,
+    "cTerm": 0.05,
+    "velocity": 6.32,
+    "columnLength": 150,
+    "velocityMax": 12,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Every chromatography column — the workhorse that separates the molecules in a blood sample, a drug batch, or a river-water pollutant panel — has one best speed. The van Deemter equation H = A + B/u + C·u splits peak broadening into three causes: eddy diffusion (A, a fixed floor), longitudinal diffusion (B/u, worst when you run slowly and give molecules time to spread), and resistance to mass transfer (C·u, worst when you run fast). The two speed-dependent terms fight, so the plate height bottoms out at u_opt = √(B/C) ≈ 6.3 mm/s here — the fastest run that still gives the sharpest possible peaks. This run sits the velocity right at that minimum: efficiency versus optimum reads 1.0, and the plotted curve shows the characteristic U you are balancing on top of. Go faster to save time and you pay in resolution; go slower and diffusion quietly ruins the separation anyway."
+}

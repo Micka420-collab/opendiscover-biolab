@@ -1,0 +1,17 @@
+{
+  "slug": "why-seawater-dehydrates-you",
+  "title": "Why seawater dehydrates you",
+  "engine": "osmotic-pressure",
+  "params": {
+    "vantHoffFactor": 2,
+    "molarity": 0.6,
+    "temperatureC": 37,
+    "referenceOsmolarity": 0.3,
+    "massConcentration": 35,
+    "concentrationMax": 1.2,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Seawater carries roughly 0.6 mol/L of dissolved salt — and because each NaCl splits into two ions, that is about 1.2 Osm/L of osmotically active particles, four times the ~0.30 Osm/L of your blood. Drink it and every cell it reaches sits in a strongly hypertonic bath: water is pulled OUT of the cells, across their membranes, to dilute the salt outside. Your kidneys then need even more fresh water than you drank to flush that salt away, so you end up thirstier than before. This is the van't Hoff law (Π = i·M·R·T) at work — the same physics that makes a wilting plant droop in salty soil, that preserves food in brine, and that a nurse must respect when mixing an IV drip. The run reports a tonicity ratio near 4 and the verdict that a cell here shrinks."
+}
