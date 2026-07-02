@@ -123,7 +123,7 @@ export function run(rawParams: Partial<SirEndemicParams> = {}): SimResult {
       key: 'meanInfected',
       label: 'Time-averaged prevalence',
       value: meanInfected,
-      note: 'over the second half; converges to I*',
+      note: 'over the second half; approaches I* only once the oscillations have damped',
     },
     { key: 'finalInfected', label: 'Final prevalence (t=tEnd)', value: finalInfected },
     {
@@ -147,12 +147,18 @@ export function run(rawParams: Partial<SirEndemicParams> = {}): SimResult {
     },
   ];
 
+  // Has the endemic level actually been reached within tEnd? (Small mu damps
+  // slowly, so the run may still be deep in a post-outbreak trough.)
+  const settled = eq.r0 > 1 && Math.abs(finalInfected - eq.i) < 0.1 * eq.i;
+
   return {
     engine: 'sir-endemic',
     summary:
-      eq.r0 > 1
-        ? `Endemic SIR (R₀=${eq.r0.toFixed(2)}): damped oscillations settle to I*=${eq.i.toFixed(4)}, S*=${eq.s.toFixed(3)}.`
-        : `Endemic SIR (R₀=${eq.r0.toFixed(2)} ≤ 1): infection dies out.`,
+      eq.r0 <= 1
+        ? `Endemic SIR (R₀=${eq.r0.toFixed(2)} ≤ 1): infection dies out.`
+        : settled
+          ? `Endemic SIR (R₀=${eq.r0.toFixed(2)}): damped oscillations settle to I*=${eq.i.toFixed(4)}, S*=${eq.s.toFixed(3)}.`
+          : `Endemic SIR (R₀=${eq.r0.toFixed(2)}): still approaching the endemic level I*=${eq.i.toFixed(4)} — a horizon longer than tEnd=${p.tEnd} is needed to settle.`,
     metrics,
     series,
     detail: { equilibrium: eq, meanInfected, finalInfected },

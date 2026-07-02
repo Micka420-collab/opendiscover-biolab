@@ -42,6 +42,18 @@ describe('chemostat-competition', () => {
     }
   });
 
+  it('a species seeded at zero cannot win, even with the lower R*', () => {
+    // Species 1 has the lower R* (ks1<ks2) but is absent → species 2 is the survivor.
+    const r = run({ x1_0: 0, ks1: 1, ks2: 3 });
+    expect(metric(r, 'winner')).toBe(2);
+    expect(metric(r, 'finalBiomass2')).toBeGreaterThan(3);
+  });
+
+  it('an exact R* tie is neutral coexistence, not a decisive win', () => {
+    const r = run({ ks1: 2, ks2: 2, muMax1: 0.5, muMax2: 0.5 }); // R*1 === R*2
+    expect(metric(r, 'winner')).toBe(3);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('chemostat-competition', { ks1: 1.5, ks2: 2.5 });
     const b = runEngine('chemostat-competition', { ks1: 1.5, ks2: 2.5 });

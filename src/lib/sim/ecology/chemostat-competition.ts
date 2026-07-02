@@ -105,10 +105,19 @@ export function run(rawParams: Partial<ChemostatCompetitionParams> = {}): SimRes
   const rStar1 = breakEvenSubstrate(p.muMax1, p.ks1, p.d);
   const rStar2 = breakEvenSubstrate(p.muMax2, p.ks2, p.d);
 
-  // Analytic winner: the lower R*, provided it is below the feed (else both wash out).
-  const lowerRStar = Math.min(rStar1, rStar2);
+  // Analytic winner: among species ACTUALLY SEEDED (x_i0 > 0) that can persist
+  // (R* < feed), the lower R* excludes the other. An exact R* tie is neutral
+  // coexistence (code 3); a species seeded at zero can't win.
+  const canPersist1 = p.x1_0 > 0 && rStar1 < p.sin;
+  const canPersist2 = p.x2_0 > 0 && rStar2 < p.sin;
   let winner = 0;
-  if (lowerRStar < p.sin) winner = rStar1 < rStar2 ? 1 : 2;
+  if (canPersist1 && canPersist2) {
+    winner = Math.abs(rStar1 - rStar2) < 1e-12 ? 3 : rStar1 < rStar2 ? 1 : 2;
+  } else if (canPersist1) {
+    winner = 1;
+  } else if (canPersist2) {
+    winner = 2;
+  }
 
   const traj = rk45(chemostatCompetitionDerivative(p), [p.s0, p.x1_0, p.x2_0], 0, p.tEnd, {
     tol: p.tol,
@@ -142,7 +151,7 @@ export function run(rawParams: Partial<ChemostatCompetitionParams> = {}): SimRes
       key: 'winner',
       label: 'Surviving species',
       value: winner,
-      note: '1 or 2 (the lower R*); 0 = both wash out',
+      note: '1 or 2 (the lower R*), 3 = tie/coexistence, 0 = neither persists',
     },
     { key: 'finalSubstrate', label: 'Final substrate', value: finalS, unit: 'g/L' },
     { key: 'finalBiomass1', label: 'Final species-1 biomass', value: finalX1, unit: 'g/L' },
@@ -168,8 +177,10 @@ export function run(rawParams: Partial<ChemostatCompetitionParams> = {}): SimRes
     engine: 'chemostat-competition',
     summary:
       winner === 0
-        ? `Chemostat competition: both species wash out (min R* ≥ Sin at D=${p.d}).`
-        : `Chemostat competition: species ${winner} wins (R*=${displayRStar(winner === 1 ? rStar1 : rStar2).toFixed(3)}); the competitor is excluded to ${(winner === 1 ? finalX2 : finalX1).toExponential(1)} g/L.`,
+        ? `Chemostat competition: no species persists (washout at D=${p.d}).`
+        : winner === 3
+          ? `Chemostat competition: an exact R*=${displayRStar(rStar1).toFixed(3)} tie — neutral coexistence, neither species is excluded.`
+          : `Chemostat competition: species ${winner} wins (R*=${displayRStar(winner === 1 ? rStar1 : rStar2).toFixed(3)}); the competitor is excluded to ${(winner === 1 ? finalX2 : finalX1).toExponential(1)} g/L.`,
     metrics,
     series,
     detail: { rStar1, rStar2, winner, finalSubstrate: finalS },

@@ -54,9 +54,17 @@ export const paramsSchema = z
   .refine((p) => p.finalSize > p.initialSize, {
     message: 'finalSize must exceed initialSize',
     path: ['finalSize'],
+  })
+  .refine((p) => p.mutationRate * (p.finalSize - p.initialSize) * p.cultures <= 5e6, {
+    message:
+      'expected total mutations (mutationRate·(Nt−N0)·cultures) is too large to simulate — reduce the rate, size, or culture count',
+    path: ['mutationRate'],
   });
 
 export type LuriaDelbruckParams = z.infer<typeof paramsSchema>;
+
+/** Hard cap on the per-culture clone loop, guaranteeing termination. */
+const MAX_CLONES = 5_000_000;
 
 /** Simulate one culture's resistant-mutant count (Lea–Coulson). */
 export function simulateCulture(
@@ -66,7 +74,7 @@ export function simulateCulture(
   rng: ReturnType<typeof createRng>,
 ): number {
   const m = mutationRate * (nt - n0);
-  const mutations = rng.poisson(m);
+  const mutations = Math.min(rng.poisson(m), MAX_CLONES);
   let resistant = 0;
   for (let j = 0; j < mutations; j++) {
     const x = rng.uniform(n0, nt); // population size when the mutation arose
@@ -108,14 +116,14 @@ export function run(rawParams: Partial<LuriaDelbruckParams> = {}): SimResult {
   let sqDev = 0;
   for (const c of counts) sqDev += (c - mean) * (c - mean);
   const variance = sqDev / p.cultures;
-  const vmr = mean > 0 ? variance / mean : Number.NaN;
+  const vmr = mean > 0 ? variance / mean : 0;
 
   const p0 = zeros / p.cultures;
   // p0 method: a culture has 0 mutants iff it had 0 mutations, so p0 = e^{−m}.
-  const estimatedMutations = p0 > 0 ? -Math.log(p0) : Number.NaN;
-  const estimatedRate = Number.isFinite(estimatedMutations)
-    ? estimatedMutations / (p.finalSize - p.initialSize)
-    : Number.NaN;
+  // Laplace-smooth p0 by half a pseudo-count so the estimate stays finite even when
+  // no (p0→0) or all (p0→1) cultures had a mutant.
+  const estimatedMutations = -Math.log(Math.max(p0, 0.5 / p.cultures));
+  const estimatedRate = estimatedMutations / (p.finalSize - p.initialSize);
 
   const metrics: Metric[] = [
     {
@@ -160,7 +168,10 @@ export function run(rawParams: Partial<LuriaDelbruckParams> = {}): SimResult {
 
   return {
     engine: 'luria-delbruck',
-    summary: `Luria–Delbrück (m=${m.toFixed(2)}): mean ${mean.toFixed(1)} but variance/mean = ${vmr.toFixed(0)} (jackpots up to ${peak}) — mutations arose at random during growth.`,
+    summary:
+      mean > 0
+        ? `Luria–Delbrück (m=${m.toFixed(2)}): mean ${mean.toFixed(1)} but variance/mean = ${vmr.toFixed(0)} (jackpots up to ${peak}) — mutations arose at random during growth.`
+        : `Luria–Delbrück (m=${m.toFixed(2)}): no resistant mutants observed across ${p.cultures} cultures — the mutation rate is too low for this culture size.`,
     metrics,
     detail: {
       expectedMutations: m,

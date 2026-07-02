@@ -147,16 +147,27 @@ export function rk45(
     }
     err = Math.sqrt(err / cur.length);
 
-    if (err <= 1) {
+    if (Number.isFinite(err) && err <= 1) {
       const tPrev = time;
       const yPrev = cur;
       time += h;
       cur = y5;
       emitInterpolated(tPrev, yPrev, time, cur);
     }
-    // PI-ish step-size control with clamped growth.
-    const factor = err === 0 ? 5 : 0.9 * err ** -0.2;
-    h *= Math.min(5, Math.max(0.2, factor));
+    // PI-ish step-size control with clamped growth. A non-finite err means the
+    // trial step overshot into Inf/NaN (e.g. a too-large first step for a stiff,
+    // large-rate system) — reject it and shrink h hard so the integrator recovers
+    // instead of stalling with h = NaN.
+    if (Number.isFinite(err)) {
+      const factor = err === 0 ? 5 : 0.9 * err ** -0.2;
+      h *= Math.min(5, Math.max(0.2, factor));
+    } else {
+      h *= 0.1;
+    }
+    // Min-step floor: if h collapses (or went non-finite) the problem can't be
+    // integrated here — stop rather than spinning to maxSteps and returning a
+    // flat trajectory that silently looks converged.
+    if (!(h > (t1 - t0) * 1e-13)) break;
     steps++;
   }
 

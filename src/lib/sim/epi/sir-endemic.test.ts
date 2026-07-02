@@ -47,6 +47,21 @@ describe('sir-endemic', () => {
     }
   });
 
+  it('integrates (does not stall) for very large rates — hardened RK45', () => {
+    // A too-large first step would overshoot to Inf/NaN and freeze the old rk45.
+    const r = run({ beta: 2000, gamma: 0.1, mu: 0.01, tEnd: 100 });
+    const t = (r.series ?? [])[0].x;
+    expect(t[t.length - 1]).toBeGreaterThan(90); // reached ~tEnd, not stuck at 0
+    for (const v of (r.series ?? [])[0].y.infected) expect(Number.isFinite(v)).toBe(true);
+  });
+
+  it("doesn't claim convergence when the horizon is too short to settle", () => {
+    // Small mu damps very slowly, so tEnd=500 leaves it far from I*.
+    const r = run({ beta: 0.5, gamma: 0.1, mu: 0.0001, tEnd: 500 });
+    expect(r.summary).toContain('approaching');
+    expect(r.summary).not.toContain('settle to');
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('sir-endemic', { beta: 0.6, gamma: 0.2, mu: 0.02 });
     const b = runEngine('sir-endemic', { beta: 0.6, gamma: 0.2, mu: 0.02 });
