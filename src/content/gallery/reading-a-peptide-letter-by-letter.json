@@ -1,0 +1,9 @@
+{
+  "slug": "reading-a-peptide-letter-by-letter",
+  "title": "Reading a peptide, letter by letter",
+  "engine": "mass-spec",
+  "params": { "sequence": "PEPTIDE", "precursorCharge": 2, "fragmentCharges": [1] },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "This is how a mass spectrometer spells out a protein. Smash the peptide PEPTIDE apart at its backbone bonds and every break leaves two charged pieces — a b-ion counted from the front, a y-ion counted from the back. Each peak on the spectrum is one such fragment, and the GAP between neighbouring peaks in a series is the mass of a single amino acid: step along the b-ions and you literally read P-E-P-T-I-D-E off the spacings. It is the trick behind shotgun proteomics, where software sequences thousands of peptides a second from nothing but these mass ladders. Deterministic monoisotopic masses — the same peptide always yields the same rungs."
+}

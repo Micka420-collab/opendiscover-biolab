@@ -467,6 +467,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 7.4,
     hint: 'A buffer works best at its pKa, and the half-equivalence pH ≈ pKa. So pick a weak acid with pKa ≈ 7.4 — like phosphate’s second pKa (7.2), the real blood buffer.',
   },
+  {
+    id: 'primer-melting-temp',
+    engine: 'dna-melting',
+    title: 'Tune a primer to melt at 60°C',
+    brief:
+      'A good PCR primer melts right around 60°C — hot enough to bind specifically, cool enough to work. Dial the duplex’s binding enthalpy ΔH° so its melting temperature Tm lands on the 60°C sweet spot. Stronger binding (more negative ΔH°) melts higher.',
+    baseParams: { deltaS: -1, strandConc: 1e-5, selfComplementary: false },
+    knob: {
+      param: 'deltaH',
+      label: 'Binding enthalpy ΔH° (kJ/mol)',
+      min: -600,
+      max: -150,
+      step: 1,
+      default: -250,
+    },
+    metricKey: 'meltingTemp',
+    metricLabel: 'Melting temperature Tm',
+    goal: 'target',
+    target: 60,
+    hint: 'Tm = ΔH° / (ΔS° + R·ln(C_T/4)). With ΔS°=−1 and C_T=1e−5 the denominator is ≈ −1.107, so Tm(°C) ≈ −ΔH°/1.107 − 273.15. Target 60°C ⇒ ΔH° ≈ −369 kJ/mol.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
