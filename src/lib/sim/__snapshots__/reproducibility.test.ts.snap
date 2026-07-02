@@ -536,6 +536,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Two-state folding: Tm=60°C, ΔG(25°C)=11.0 kJ/mol (98.8% folded), peak stability 11.4 kJ/mol at 30.2°C.",
   },
+  "vaccination": {
+    "metrics": {
+      "casesPrevented": 0.610667,
+      "criticalCoverage": 0.701754,
+      "effectiveR": 1.575,
+      "finalSize": 0.329812,
+      "finalSizeNoVax": 0.94048,
+      "herdImmunity": 0,
+      "r0": 3,
+    },
+    "summary": "Vaccination vs R₀=3: critical coverage v_c=70% at ε=0.95; at v=50% → 33.0% infected (R_eff=1.58).",
+  },
   "wilson-cowan": {
     "metrics": {
       "amplitudeE": 0.316775,

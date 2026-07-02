@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **54 deterministic simulation engines** across
+The OpenDiscover BioLab ships **55 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -25,7 +25,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
-- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
+- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting)
 
@@ -1935,6 +1935,38 @@ The Reed–Frost chain-binomial epidemic: a discrete-generation model where the 
 ```
 
 _Run it: `POST /api/lab/run { "engine": "reed-frost", "params": … }` or interactively at `/lab/reed-frost`._
+
+---
+
+### `vaccination` — Vaccination & Herd Immunity (SIR threshold)
+
+The vaccination-policy calculator for an SIR disease: vaccinating a fraction v at efficacy ε drops the reproduction number to R_eff=R₀(1−εv), and the outbreak is prevented once coverage reaches the critical value v_c=(1−1/R₀)/ε (the classic 1−1/R₀ when ε=1, higher for an imperfect vaccine, and >1 — impossible — for a weak vaccine against a very transmissible disease). Below threshold it reports the final epidemic size (the nonzero root of z=s₀(1−e^(−R₀z)) by bracketed bisection, with the no-epidemic R_eff≤1 case handled), the fraction of the population spared versus no vaccination, and a full coverage-response curve. Closed-form and deterministic; the threshold/eradication tool, not a time-course integrator.
+
+**References**
+- Anderson, R.M. & May, R.M. (1991) Infectious Diseases of Humans. Oxford University Press.
+- Fine, P., Eames, K. & Heymann, D.L. (2011) "Herd immunity": a rough guide. Clin. Infect. Dis. 52:911-916.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `r0` | number | `3` | ≥ 0.01, ≤ 50 |  |
+| `coverage` | number | `0.5` | ≥ 0, ≤ 1 |  |
+| `efficacy` | number | `0.95` | ≥ 0.01, ≤ 1 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "r0": 3,
+  "coverage": 0.5,
+  "efficacy": 0.95,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "vaccination", "params": … }` or interactively at `/lab/vaccination`._
 
 
 ## 💊 Drug discovery

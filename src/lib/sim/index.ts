@@ -35,6 +35,7 @@ import { spec as compartmental } from './epi/compartmental';
 import { spec as reedFrost } from './epi/reed-frost';
 import { spec as sirEndemic } from './epi/sir-endemic';
 import { spec as sis } from './epi/sis';
+import { spec as vaccination } from './epi/vaccination';
 import { spec as breeding } from './genetics/breeding';
 import { spec as alignment } from './molbio/alignment';
 import { cloningSpec as cloning } from './molbio/cloning';
@@ -118,6 +119,7 @@ export const engines: AnyEngine[] = [
   sis,
   sirEndemic,
   reedFrost,
+  vaccination,
   admet,
   docking,
   doseResponse,
