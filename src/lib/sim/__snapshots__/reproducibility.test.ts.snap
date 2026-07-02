@@ -24,6 +24,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Global (Needleman–Wunsch) alignment: score 11, 70.0% identity over 10 columns (7 matches, 0 gaps).",
   },
+  "beer-lambert": {
+    "metrics": {
+      "absorbanceAtReadout": 0.376546,
+      "minTransmittancePct": 38.2122,
+      "peakAbsorbance": 0.417798,
+      "peakWavelength": 452.174,
+      "recoveredConc1": 20,
+      "recoveredConc2": 15,
+      "wellConditioned": 1,
+    },
+    "summary": "Beer–Lambert: peak absorbance 0.418 at 452 nm (38.2% T); un-mixed to c₁=20.00, c₂=15.00.",
+  },
   "bioreactor": {
     "metrics": {
       "criticalDilutionRate": 0.380952,

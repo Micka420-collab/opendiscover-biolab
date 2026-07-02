@@ -14,6 +14,7 @@ export const DOMAIN_LABELS: Record<string, string> = {
   structural: '🔬 Structural',
   neuroscience: '🧠 Neuroscience',
   ecology: '🐺 Ecology',
+  biochemistry: '🧪 Biochemistry',
 };
 
 /** Title-case a kebab/space domain key: 'quantum-biology' → 'Quantum Biology'. */

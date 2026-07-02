@@ -2,8 +2,8 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **50 deterministic simulation engines** across
-10 domains of computational biology. Every engine is a *pure function* — no clock,
+The OpenDiscover BioLab ships **51 deterministic simulation engines** across
+11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
 
@@ -24,6 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
@@ -1654,6 +1655,57 @@ Gas–liquid oxygen transfer in a stirred bioreactor: dissolved O2 obeys dC/dt =
 ```
 
 _Run it: `POST /api/lab/run { "engine": "oxygen-transfer", "params": … }` or interactively at `/lab/oxygen-transfer`._
+
+
+## 🧪 Biochemistry
+
+### `beer-lambert` — Beer–Lambert Spectrophotometry (two-component un-mixing)
+
+Beer–Lambert absorption of a two-component mixture: each species is a Gaussian band ε(λ)=εmax·exp(−½((λ−λ₀)/w)²) and absorbances add, A(λ)=l·Σc_i·ε_i(λ), with transmittance T=10^(−A). Draws the mixture spectrum and its component contributions, and solves the INVERSE problem — recovering the two concentrations from the spectrum by least squares (2×2 normal equations, Cramer's rule, ridge-stabilized), the everyday task of quantitative spectrophotometry. Flags when the two bands are too similar to separate. Closed-form and deterministic; the un-mixing recovers the true concentrations on noiseless data.
+
+**References**
+- Ingle, J.D. & Crouch, S.R. (1988) Spectrochemical Analysis. Prentice Hall.
+- Skoog, D.A., Holler, F.J. & Crouch, S.R. (2017) Principles of Instrumental Analysis, 7th ed. Cengage.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `eMax1` | number | `0.02` | ≥ 0, ≤ 1000000 |  |
+| `peak1` | number | `450` | ≥ 1, ≤ 2000 |  |
+| `width1` | number | `30` | ≥ 0, ≤ 1000 |  |
+| `conc1` | number | `20` | ≥ 0, ≤ 1000000 |  |
+| `eMax2` | number | `0.025` | ≥ 0, ≤ 1000000 |  |
+| `peak2` | number | `550` | ≥ 1, ≤ 2000 |  |
+| `width2` | number | `40` | ≥ 0, ≤ 1000 |  |
+| `conc2` | number | `15` | ≥ 0, ≤ 1000000 |  |
+| `pathLength` | number | `1` | ≥ 0, ≤ 100 |  |
+| `lambdaMin` | number | `400` | ≥ 1, ≤ 2000 |  |
+| `lambdaMax` | number | `700` | ≥ 1, ≤ 2000 |  |
+| `readoutWavelength` | number | `550` | ≥ 1, ≤ 2000 |  |
+| `outputPoints` | integer | `300` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "eMax1": 0.02,
+  "peak1": 450,
+  "width1": 30,
+  "conc1": 20,
+  "eMax2": 0.025,
+  "peak2": 550,
+  "width2": 40,
+  "conc2": 15,
+  "pathLength": 1,
+  "lambdaMin": 400,
+  "lambdaMax": 700,
+  "readoutWavelength": 550,
+  "outputPoints": 300
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "beer-lambert", "params": … }` or interactively at `/lab/beer-lambert`._
 
 
 ## 🦠 Epidemiology
