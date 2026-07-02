@@ -74,6 +74,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "EcoRI + BamHI digest of a 25 bp linear template -> 2 sites, 3 fragments.",
   },
+  "coalescent": {
+    "metrics": {
+      "expectedPairwiseDiversity": 5,
+      "expectedSegregatingSites": 17.7387,
+      "expectedTMRCA": 1.9,
+      "expectedTreeLength": 7.09548,
+      "harmonicNumber": 3.54774,
+      "sampleSize": 20,
+      "wattersonTheta": 5.07365,
+    },
+    "summary": "Kingman coalescent (n=20, θ=5): E[T_MRCA]=1.900, E[tree length]=7.10, E[segregating sites]=17.7.",
+  },
   "compartmental": {
     "metrics": {
       "finalSize": 0.892646,
