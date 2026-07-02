@@ -40,13 +40,13 @@ export const paramsSchema = z
     /** Prey intrinsic growth rate r. */
     r: z.number().positive().default(1),
     /** Prey carrying capacity K (the "enrichment" knob). */
-    k: z.number().positive().default(6),
+    k: z.number().min(1e-9).default(6),
     /** Attack rate a. */
-    a: z.number().positive().default(1),
+    a: z.number().min(1e-9).default(1),
     /** Handling time h > 0 (Holling type-II saturation; h→0 is the linear type-I limit). */
-    h: z.number().positive().default(0.5),
+    h: z.number().min(1e-9).default(0.5),
     /** Conversion efficiency e (prey eaten → predators). */
-    e: z.number().positive().default(0.5),
+    e: z.number().min(1e-9).default(0.5),
     /** Predator mortality m. */
     m: z.number().positive().default(0.2),
     /** Initial prey N0. */

@@ -35,9 +35,9 @@ const KELVIN = 273.15;
 export const paramsSchema = z
   .object({
     /** Persistence length Lp (nm) — ~50 nm for dsDNA. */
-    persistenceLength: z.number().positive().max(100_000).default(50),
+    persistenceLength: z.number().min(1e-9).max(100_000).default(50),
     /** Contour length L (nm) — full stretched length. */
-    contourLength: z.number().positive().max(10_000_000).default(1000),
+    contourLength: z.number().min(1e-9).max(10_000_000).default(1000),
     /** Temperature (°C). */
     temperatureCelsius: z.number().min(-50).max(150).default(25),
     /** Highest fractional extension x = z/L to plot (must stay below 1). */

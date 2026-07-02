@@ -44,15 +44,15 @@ export const paramsSchema = z
     /** Prey intrinsic growth rate α (1/time). */
     alpha: z.number().positive().default(1.1),
     /** Predation rate coefficient β. */
-    beta: z.number().positive().default(0.4),
+    beta: z.number().min(1e-9).default(0.4),
     /** Predator growth per prey eaten δ. */
-    delta: z.number().positive().default(0.1),
+    delta: z.number().min(1e-9).default(0.1),
     /** Predator death rate γ (1/time). */
     gamma: z.number().positive().default(0.4),
     /** Initial prey abundance. */
     x0: z.number().positive().default(10),
     /** Initial predator abundance. */
-    y0: z.number().positive().default(10),
+    y0: z.number().min(1e-9).default(10),
     /** Integration horizon. */
     tEnd: z.number().positive().max(10_000).default(40),
     /** Fixed RK4 steps (accuracy vs cost). */

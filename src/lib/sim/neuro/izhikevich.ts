@@ -46,7 +46,7 @@ export const paramsSchema = z
     /** Initial membrane potential (mV). */
     v0: z.number().min(-90).max(30).default(-65),
     /** Simulated duration (ms). */
-    tEnd: z.number().positive().max(2000).default(300),
+    tEnd: z.number().min(1e-9).max(2000).default(300),
     /** Integration step (ms). */
     dt: z.number().min(0.02).max(1).default(0.25),
     /** Points kept for the plotted trace. */

@@ -37,7 +37,7 @@ export const paramsSchema = z
     /** Half-saturation constant Ks (g/L): substrate for half of µmax without inhibition. */
     ks: z.number().positive().max(1e6).default(1),
     /** Inhibition constant Ki (g/L): larger = weaker self-inhibition (Ki→∞ is Monod). */
-    ki: z.number().positive().max(1e9).default(100),
+    ki: z.number().min(1e-9).max(1e9).default(100),
     /** Highest substrate concentration plotted (g/L). */
     substrateMax: z.number().positive().max(1e9).default(200),
     /** Points in the plotted µ-vs-S curve. */

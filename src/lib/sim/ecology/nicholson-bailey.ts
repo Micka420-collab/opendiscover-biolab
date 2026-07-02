@@ -40,11 +40,11 @@ const MAX_POP = 1e12;
 export const paramsSchema = z
   .object({
     /** Host reproductive rate R (> 1 for a coexistence equilibrium to exist). */
-    reproduction: z.number().positive().default(2),
+    reproduction: z.number().min(1e-9).default(2),
     /** Parasitoid search efficiency a. */
-    searchEfficiency: z.number().positive().default(0.05),
+    searchEfficiency: z.number().min(1e-9).default(0.05),
     /** Parasitoids emerging per parasitized host c. */
-    parasitoidsPerHost: z.number().positive().default(1),
+    parasitoidsPerHost: z.number().min(1e-9).default(1),
     /** Initial host population. */
     host0: z.number().min(0).default(24),
     /** Initial parasitoid population. */

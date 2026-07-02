@@ -36,7 +36,7 @@ export const paramsSchema = z
     /** Transmission rate beta. */
     beta: z.number().positive().default(0.3),
     /** Recovery rate gamma (recovered return to susceptible). */
-    gamma: z.number().positive().default(0.1),
+    gamma: z.number().min(1e-9).default(0.1),
     /** Initial infected fraction i0 (0 < i0 < 1). */
     i0: z.number().gt(0).lt(1).default(0.01),
     /** Integration horizon. */

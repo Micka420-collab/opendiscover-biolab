@@ -42,17 +42,17 @@ export const paramsSchema = z
     /** Temperature (°C). */
     temperatureC: z.number().min(-20).max(60).default(37),
     /** Extracellular K⁺ (mM). */
-    ko: z.number().positive().max(1000).default(5),
+    ko: z.number().min(1e-9).max(1000).default(5),
     /** Intracellular K⁺ (mM). */
-    ki: z.number().positive().max(1000).default(140),
+    ki: z.number().min(1e-9).max(1000).default(140),
     /** Extracellular Na⁺ (mM). */
-    nao: z.number().positive().max(1000).default(145),
+    nao: z.number().min(1e-9).max(1000).default(145),
     /** Intracellular Na⁺ (mM). */
-    nai: z.number().positive().max(1000).default(15),
+    nai: z.number().min(1e-9).max(1000).default(15),
     /** Extracellular Cl⁻ (mM). */
-    clo: z.number().positive().max(1000).default(110),
+    clo: z.number().min(1e-9).max(1000).default(110),
     /** Intracellular Cl⁻ (mM). */
-    cli: z.number().positive().max(1000).default(10),
+    cli: z.number().min(1e-9).max(1000).default(10),
     /** Relative K⁺ permeability P_K. */
     pK: z.number().min(0).max(1000).default(1),
     /** Relative Na⁺ permeability P_Na. */

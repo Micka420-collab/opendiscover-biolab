@@ -30,7 +30,7 @@ import { provenance } from '../core/types';
 export const paramsSchema = z
   .object({
     /** Volumetric oxygen mass-transfer coefficient kLa (1/h). */
-    kLa: z.number().positive().max(100_000).default(100),
+    kLa: z.number().min(1e-9).max(100_000).default(100),
     /** Saturation dissolved-O2 concentration C* (mg/L) — ~8 mg/L for air/water at 25°C. */
     saturationDO: z.number().positive().max(1000).default(8),
     /** Oxygen uptake rate OUR = qO2·X (mg/L/h). */

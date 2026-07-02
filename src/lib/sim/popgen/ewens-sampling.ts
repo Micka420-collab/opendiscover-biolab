@@ -33,7 +33,7 @@ export const paramsSchema = z
     /** Sample size n (number of genes sampled). */
     sampleSize: z.number().int().min(2).max(2000).default(50),
     /** Scaled mutation rate θ = 4Nμ (> 0). */
-    theta: z.number().positive().max(10_000).default(1),
+    theta: z.number().min(1e-9).max(10_000).default(1),
   })
   .strict();
 

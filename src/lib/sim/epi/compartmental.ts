@@ -245,13 +245,13 @@ export const compartmentalParams = z.object({
   /** Effective transmission rate β (per unit time). */
   beta: z.number().positive(),
   /** Removal / recovery rate γ (per unit time); mean infectious period = 1/γ. */
-  gamma: z.number().positive(),
+  gamma: z.number().min(1e-9),
   /** Incubation rate σ (E → I); mean latent period = 1/σ. Used by SEIR. */
   sigma: z.number().positive().default(0.2),
   /** Disease mortality rate μ (I → D). Used by SIRD. */
   mu: z.number().min(0).default(0.02),
   /** Total (constant) population N. */
-  population: z.number().positive().default(1_000_000),
+  population: z.number().min(1e-9).default(1_000_000),
   /** Initial number of infectious individuals. */
   i0: z.number().positive().default(1),
   /** Simulation horizon in the same time units as the rates. */

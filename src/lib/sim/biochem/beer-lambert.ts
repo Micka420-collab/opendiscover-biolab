@@ -46,7 +46,7 @@ export const paramsSchema = z
     /** Component 2 concentration. */
     conc2: z.number().min(0).max(1e6).default(15),
     /** Cuvette path length l (cm). */
-    pathLength: z.number().positive().max(100).default(1),
+    pathLength: z.number().min(1e-9).max(100).default(1),
     /** Low end of the scanned wavelength range (nm). */
     lambdaMin: z.number().min(1).max(2000).default(400),
     /** High end of the scanned wavelength range (nm). */

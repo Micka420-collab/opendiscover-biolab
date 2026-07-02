@@ -37,13 +37,13 @@ export const paramsSchema = z
     /** IV bolus dose (mg). */
     dose: z.number().positive().max(1e6).default(100),
     /** Central volume of distribution V1 (L). */
-    v1: z.number().positive().max(1e5).default(10),
+    v1: z.number().min(1e-9).max(1e5).default(10),
     /** Clearance CL (L/h) — drug removed from the central compartment. */
-    cl: z.number().positive().max(1e5).default(5),
+    cl: z.number().min(1e-9).max(1e5).default(5),
     /** Intercompartmental clearance Q (L/h). Must be > 0 for a real 2-compartment model. */
-    q: z.number().positive().max(1e5).default(10),
+    q: z.number().min(1e-9).max(1e5).default(10),
     /** Peripheral volume of distribution V2 (L). */
-    v2: z.number().positive().max(1e5).default(20),
+    v2: z.number().min(1e-9).max(1e5).default(20),
     /** Simulated duration (h). */
     tEnd: z.number().positive().max(100_000).default(24),
     /** Points in the plotted concentration curve (>= 2). */

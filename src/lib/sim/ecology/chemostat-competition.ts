@@ -36,13 +36,13 @@ import { provenance } from '../core/types';
 export const paramsSchema = z
   .object({
     /** Species 1 max growth rate. */
-    muMax1: z.number().positive().default(0.5),
+    muMax1: z.number().min(1e-9).default(0.5),
     /** Species 1 half-saturation Ks. */
     ks1: z.number().positive().default(1),
     /** Species 1 yield. */
     y1: z.number().positive().default(0.5),
     /** Species 2 max growth rate. */
-    muMax2: z.number().positive().default(0.5),
+    muMax2: z.number().min(1e-9).default(0.5),
     /** Species 2 half-saturation Ks. */
     ks2: z.number().positive().default(3),
     /** Species 2 yield. */
