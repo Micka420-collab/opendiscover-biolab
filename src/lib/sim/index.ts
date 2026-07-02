@@ -19,6 +19,7 @@ import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as logisticMap } from './ecology/logistic-map';
 import { spec as lotkaVolterra } from './ecology/lotka-volterra';
+import { spec as nicholsonBailey } from './ecology/nicholson-bailey';
 import { spec as rockPaperScissors } from './ecology/rock-paper-scissors';
 import { spec as rosenzweigMacArthur } from './ecology/rosenzweig-macarthur';
 import { spec as compartmental } from './epi/compartmental';
@@ -79,6 +80,7 @@ export const engines: AnyEngine[] = [
   logisticMap,
   rosenzweigMacArthur,
   rockPaperScissors,
+  nicholsonBailey,
   bioreactor,
   compartmental,
   sis,

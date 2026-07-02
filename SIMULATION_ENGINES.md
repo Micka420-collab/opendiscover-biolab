@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **34 deterministic simulation engines** across
+The OpenDiscover BioLab ships **35 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1152,6 +1152,43 @@ Evolutionary game theory of cyclic dominance — Rock beats Scissors beats Paper
 ```
 
 _Run it: `POST /api/lab/run { "engine": "rock-paper-scissors", "params": … }` or interactively at `/lab/rock-paper-scissors`._
+
+---
+
+### `nicholson-bailey` — Nicholson–Bailey Host–Parasitoid
+
+The classic discrete host–parasitoid map: hosts reproduce at rate R and escape a randomly-searching parasitoid with probability exp(−a·P). Its coexistence equilibrium P* = lnR/a, H* = R·lnR/(a·c·(R−1)) is ALWAYS unstable — any perturbation grows into diverging boom-and-bust oscillations until one species goes extinct, the foundational result showing that simple host–parasitoid coupling cannot persist without extra stabilizing structure.
+
+**References**
+- Nicholson, A.J. & Bailey, V.A. (1935) The balance of animal populations. Proc. Zool. Soc. Lond. 105:551-598.
+- Hassell, M.P. (1978) The Dynamics of Arthropod Predator-Prey Systems.
+- Murray, J.D. (2002) Mathematical Biology I: An Introduction, 3rd ed., ch. 5.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `reproduction` | number | `2` | ≥ 0 |  |
+| `searchEfficiency` | number | `0.05` | ≥ 0 |  |
+| `parasitoidsPerHost` | number | `1` | ≥ 0 |  |
+| `host0` | number | `24` | ≥ 0 |  |
+| `parasitoid0` | number | `12` | ≥ 0 |  |
+| `generations` | integer | `40` | ≥ 0, ≤ 100000 |  |
+
+**Example**
+
+```json
+{
+  "reproduction": 2,
+  "searchEfficiency": 0.05,
+  "parasitoidsPerHost": 1,
+  "host0": 24,
+  "parasitoid0": 12,
+  "generations": 40
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "nicholson-bailey", "params": … }` or interactively at `/lab/nicholson-bailey`._
 
 
 ## 🏭 Bioprocess

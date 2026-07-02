@@ -70,6 +70,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `logistic-map` | Robert May's map: fixed point → period-doubling → chaos, Lyapunov exponent, bifurcation diagram |
 | | `rosenzweig-macarthur` | Realistic predator–prey (logistic prey, Holling II): coexistence equilibrium, paradox of enrichment |
 | | `rock-paper-scissors` | Replicator dynamics of cyclic dominance: conserved V = xR·xP·xS, center/edge regimes |
+| | `nicholson-bailey` | Discrete host–parasitoid map: exact equilibrium, the always-unstable divergent oscillation |
 
 > Full catalog with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
 > Run any engine interactively — a param form generated from its Zod schema, Vega-Lite result
@@ -177,7 +178,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 34 engines + the lab layer: **790+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 35 engines + the lab layer: **795+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

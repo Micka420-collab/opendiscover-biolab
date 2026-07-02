@@ -238,6 +238,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Moran process (N=50, r=2): fixation probability 50.0% (analytic) vs 51.4% over 500 runs.",
   },
+  "nicholson-bailey": {
+    "metrics": {
+      "hostEquilibrium": 27.7259,
+      "minHost": 6.66628e-25,
+      "outbreakRatio": 40.7607,
+      "parasitoidEquilibrium": 13.8629,
+      "peakHost": 1130.13,
+      "peakParasitoid": 1129.56,
+    },
+    "summary": "Nicholson–Bailey (R=2): unstable equilibrium (H*=27.7), host outbreak peaks at 1130 (40.8× equilibrium).",
+  },
   "pcr": {
     "metrics": {
       "ampliconLength": 100,
