@@ -110,9 +110,10 @@ export function AuroraClient({
   const [narration, setNarration] = useState<string>('');
   const [relayMsg, setRelayMsg] = useState<string | null>(null);
 
-  // The active round: gauntlet play/watch walk the 5; endless cycles the whole pool.
-  const rounds = mode === 'endless' ? CHALLENGE_POOL : gauntlet;
-  const complete = mode !== 'endless' && roundIndex >= rounds.length;
+  // Play walks the 5-round daily gauntlet and can finish; Watch and Endless both cycle
+  // the whole pool forever (Watch auto-solving) — so Watch never idles, ideal for a stream.
+  const rounds = mode === 'play' ? gauntlet : CHALLENGE_POOL;
+  const complete = mode === 'play' && roundIndex >= rounds.length;
   const challenge = complete ? null : (rounds[roundIndex % rounds.length] as Challenge);
 
   const landscape = useMemo(
@@ -172,7 +173,7 @@ export function AuroraClient({
     // Side effects live OUTSIDE the state updater (updaters must be pure — React may
     // re-invoke them, which would double-bank the streak).
     const next = roundIndex + 1;
-    if (mode !== 'endless' && next >= rounds.length) {
+    if (mode === 'play' && next >= rounds.length) {
       setStreak(registerClear(date)); // bank the 🔥 streak on a full gauntlet clear
       setPhase('complete');
     }
@@ -323,7 +324,7 @@ export function AuroraClient({
         {/* ── Left column: banner, scope, gauge, dial ───────────────────── */}
         <section className="flex flex-col gap-4 min-w-0">
           <Hud
-            roundIds={mode === 'endless' ? [] : gauntlet.map((c) => c.id)}
+            roundIds={mode === 'play' ? gauntlet.map((c) => c.id) : []}
             roundIndex={roundIndex}
             mode={mode}
             combo={combo}
@@ -524,6 +525,15 @@ function Hud({
             </button>
           ))}
         </div>
+        <a
+          href="/aurora/overlay"
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs text-[hsl(240_5%_65%)] hover:text-[hsl(142_71%_60%)]"
+          title="Chrome-less auto-playing view — add as a Twitch/OBS browser source"
+        >
+          📺 stream view
+        </a>
       </div>
     </div>
   );
