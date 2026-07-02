@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **55 deterministic simulation engines** across
+The OpenDiscover BioLab ships **56 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -19,7 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
-- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich)
+- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
@@ -554,6 +554,52 @@ Izhikevich's 2003 two-variable spiking-neuron model: v' = 0.04v² + 5v + 140 −
 ```
 
 _Run it: `POST /api/lab/run { "engine": "izhikevich", "params": … }` or interactively at `/lab/izhikevich`._
+
+---
+
+### `resting-potential` — Resting Membrane Potential (Nernst / Goldman–Hodgkin–Katz)
+
+The steady resting voltage of a cell membrane from ion gradients and permeabilities. Each ion's Nernst equilibrium potential is E=(RT/zF)·ln([out]/[in]), and the resting potential is the Goldman–Hodgkin–Katz weighted average V_m=(RT/F)·ln((P_K[K]o+P_Na[Na]o+P_Cl[Cl]i)/(P_K[K]i+P_Na[Na]i+P_Cl[Cl]o)) — with the chloride anion inverted. Reports E_K, E_Na, E_Cl, V_m, the thermal voltage RT/F, and the K⁺/Na⁺ driving forces, plus a [K]o sweep showing the depolarization behind hyperkalemia. Closed-form and deterministic; distinct from hodgkin-huxley (which takes reversal potentials as inputs and integrates spikes) — this derives them.
+
+**References**
+- Goldman, D.E. (1943) Potential, impedance, and rectification in membranes. J. Gen. Physiol. 27:37-60.
+- Hodgkin, A.L. & Katz, B. (1949) The effect of sodium ions on the electrical activity of the giant axon of the squid. J. Physiol. 108:37-77.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `temperatureC` | number | `37` | ≥ -20, ≤ 60 |  |
+| `ko` | number | `5` | ≥ 0, ≤ 1000 |  |
+| `ki` | number | `140` | ≥ 0, ≤ 1000 |  |
+| `nao` | number | `145` | ≥ 0, ≤ 1000 |  |
+| `nai` | number | `15` | ≥ 0, ≤ 1000 |  |
+| `clo` | number | `110` | ≥ 0, ≤ 1000 |  |
+| `cli` | number | `10` | ≥ 0, ≤ 1000 |  |
+| `pK` | number | `1` | ≥ 0, ≤ 1000 |  |
+| `pNa` | number | `0.04` | ≥ 0, ≤ 1000 |  |
+| `pCl` | number | `0.45` | ≥ 0, ≤ 1000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "temperatureC": 37,
+  "ko": 5,
+  "ki": 140,
+  "nao": 145,
+  "nai": 15,
+  "clo": 110,
+  "cli": 10,
+  "pK": 1,
+  "pNa": 0.04,
+  "pCl": 0.45,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "resting-potential", "params": … }` or interactively at `/lab/resting-potential`._
 
 
 ## ⚙️ Systems biology

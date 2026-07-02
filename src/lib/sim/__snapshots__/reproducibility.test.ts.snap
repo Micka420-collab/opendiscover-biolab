@@ -442,6 +442,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Replicator dynamics: coexistence (stable mixed ESS) — stable coexistence at 50% A.",
   },
+  "resting-potential": {
+    "metrics": {
+      "drivingForceK": 21.7156,
+      "drivingForceNa": -127.977,
+      "eCl": -64.0877,
+      "eK": -89.0587,
+      "eNa": 60.6343,
+      "restingPotential": -67.3431,
+      "thermalVoltage": 26.7267,
+    },
+    "summary": "Resting potential V_m=-67.3 mV (GHK) at 37°C: E_K=-89.1, E_Na=60.6, E_Cl=-64.1 mV — sits near E_K⁺ because K⁺ is most permeant.",
+  },
   "rna-fold": {
     "metrics": {
       "basePairs": 4,
