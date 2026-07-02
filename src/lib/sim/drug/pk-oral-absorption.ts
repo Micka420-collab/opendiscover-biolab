@@ -32,11 +32,11 @@ export const paramsSchema = z
     /** Bioavailability F — fraction of the dose that reaches the blood. */
     bioavailability: z.number().min(0.01).max(1).default(1),
     /** First-order absorption rate constant ka (1/h). */
-    ka: z.number().positive().max(1e4).default(1),
+    ka: z.number().min(1e-6).max(1e4).default(1),
     /** Clearance CL (L/h). Elimination rate ke = CL/V. */
-    cl: z.number().positive().max(1e5).default(5),
-    /** Volume of distribution V (L). */
-    v: z.number().positive().max(1e5).default(20),
+    cl: z.number().min(1e-6).max(1e5).default(5),
+    /** Volume of distribution V (L). Lower-bounded so ke = CL/V stays finite. */
+    v: z.number().min(1e-6).max(1e5).default(20),
     /** Simulated duration (h). */
     tEnd: z.number().positive().max(1e5).default(24),
     /** Points in the plotted concentration curve (>= 2). */
@@ -82,7 +82,13 @@ export function run(rawParams: Partial<PkOralParams> = {}): SimResult {
 
   const metrics: Metric[] = [
     { key: 'cmax', label: 'Peak plasma conc Cmax', value: cmax, unit: 'mg/L' },
-    { key: 'tmax', label: 'Time to peak Tmax', value: tmax, unit: 'h', note: 'ln(ka/ke)/(ka−ke)' },
+    {
+      key: 'tmax',
+      label: 'Time to peak Tmax',
+      value: tmax,
+      unit: 'h',
+      note: ratesEqual(p.ka, ke) ? '1/ka (ka=ke limit)' : 'ln(ka/ke)/(ka−ke)',
+    },
     { key: 'auc', label: 'AUC(0→∞)', value: auc, unit: 'mg·h/L', note: 'F·Dose/CL' },
     { key: 'ka', label: 'Absorption rate ka', value: p.ka, unit: '1/h' },
     { key: 'ke', label: 'Elimination rate ke', value: ke, unit: '1/h', note: 'CL/V' },

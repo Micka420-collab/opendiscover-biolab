@@ -45,6 +45,18 @@ describe('oxygen-transfer', () => {
     }
   });
 
+  it('steady-state OTR equals OUR whenever DO settles above zero, even if below C_crit (regression)', () => {
+    // rawSteadyState = 8 − 750/100 = 0.5 (> 0 but < criticalDO=1): DO is positive,
+    // so OTR must balance OUR (750), not the maximum kLa·C* (800).
+    const r = run({ kLa: 100, saturationDO: 8, our: 750, criticalDO: 1 });
+    expect(metric(r, 'steadyStateDO')).toBeCloseTo(0.5, 10);
+    expect(metric(r, 'oxygenLimited')).toBe(1); // still flagged (below C_crit)
+    expect(metric(r, 'otrAtSteadyState')).toBeCloseTo(750, 6); // = OUR, not 800
+    // Fully limited (DO pins at 0) → OTR is the maximum kLa·C*.
+    const limited = run({ kLa: 40, saturationDO: 8, our: 400 }); // rawSS = −2 → DO 0
+    expect(metric(limited, 'otrAtSteadyState')).toBeCloseTo(40 * 8, 6);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('oxygen-transfer', { kLa: 120, our: 300 });
     const b = runEngine('oxygen-transfer', { kLa: 120, our: 300 });

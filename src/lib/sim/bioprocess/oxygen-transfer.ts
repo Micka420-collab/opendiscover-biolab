@@ -106,9 +106,15 @@ export function run(rawParams: Partial<OxygenTransferParams> = {}): SimResult {
     {
       key: 'otrAtSteadyState',
       label: 'Steady-state O₂ transfer rate',
-      value: oxygenLimited ? p.kLa * cStar : p.our,
+      // kLa·(C*−DO): equals OUR wherever DO settles above 0, and kLa·C* only when DO
+      // pins at 0 (fully oxygen-limited). Branching on the flag would over-report OTR
+      // in the 0 ≤ C_ss < C_crit window where DO is still positive.
+      value: p.kLa * (cStar - steadyStateDO),
       unit: 'mg/L/h',
-      note: 'balances OUR when not limited',
+      note:
+        steadyStateDO > 0
+          ? 'balances OUR at the positive steady state'
+          : 'maximum transfer (DO pinned at 0)',
     },
     { key: 'kLa', label: 'Mass-transfer coefficient kLa', value: p.kLa, unit: '1/h' },
   ];

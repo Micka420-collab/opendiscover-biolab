@@ -2070,9 +2070,9 @@ One-compartment oral pharmacokinetics with first-order absorption: the Bateman p
 |---|---|---|---|---|
 | `dose` | number | `100` | ≥ 0, ≤ 1000000 |  |
 | `bioavailability` | number | `1` | ≥ 0.01, ≤ 1 |  |
-| `ka` | number | `1` | ≥ 0, ≤ 10000 |  |
-| `cl` | number | `5` | ≥ 0, ≤ 100000 |  |
-| `v` | number | `20` | ≥ 0, ≤ 100000 |  |
+| `ka` | number | `1` | ≥ 0.000001, ≤ 10000 |  |
+| `cl` | number | `5` | ≥ 0.000001, ≤ 100000 |  |
+| `v` | number | `20` | ≥ 0.000001, ≤ 100000 |  |
 | `tEnd` | number | `24` | ≥ 0, ≤ 100000 |  |
 | `outputPoints` | integer | `300` | ≥ 2, ≤ 4000 |  |
 

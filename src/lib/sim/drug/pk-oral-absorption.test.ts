@@ -63,6 +63,16 @@ describe('pk-oral-absorption', () => {
     for (const c of r.series?.[0]?.y.plasma ?? []) expect(c).toBeGreaterThanOrEqual(0);
   });
 
+  it('rejects subnormal cl/v that would make ke non-finite (regression)', () => {
+    // Previously cl/v were only bounded above, so v=5e-320 gave ke=Infinity → NaN metrics.
+    expect(() => run({ dose: 100, ka: 1, cl: 5, v: 5e-320 })).toThrow();
+    expect(() => run({ dose: 100, ka: 1, cl: 5e-320, v: 1e5 })).toThrow();
+    // A tiny-but-valid volume still yields finite metrics.
+    const r = run({ dose: 100, ka: 1, cl: 5, v: 0.001 });
+    expect(Number.isFinite(metric(r, 'cmax'))).toBe(true);
+    expect(Number.isFinite(metric(r, 'tmax'))).toBe(true);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('pk-oral-absorption', { dose: 50, ka: 1.5, cl: 4 });
     const b = runEngine('pk-oral-absorption', { dose: 50, ka: 1.5, cl: 4 });
