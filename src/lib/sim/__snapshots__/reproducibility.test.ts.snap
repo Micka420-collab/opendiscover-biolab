@@ -128,6 +128,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "5 SpCas9 guide(s); best on-target 0.72, best specificity 1.00.",
   },
+  "dna-melting": {
+    "metrics": {
+      "deltaGAt37": -69.85,
+      "deltaH": -380,
+      "deltaS": -1,
+      "fractionDuplexAt37": 0.999413,
+      "meltingTemp": 70.0424,
+      "strandConc": 0.00001,
+      "transitionWidth": 16.8679,
+    },
+    "summary": "DNA duplex melting: Tm=70.0°C at 1.0e-5 M strands (100% duplex at 37°C); melt spans 16.9°C.",
+  },
   "docking": {
     "metrics": {
       "bestContactDistance": 2.19545,

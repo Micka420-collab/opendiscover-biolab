@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **52 deterministic simulation engines** across
+The OpenDiscover BioLab ships **53 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -27,7 +27,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
-- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
+- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting)
 
 ---
 
@@ -2243,6 +2243,44 @@ The Marko–Siggia worm-like-chain model of polymer elasticity — the force–e
 ```
 
 _Run it: `POST /api/lab/run { "engine": "worm-like-chain", "params": … }` or interactively at `/lab/worm-like-chain`._
+
+---
+
+### `dna-melting` — DNA Duplex Melting (two-state hybridization)
+
+The thermal melting curve of a DNA/RNA duplex from two-state van't Hoff thermodynamics: two strands associate (S1+S2⇌D) with ΔG°(T)=ΔH°−T·ΔS°, and the fraction in duplex θ = 2β/((2β+1)+√(4β+1)) with β=K·C_T/2 falls sigmoidally with temperature. Reports the concentration-dependent melting temperature Tm=ΔH°/(ΔS°+R·ln(C_T/x)) (x=4 non-self, 1 self-complementary), the fraction hybridized at 37°C, ΔG° at 37°C, and the transition width. Unlike a nearest-neighbour Tm point estimate this is the full curve, and it captures the bimolecular hallmark that Tm rises with strand concentration. Closed-form and deterministic.
+
+**References**
+- Marky, L.A. & Breslauer, K.J. (1987) Calculating thermodynamic data for transitions of any molecularity from equilibrium melting curves. Biopolymers 26:1601-1620.
+- SantaLucia, J. (1998) A unified view of oligonucleotide nearest-neighbor thermodynamics. PNAS 95:1460-1465.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `deltaH` | number | `-380` | ≥ -5000, ≤ -1 |  |
+| `deltaS` | number | `-1` | ≥ -100, ≤ -0.001 |  |
+| `strandConc` | number | `0.00001` | ≥ 1e-12, ≤ 1 |  |
+| `selfComplementary` | boolean | `false` |  |  |
+| `tMinCelsius` | number | `20` | ≥ -20, ≤ 150 |  |
+| `tMaxCelsius` | number | `95` | ≥ -10, ≤ 200 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "deltaH": -380,
+  "deltaS": -1,
+  "strandConc": 0.00001,
+  "selfComplementary": false,
+  "tMinCelsius": 20,
+  "tMaxCelsius": 95,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "dna-melting", "params": … }` or interactively at `/lab/dna-melting`._
 
 
 ## Authoring an engine

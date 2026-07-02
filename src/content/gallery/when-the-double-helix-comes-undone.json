@@ -1,0 +1,9 @@
+{
+  "slug": "when-the-double-helix-comes-undone",
+  "title": "When the double helix comes undone",
+  "engine": "dna-melting",
+  "params": { "deltaH": -380, "deltaS": -1, "strandConc": 1e-5, "selfComplementary": false },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Heat a solution of complementary DNA strands and, for a while, nothing seems to happen — then, over just a few degrees, the double helix unzips all at once. That sharp sigmoidal collapse is the melting curve, and its midpoint is the melting temperature Tm where exactly half the strands are still paired. What makes DNA melting special is that Tm is not a fixed property of the sequence alone: because two strands must find each other, diluting the sample lowers Tm. Every point here comes from two-state van't Hoff thermodynamics (ΔG° = ΔH° − T·ΔS°) with the bound fraction written in a cancellation-free closed form — the physics a qPCR machine reads out in reverse."
+}
