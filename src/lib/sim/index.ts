@@ -16,6 +16,7 @@ import { spec as acidBaseTitration } from './biochem/acid-base-titration';
 import { spec as beerLambert } from './biochem/beer-lambert';
 import { spec as diffusion } from './biochem/diffusion';
 import { spec as osmoticPressure } from './biochem/osmotic-pressure';
+import { spec as oxygenHemoglobin } from './biochem/oxygen-hemoglobin';
 import { spec as vanDeemter } from './biochem/van-deemter';
 import { spec as bioreactor } from './bioprocess/bioreactor';
 import { spec as oxygenTransfer } from './bioprocess/oxygen-transfer';
@@ -124,6 +125,7 @@ export const engines: AnyEngine[] = [
   diffusion,
   vanDeemter,
   osmoticPressure,
+  oxygenHemoglobin,
   compartmental,
   sis,
   sirEndemic,

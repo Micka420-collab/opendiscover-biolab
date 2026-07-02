@@ -387,6 +387,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Osmotic pressure Π=7.84 atm (794 kPa) for i=2, 0.154 M at 37°C → osmolarity 0.308 Osm/L, isotonic vs the 0.3 Osm/L reference (a cell here holds its volume).",
   },
+  "oxygen-hemoglobin": {
+    "metrics": {
+      "arterialSaturation": 0.974347,
+      "extractionRatio": 0.218042,
+      "hillCoefficient": 2.7,
+      "oxygenDelivered": 0.212449,
+      "p50": 26,
+      "venousSaturation": 0.761898,
+    },
+    "summary": "O₂–hemoglobin (Hill n=2.7, P₅₀=26 mmHg): arterial 97.4% at 100 mmHg, venous 76.2% at 40 mmHg → 21.2% of capacity unloaded to tissues (extraction 22%).",
+  },
   "oxygen-transfer": {
     "metrics": {
       "criticalKLa": 57.1429,

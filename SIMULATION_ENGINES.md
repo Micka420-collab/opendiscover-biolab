@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **60 deterministic simulation engines** across
+The OpenDiscover BioLab ships **61 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
@@ -1934,6 +1934,42 @@ Colligative properties from the van't Hoff law: dissolved particles set the osmo
 ```
 
 _Run it: `POST /api/lab/run { "engine": "osmotic-pressure", "params": … }` or interactively at `/lab/osmotic-pressure`._
+
+---
+
+### `oxygen-hemoglobin` — Oxygen–Hemoglobin Dissociation (Hill)
+
+The oxygen–hemoglobin dissociation curve from the Hill equation Y=pⁿ/(P₅₀ⁿ+pⁿ): cooperative O₂ binding gives a sigmoidal saturation curve set by the half-saturation pressure P₅₀ (~26 mmHg) and the Hill coefficient n (~2.7 for hemoglobin, 1 for non-cooperative myoglobin). The steep middle of the sigmoid between lung (~100 mmHg) and tissue (~40 mmHg) pressures is exactly what lets blood load O₂ in the lungs and release it to tissues; a right shift (higher P₅₀, the Bohr effect) unloads still more. Reports arterial and venous saturation, the fraction of capacity unloaded, the O₂ extraction ratio, and the full dissociation curve. Closed-form and deterministic.
+
+**References**
+- Hill, A.V. (1910) The possible effects of the aggregation of the molecules of haemoglobin on its dissociation curves. J. Physiol. 40:iv-vii.
+- Berg, J.M., Tymoczko, J.L. & Stryer, L. (2015) Biochemistry, 8th ed. W. H. Freeman.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `p50` | number | `26` | ≥ 0.001, ≤ 1000 |  |
+| `hillCoefficient` | number | `2.7` | ≥ 0.001, ≤ 8 |  |
+| `arterialPO2` | number | `100` | ≥ 0, ≤ 1000 |  |
+| `venousPO2` | number | `40` | ≥ 0, ≤ 1000 |  |
+| `pO2Max` | number | `100` | ≥ 0.001, ≤ 1000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "p50": 26,
+  "hillCoefficient": 2.7,
+  "arterialPO2": 100,
+  "venousPO2": 40,
+  "pO2Max": 100,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "oxygen-hemoglobin", "params": … }` or interactively at `/lab/oxygen-hemoglobin`._
 
 
 ## 🦠 Epidemiology
