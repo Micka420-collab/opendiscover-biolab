@@ -1,0 +1,9 @@
+{
+  "slug": "stretching-a-single-dna-molecule",
+  "title": "Stretching a single DNA molecule",
+  "engine": "worm-like-chain",
+  "params": { "persistenceLength": 50, "contourLength": 1000, "temperatureCelsius": 25 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Grab the two ends of a DNA molecule with optical tweezers and pull. At first it barely resists — a coiled chain has vastly more configurations than a straight one, so entropy alone acts as a soft spring (here about 8×10⁻⁵ pN/nm). But as the extension approaches the full contour length there are almost no configurations left to give up, and the force rockets: the Marko–Siggia 1/(1−x)² term. This force–extension curve, first measured on λ-DNA by Bustamante and Smith in 1994, is how single-molecule biophysics reads out the mechanics of DNA, one molecule at a time."
+}

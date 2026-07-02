@@ -379,6 +379,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.05,
     hint: 'Herd immunity for R₀=3 needs 1−1/R₀ = 66.7% coverage. The attack rate falls steeply just below that — vaccinate about 64,000 of the 100,000 to hold it at 5%.',
   },
+  {
+    id: 'wlc-stretch-dna',
+    engine: 'worm-like-chain',
+    title: 'Stretch DNA to 10 piconewtons',
+    brief:
+      'Pull on a DNA molecule in an optical trap. As you stretch it toward its full contour length the entropic force diverges. Dial the extension in so the force at full stretch reads exactly 10 pN — just into the steep stiffening regime.',
+    baseParams: { persistenceLength: 50, contourLength: 1000, temperatureCelsius: 25 },
+    knob: {
+      param: 'maxFraction',
+      label: 'Fractional extension x = z/L',
+      min: 0.5,
+      max: 0.99,
+      step: 0.001,
+      default: 0.8,
+    },
+    metricKey: 'forceAtMaxExtension',
+    metricLabel: 'Force at full stretch',
+    unit: 'pN',
+    goal: 'target',
+    target: 10,
+    hint: 'Force blows up as x → 1 via the 1/(1−x)² term. For Lp=50 nm it reaches ~10 pN at about 95.4% extension.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
