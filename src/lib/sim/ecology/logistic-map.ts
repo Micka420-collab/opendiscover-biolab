@@ -150,8 +150,9 @@ export function run(rawParams: Partial<LogisticMapParams> = {}): SimResult {
 
   // Bifurcation diagram (attractor x vs r) as a recommended scatter vizSpec.
   const bif: { r: number; x: number }[] = [];
+  const rDenom = Math.max(p.rSteps - 1, 1); // rSteps === 1 must not divide by zero
   for (let i = 0; i < p.rSteps; i++) {
-    const rr = p.rMin + ((p.rMax - p.rMin) * i) / (p.rSteps - 1);
+    const rr = p.rMin + ((p.rMax - p.rMin) * i) / rDenom;
     let bx = p.x0;
     for (let k = 0; k < p.bifTransient; k++) bx = step(rr, bx);
     for (let k = 0; k < p.bifSamples; k++) {

@@ -53,4 +53,11 @@ describe('kuramoto', () => {
     const b = runEngine('kuramoto', { seed: 42, coupling: 2.5 });
     expect(a).toEqual(b);
   });
+
+  it('produces finite series points even at outputPoints=1', () => {
+    const r = run({ oscillators: 20, outputPoints: 1 });
+    const s = (r.series ?? [])[0];
+    expect(Number.isFinite(s.x[0])).toBe(true);
+    expect(Number.isFinite(s.y.coherence[0])).toBe(true);
+  });
 });

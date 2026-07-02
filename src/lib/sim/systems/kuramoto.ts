@@ -85,7 +85,8 @@ export function criticalCoupling(freqSpread: number): number {
 
 function downsampleIndices(len: number, n: number): number[] {
   if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / (n - 1)));
+  const denom = Math.max(n - 1, 1); // n === 1 must not divide by zero
+  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 export function run(rawParams: Partial<KuramotoParams> = {}): SimResult {

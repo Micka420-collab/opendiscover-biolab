@@ -52,4 +52,13 @@ describe('logistic-map', () => {
     const b = runEngine('logistic-map', { r: 3.83, x0: 0.31 });
     expect(a).toEqual(b);
   });
+
+  it('produces finite bifurcation points even at rSteps=1', () => {
+    const r = run({ rSteps: 1, bifSamples: 5 });
+    const viz = r.vizSpec as { data: { values: { r: number; x: number }[] } };
+    for (const pt of viz.data.values) {
+      expect(Number.isFinite(pt.r)).toBe(true);
+      expect(Number.isFinite(pt.x)).toBe(true);
+    }
+  });
 });

@@ -80,7 +80,15 @@ export function conservedQuantity(p: LotkaVolterraParams, x: number, y: number):
 /** Evenly pick ~n indices spanning [0, len-1] (keeps endpoints). */
 function downsampleIndices(len: number, n: number): number[] {
   if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / (n - 1)));
+  const denom = Math.max(n - 1, 1); // n === 1 must not divide by zero
+  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
+}
+
+/** Max of an array without spreading it (spreads overflow the stack at ~1e5). */
+function arrayMax(a: number[]): number {
+  let m = Number.NEGATIVE_INFINITY;
+  for (const v of a) if (v > m) m = v;
+  return m;
 }
 
 export function run(rawParams: Partial<LotkaVolterraParams> = {}): SimResult {
@@ -138,8 +146,8 @@ export function run(rawParams: Partial<LotkaVolterraParams> = {}): SimResult {
       value: meanPred,
       note: '→ y* over whole periods',
     },
-    { key: 'peakPrey', label: 'Peak prey', value: Math.max(...prey) },
-    { key: 'peakPredator', label: 'Peak predator', value: Math.max(...pred) },
+    { key: 'peakPrey', label: 'Peak prey', value: arrayMax(prey) },
+    { key: 'peakPredator', label: 'Peak predator', value: arrayMax(pred) },
     {
       key: 'conservedDriftPct',
       label: 'Conserved-quantity drift',

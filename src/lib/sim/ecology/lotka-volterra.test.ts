@@ -82,4 +82,22 @@ describe('lotka-volterra', () => {
     const b = runEngine('lotka-volterra', { alpha: 1.2, beta: 0.3, delta: 0.1, gamma: 0.5 });
     expect(a).toEqual(b);
   });
+
+  it('does not overflow the stack on a large (schema-max) trajectory', () => {
+    // peakPrey/peakPredator must not spread a 200k-element array into Math.max.
+    const r = run({ steps: 200_000, tEnd: 40, outputPoints: 200 });
+    expect(Number.isFinite(r.metrics.find((m) => m.key === 'peakPrey')?.value ?? Number.NaN)).toBe(
+      true,
+    );
+  });
+
+  it('produces finite series points even at outputPoints=1', () => {
+    const r = run({ outputPoints: 1 });
+    for (const s of r.series ?? []) {
+      for (const xv of s.x) expect(Number.isFinite(xv)).toBe(true);
+      for (const key of Object.keys(s.y)) {
+        for (const v of s.y[key]) expect(Number.isFinite(v)).toBe(true);
+      }
+    }
+  });
 });

@@ -103,9 +103,15 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
     }
   }
 
+  // For a target goal, meetsBar accepts within TARGET_TOLERANCE of the target,
+  // but relative to |target| (falling back to an absolute window when target≈0).
+  // Show the window that actually applies, so target=0 reads "±0.05", not "±5%".
+  const target = challenge.target ?? 0;
+  const toleranceText =
+    Math.abs(target) > 1e-9 ? `±${Math.round(TARGET_TOLERANCE * 100)}%` : `±${TARGET_TOLERANCE}`;
   const goalText =
     challenge.goal === 'target'
-      ? `hit ${formatValue(challenge.target ?? 0, challenge.unit)} (±${Math.round(TARGET_TOLERANCE * 100)}%)`
+      ? `hit ${formatValue(target, challenge.unit)} (${toleranceText})`
       : challenge.goal === 'maximize'
         ? `beat ${formatValue(challenge.par ?? 0, challenge.unit)}`
         : `get under ${formatValue(challenge.par ?? 0, challenge.unit)}`;

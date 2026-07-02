@@ -15,7 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about',
   ];
   const enginePaths = listEngines().map((e) => `/lab/${e.slug}`);
-  return [...staticPaths, ...enginePaths].map((path) => ({
+  // De-dupe: '/lab/breeding' appears both as a static path and as an engine slug.
+  const paths = [...new Set([...staticPaths, ...enginePaths])];
+  return paths.map((path) => ({
     url: `${base}${path}`,
     changeFrequency: 'weekly',
     priority: path === '' ? 1 : 0.7,
