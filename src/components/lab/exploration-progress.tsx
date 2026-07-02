@@ -8,6 +8,7 @@ import {
   computeAchievements,
   getExploredEngines,
 } from '@/lib/lab/achievements';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 interface DexEntry extends CatalogEntry {
@@ -84,17 +85,18 @@ export function ExplorationProgress({ catalog }: { catalog: DexEntry[] }) {
           {catalog.map((e) => {
             const on = exploredSet.has(e.slug);
             return (
-              <span
+              <Link
                 key={e.slug}
-                title={`${e.title}${on ? ' — explored' : ''}`}
-                className={`rounded px-1.5 py-0.5 text-[10px] font-mono border ${
+                href={`/lab/${e.slug}`}
+                title={`${e.title}${on ? ' — explored · open to revisit' : ' — open to explore'}`}
+                className={`rounded px-1.5 py-0.5 text-[10px] font-mono border transition-colors hover:border-accent hover:text-accent ${
                   on
                     ? 'border-accent/50 bg-accent/10 text-accent'
                     : 'border-border text-muted-foreground/60'
                 }`}
               >
                 {e.slug}
-              </span>
+              </Link>
             );
           })}
         </div>
