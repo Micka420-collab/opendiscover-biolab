@@ -14,6 +14,8 @@ const DOMAIN_LABELS: Record<string, string> = {
   epidemiology: '🦠 Epidemiology',
   'drug-discovery': '💊 Drug discovery',
   structural: '🔬 Structural',
+  neuroscience: '🧠 Neuroscience',
+  ecology: '🐺 Ecology',
 };
 
 export default function LabPage() {

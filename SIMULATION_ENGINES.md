@@ -2,8 +2,8 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **25 deterministic simulation engines** across
-9 domains of computational biology. Every engine is a *pure function* — no clock,
+The OpenDiscover BioLab ships **26 deterministic simulation engines** across
+10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
 
@@ -22,6 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
+- **ecology** — [`lotka-volterra`](#lotka-volterra)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -824,6 +825,50 @@ Cross two diploid parents across independent gene loci and get the full offsprin
 ```
 
 _Run it: `POST /api/lab/run { "engine": "breeding", "params": … }` or interactively at `/lab/breeding`._
+
+
+## ecology
+
+### `lotka-volterra` — Lotka–Volterra Predator–Prey
+
+The classic two-species predator–prey ODE. Prey grow exponentially and are cropped by predation; predators grow on prey and die at a constant rate. The system oscillates on closed orbits around the coexistence equilibrium (x*, y*) = (γ/δ, α/β), conserving V = δx − γ ln x + βy − α ln y, with time-averaged populations equal to the equilibrium (Volterra’s law of conservation of averages).
+
+**References**
+- Lotka, A.J. (1925) Elements of Physical Biology.
+- Volterra, V. (1926) Fluctuations in the abundance of a species considered mathematically. Nature 118:558-560.
+- Murray, J.D. (2002) Mathematical Biology I: An Introduction, 3rd ed., ch. 3.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `alpha` | number | `1.1` | ≥ 0 |  |
+| `beta` | number | `0.4` | ≥ 0 |  |
+| `delta` | number | `0.1` | ≥ 0 |  |
+| `gamma` | number | `0.4` | ≥ 0 |  |
+| `x0` | number | `10` | ≥ 0 |  |
+| `y0` | number | `10` | ≥ 0 |  |
+| `tEnd` | number | `40` | ≥ 0, ≤ 10000 |  |
+| `steps` | integer | `4000` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "alpha": 1.1,
+  "beta": 0.4,
+  "delta": 0.1,
+  "gamma": 0.4,
+  "x0": 10,
+  "y0": 10,
+  "tEnd": 40,
+  "steps": 4000,
+  "outputPoints": 400
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "lotka-volterra", "params": … }` or interactively at `/lab/lotka-volterra`._
 
 
 ## 🏭 Bioprocess

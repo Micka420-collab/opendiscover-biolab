@@ -17,6 +17,7 @@ import { spec as admet } from './drug/admet';
 import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
+import { spec as lotkaVolterra } from './ecology/lotka-volterra';
 import { spec as compartmental } from './epi/compartmental';
 import { spec as breeding } from './genetics/breeding';
 import { spec as alignment } from './molbio/alignment';
@@ -62,6 +63,7 @@ export const engines: AnyEngine[] = [
   wrightFisher,
   phylogenetics,
   breeding,
+  lotkaVolterra,
   bioreactor,
   compartmental,
   admet,

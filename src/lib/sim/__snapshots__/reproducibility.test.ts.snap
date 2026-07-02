@@ -153,6 +153,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
   },
+  "lotka-volterra": {
+    "metrics": {
+      "conservedDriftPct": 0.00000119028,
+      "meanPredator": 2.80466,
+      "meanPrey": 3.05901,
+      "peakPredator": 10.7938,
+      "peakPrey": 29.0672,
+      "predatorEquilibrium": 2.75,
+      "preyEquilibrium": 4,
+    },
+    "summary": "Predator–prey oscillation around (x*, y*) = (4.00, 2.75); conserved-quantity drift 0.000%.",
+  },
   "mass-spec": {
     "metrics": {
       "complementarityMaxError": 1.13687e-13,
