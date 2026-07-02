@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **59 deterministic simulation engines** across
+The OpenDiscover BioLab ships **60 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
@@ -533,7 +533,7 @@ Izhikevich's 2003 two-variable spiking-neuron model: v' = 0.04v² + 5v + 140 −
 | `d` | number | `8` | ≥ 0, ≤ 20 |  |
 | `current` | number | `10` | ≥ -50, ≤ 100 |  |
 | `v0` | number | `-65` | ≥ -90, ≤ 30 |  |
-| `tEnd` | number | `300` | ≥ 0, ≤ 2000 |  |
+| `tEnd` | number | `300` | ≥ 1e-9, ≤ 2000 |  |
 | `dt` | number | `0.25` | ≥ 0.02, ≤ 1 |  |
 | `outputPoints` | integer | `600` | ≥ 2, ≤ 4000 |  |
 
@@ -570,12 +570,12 @@ The steady resting voltage of a cell membrane from ion gradients and permeabilit
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `temperatureC` | number | `37` | ≥ -20, ≤ 60 |  |
-| `ko` | number | `5` | ≥ 0, ≤ 1000 |  |
-| `ki` | number | `140` | ≥ 0, ≤ 1000 |  |
-| `nao` | number | `145` | ≥ 0, ≤ 1000 |  |
-| `nai` | number | `15` | ≥ 0, ≤ 1000 |  |
-| `clo` | number | `110` | ≥ 0, ≤ 1000 |  |
-| `cli` | number | `10` | ≥ 0, ≤ 1000 |  |
+| `ko` | number | `5` | ≥ 1e-9, ≤ 1000 |  |
+| `ki` | number | `140` | ≥ 1e-9, ≤ 1000 |  |
+| `nao` | number | `145` | ≥ 1e-9, ≤ 1000 |  |
+| `nai` | number | `15` | ≥ 1e-9, ≤ 1000 |  |
+| `clo` | number | `110` | ≥ 1e-9, ≤ 1000 |  |
+| `cli` | number | `10` | ≥ 1e-9, ≤ 1000 |  |
 | `pK` | number | `1` | ≥ 0, ≤ 1000 |  |
 | `pNa` | number | `0.04` | ≥ 0, ≤ 1000 |  |
 | `pCl` | number | `0.45` | ≥ 0, ≤ 1000 |  |
@@ -1123,7 +1123,7 @@ The Ewens sampling formula for a neutral sample of n genes under the infinite-al
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `sampleSize` | integer | `50` | ≥ 2, ≤ 2000 |  |
-| `theta` | number | `1` | ≥ 0, ≤ 10000 |  |
+| `theta` | number | `1` | ≥ 1e-9, ≤ 10000 |  |
 
 **Example**
 
@@ -1271,11 +1271,11 @@ The classic two-species predator–prey ODE. Prey grow exponentially and are cro
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `alpha` | number | `1.1` | ≥ 0 |  |
-| `beta` | number | `0.4` | ≥ 0 |  |
-| `delta` | number | `0.1` | ≥ 0 |  |
+| `beta` | number | `0.4` | ≥ 1e-9 |  |
+| `delta` | number | `0.1` | ≥ 1e-9 |  |
 | `gamma` | number | `0.4` | ≥ 0 |  |
 | `x0` | number | `10` | ≥ 0 |  |
-| `y0` | number | `10` | ≥ 0 |  |
+| `y0` | number | `10` | ≥ 1e-9 |  |
 | `tEnd` | number | `40` | ≥ 0, ≤ 10000 |  |
 | `steps` | integer | `4000` | ≥ 0, ≤ 200000 |  |
 | `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
@@ -1359,10 +1359,10 @@ A realistic predator–prey model: logistic (self-limiting) prey and a saturatin
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `r` | number | `1` | ≥ 0 |  |
-| `k` | number | `6` | ≥ 0 |  |
-| `a` | number | `1` | ≥ 0 |  |
-| `h` | number | `0.5` | ≥ 0 |  |
-| `e` | number | `0.5` | ≥ 0 |  |
+| `k` | number | `6` | ≥ 1e-9 |  |
+| `a` | number | `1` | ≥ 1e-9 |  |
+| `h` | number | `0.5` | ≥ 1e-9 |  |
+| `e` | number | `0.5` | ≥ 1e-9 |  |
 | `m` | number | `0.2` | ≥ 0 |  |
 | `n0` | number | `1` | ≥ 0 |  |
 | `p0` | number | `1` | ≥ 0 |  |
@@ -1444,9 +1444,9 @@ The classic discrete host–parasitoid map: hosts reproduce at rate R and escape
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `reproduction` | number | `2` | ≥ 0 |  |
-| `searchEfficiency` | number | `0.05` | ≥ 0 |  |
-| `parasitoidsPerHost` | number | `1` | ≥ 0 |  |
+| `reproduction` | number | `2` | ≥ 1e-9 |  |
+| `searchEfficiency` | number | `0.05` | ≥ 1e-9 |  |
+| `parasitoidsPerHost` | number | `1` | ≥ 1e-9 |  |
 | `host0` | number | `24` | ≥ 0 |  |
 | `parasitoid0` | number | `12` | ≥ 0 |  |
 | `generations` | integer | `40` | ≥ 0, ≤ 100000 |  |
@@ -1481,10 +1481,10 @@ Two species competing for one limiting substrate in a chemostat. Tilman's R* rul
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `muMax1` | number | `0.5` | ≥ 0 |  |
+| `muMax1` | number | `0.5` | ≥ 1e-9 |  |
 | `ks1` | number | `1` | ≥ 0 |  |
 | `y1` | number | `0.5` | ≥ 0 |  |
-| `muMax2` | number | `0.5` | ≥ 0 |  |
+| `muMax2` | number | `0.5` | ≥ 1e-9 |  |
 | `ks2` | number | `3` | ≥ 0 |  |
 | `y2` | number | `0.5` | ≥ 0 |  |
 | `d` | number | `0.2` | ≥ 0 |  |
@@ -1678,7 +1678,7 @@ Gas–liquid oxygen transfer in a stirred bioreactor: dissolved O2 obeys dC/dt =
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `kLa` | number | `100` | ≥ 0, ≤ 100000 |  |
+| `kLa` | number | `100` | ≥ 1e-9, ≤ 100000 |  |
 | `saturationDO` | number | `8` | ≥ 0, ≤ 1000 |  |
 | `our` | number | `400` | ≥ 0, ≤ 1000000 |  |
 | `initialDO` | number | `8` | ≥ 0, ≤ 1000 |  |
@@ -1718,7 +1718,7 @@ Microbial growth on an inhibitory substrate (Haldane/Andrews model): µ(S)=µmax
 |---|---|---|---|---|
 | `muMax` | number | `0.8` | ≥ 0, ≤ 1000 |  |
 | `ks` | number | `1` | ≥ 0, ≤ 1000000 |  |
-| `ki` | number | `100` | ≥ 0, ≤ 1000000000 |  |
+| `ki` | number | `100` | ≥ 1e-9, ≤ 1000000000 |  |
 | `substrateMax` | number | `200` | ≥ 0, ≤ 1000000000 |  |
 | `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
 
@@ -1759,7 +1759,7 @@ Beer–Lambert absorption of a two-component mixture: each species is a Gaussian
 | `peak2` | number | `550` | ≥ 1, ≤ 2000 |  |
 | `width2` | number | `40` | ≥ 0, ≤ 1000 |  |
 | `conc2` | number | `15` | ≥ 0, ≤ 1000000 |  |
-| `pathLength` | number | `1` | ≥ 0, ≤ 100 |  |
+| `pathLength` | number | `1` | ≥ 1e-9, ≤ 100 |  |
 | `lambdaMin` | number | `400` | ≥ 1, ≤ 2000 |  |
 | `lambdaMax` | number | `700` | ≥ 1, ≤ 2000 |  |
 | `readoutWavelength` | number | `550` | ≥ 1, ≤ 2000 |  |
@@ -1835,8 +1835,8 @@ How fast molecules wander by thermal motion: the Stokes–Einstein relation D=kB
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `radius` | number | `5` | ≥ 0, ≤ 1000000 |  |
-| `viscosity` | number | `1` | ≥ 0, ≤ 1000000 |  |
+| `radius` | number | `5` | ≥ 0.001, ≤ 1000000 |  |
+| `viscosity` | number | `1` | ≥ 0.000001, ≤ 1000000 |  |
 | `temperatureC` | number | `20` | ≥ -20, ≤ 200 |  |
 | `dimensions` | integer | `3` | ≥ 1, ≤ 3 |  |
 | `observationTime` | number | `1` | ≥ 0, ≤ 1000000000 |  |
@@ -1874,11 +1874,11 @@ The efficiency curve of a chromatography column: the plate height H(u)=A+B/u+C·
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `aTerm` | number | `0.5` | ≥ 0, ≤ 100 |  |
-| `bTerm` | number | `2` | ≥ 0, ≤ 10000 |  |
-| `cTerm` | number | `0.05` | ≥ 0, ≤ 10000 |  |
-| `velocity` | number | `2` | ≥ 0, ≤ 10000 |  |
+| `bTerm` | number | `2` | ≥ 0.000001, ≤ 10000 |  |
+| `cTerm` | number | `0.05` | ≥ 0.000001, ≤ 10000 |  |
+| `velocity` | number | `2` | ≥ 0.000001, ≤ 10000 |  |
 | `columnLength` | number | `100` | ≥ 0, ≤ 1000000 |  |
-| `velocityMax` | number | `12` | ≥ 0, ≤ 10000 |  |
+| `velocityMax` | number | `12` | ≥ 0.001, ≤ 10000 |  |
 | `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
 
 **Example**
@@ -1896,6 +1896,44 @@ The efficiency curve of a chromatography column: the plate height H(u)=A+B/u+C·
 ```
 
 _Run it: `POST /api/lab/run { "engine": "van-deemter", "params": … }` or interactively at `/lab/van-deemter`._
+
+---
+
+### `osmotic-pressure` — Osmotic Pressure & Colligative Properties (van't Hoff)
+
+Colligative properties from the van't Hoff law: dissolved particles set the osmotic pressure Π=i·M·R·T, the osmolarity i·M, and the freezing-point depression ΔTf=i·Kf·M — all depending only on the particle count (the van't Hoff factor i times molarity), not the solute identity. Classifies a solution's tonicity (hypo/iso/hypertonic) against a reference osmolarity and states whether a cell swells, holds, or shrinks, and inverts Π to a molar mass (membrane osmometry). Reports Π in atm and kPa, osmolarity, ΔTf, tonicity and the implied molar mass, plus the Π-vs-concentration curve. Closed-form and deterministic.
+
+**References**
+- van't Hoff, J.H. (1887) Die Rolle des osmotischen Drucks… Z. Phys. Chem. 1:481-508.
+- Atkins, P. & de Paula, J. (2014) Physical Chemistry, 10th ed. Oxford University Press.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `vantHoffFactor` | number | `2` | ≥ 0.000001, ≤ 10 |  |
+| `molarity` | number | `0.154` | ≥ 1e-9, ≤ 100 |  |
+| `temperatureC` | number | `37` | ≥ -20, ≤ 200 |  |
+| `referenceOsmolarity` | number | `0.3` | ≥ 1e-9, ≤ 100 |  |
+| `massConcentration` | number | `9` | ≥ 1e-9, ≤ 1000000 |  |
+| `concentrationMax` | number | `0.6` | ≥ 1e-9, ≤ 100 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "vantHoffFactor": 2,
+  "molarity": 0.154,
+  "temperatureC": 37,
+  "referenceOsmolarity": 0.3,
+  "massConcentration": 9,
+  "concentrationMax": 0.6,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "osmotic-pressure", "params": … }` or interactively at `/lab/osmotic-pressure`._
 
 
 ## 🦠 Epidemiology
@@ -1916,10 +1954,10 @@ Deterministic SIR / SEIR / SIRD transmission models with standard (frequency-dep
 |---|---|---|---|---|
 | `model` | enum(SIR \| SEIR \| SIRD) | `SIR` |  |  |
 | `beta` | number | **required** | ≥ 0 |  |
-| `gamma` | number | **required** | ≥ 0 |  |
+| `gamma` | number | **required** | ≥ 1e-9 |  |
 | `sigma` | number | `0.2` | ≥ 0 |  |
 | `mu` | number | `0.02` | ≥ 0 |  |
-| `population` | number | `1000000` | ≥ 0 |  |
+| `population` | number | `1000000` | ≥ 1e-9 |  |
 | `i0` | number | `1` | ≥ 0 |  |
 | `tMax` | number | `160` | ≥ 0 |  |
 | `outputPoints` | integer | `400` | ≥ 0 |  |
@@ -1962,7 +2000,7 @@ The SIS model for infections that confer no lasting immunity: the infected recov
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `beta` | number | `0.3` | ≥ 0 |  |
-| `gamma` | number | `0.1` | ≥ 0 |  |
+| `gamma` | number | `0.1` | ≥ 1e-9 |  |
 | `i0` | number | `0.01` | ≥ 0, ≤ 1 |  |
 | `tEnd` | number | `120` | ≥ 0, ≤ 100000 |  |
 | `tol` | number | `1e-8` | ≥ 0 |  |
@@ -2305,10 +2343,10 @@ The classic two-compartment IV-bolus pharmacokinetic model: a drug distributes f
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
 | `dose` | number | `100` | ≥ 0, ≤ 1000000 |  |
-| `v1` | number | `10` | ≥ 0, ≤ 100000 |  |
-| `cl` | number | `5` | ≥ 0, ≤ 100000 |  |
-| `q` | number | `10` | ≥ 0, ≤ 100000 |  |
-| `v2` | number | `20` | ≥ 0, ≤ 100000 |  |
+| `v1` | number | `10` | ≥ 1e-9, ≤ 100000 |  |
+| `cl` | number | `5` | ≥ 1e-9, ≤ 100000 |  |
+| `q` | number | `10` | ≥ 1e-9, ≤ 100000 |  |
+| `v2` | number | `20` | ≥ 1e-9, ≤ 100000 |  |
 | `tEnd` | number | `24` | ≥ 0, ≤ 100000 |  |
 | `outputPoints` | integer | `300` | ≥ 2, ≤ 4000 |  |
 
@@ -2412,8 +2450,8 @@ The Marko–Siggia worm-like-chain model of polymer elasticity — the force–e
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `persistenceLength` | number | `50` | ≥ 0, ≤ 100000 |  |
-| `contourLength` | number | `1000` | ≥ 0, ≤ 10000000 |  |
+| `persistenceLength` | number | `50` | ≥ 1e-9, ≤ 100000 |  |
+| `contourLength` | number | `1000` | ≥ 1e-9, ≤ 10000000 |  |
 | `temperatureCelsius` | number | `25` | ≥ -50, ≤ 150 |  |
 | `maxFraction` | number | `0.95` | ≥ 0.05, ≤ 0.99 |  |
 | `outputPoints` | integer | `200` | ≥ 2, ≤ 4000 |  |
@@ -2484,8 +2522,8 @@ The molecular ruler of fluorescence microscopy: the energy-transfer efficiency b
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `distance` | number | `5` | ≥ 0, ≤ 1000 |  |
-| `forsterRadius` | number | `5` | ≥ 0, ≤ 1000 |  |
+| `distance` | number | `5` | ≥ 0.01, ≤ 1000 |  |
+| `forsterRadius` | number | `5` | ≥ 0.01, ≤ 1000 |  |
 | `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
 
 **Example**

@@ -375,6 +375,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Nicholson–Bailey (R=2): unstable equilibrium (H*=27.7), host outbreak peaks at 1130 (40.8× equilibrium).",
   },
+  "osmotic-pressure": {
+    "metrics": {
+      "freezingPointDepression": 0.57288,
+      "impliedMolarMass": 58.4416,
+      "osmolarity": 0.308,
+      "osmoticPressure": 7.83863,
+      "osmoticPressureKPa": 794.249,
+      "tonicityRatio": 1.02667,
+      "vantHoffFactor": 2,
+    },
+    "summary": "Osmotic pressure Π=7.84 atm (794 kPa) for i=2, 0.154 M at 37°C → osmolarity 0.308 Osm/L, isotonic vs the 0.3 Osm/L reference (a cell here holds its volume).",
+  },
   "oxygen-transfer": {
     "metrics": {
       "criticalKLa": 57.1429,
