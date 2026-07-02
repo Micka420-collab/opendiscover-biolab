@@ -33,6 +33,7 @@ import { spec as sequence } from './molbio/sequence';
 import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
 import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
 import { spec as hardyWeinberg } from './popgen/hardy-weinberg';
+import { spec as luriaDelbruck } from './popgen/luria-delbruck';
 import { spec as moranProcess } from './popgen/moran-process';
 import { spec as phylogenetics } from './popgen/phylogenetics';
 import { spec as wrightFisher } from './popgen/wright-fisher';
@@ -75,6 +76,7 @@ export const engines: AnyEngine[] = [
   phylogenetics,
   hardyWeinberg,
   moranProcess,
+  luriaDelbruck,
   breeding,
   lotkaVolterra,
   logisticMap,

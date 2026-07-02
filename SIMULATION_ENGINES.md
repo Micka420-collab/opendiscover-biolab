@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **35 deterministic simulation engines** across
+The OpenDiscover BioLab ships **36 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -21,7 +21,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`breeding`](#breeding)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis)
@@ -889,6 +889,41 @@ A finite population of N individuals where mutants (relative fitness r) and wild
 ```
 
 _Run it: `POST /api/lab/run { "engine": "moran-process", "params": … }` or interactively at `/lab/moran-process`._
+
+---
+
+### `luria-delbruck` — Luria–Delbrück Fluctuation Test
+
+The 1943 fluctuation test that proved mutations arise at random during growth, before selection. Many identical cultures are grown and screened for pre-existing resistant mutants; because an early mutation founds a large clone, a few "jackpot" cultures have enormous counts, so the variance of resistant counts is far larger than the mean — unlike the Poisson (variance ≈ mean) expected if resistance were induced by the selective agent. Simulates the Lea–Coulson model and reports the variance-to-mean ratio and the p0 mutation-rate estimate m = −ln(p0).
+
+**References**
+- Luria, S.E. & Delbrück, M. (1943) Mutations of bacteria from virus sensitivity to virus resistance. Genetics 28:491-511.
+- Lea, D.E. & Coulson, C.A. (1949) The distribution of the numbers of mutants in bacterial populations. J. Genet. 49:264-285.
+- Foster, P.L. (2006) Methods for determining spontaneous mutation rates. Methods Enzymol. 409:195-213.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `mutationRate` | number | `1e-8` | ≥ 0 |  |
+| `finalSize` | number | `100000000` | ≥ 0 |  |
+| `initialSize` | number | `1` | ≥ 0 |  |
+| `cultures` | integer | `2000` | ≥ 2, ≤ 200000 |  |
+| `seed` | json | `luria-delbruck` |  |  |
+
+**Example**
+
+```json
+{
+  "mutationRate": 1e-8,
+  "finalSize": 100000000,
+  "initialSize": 1,
+  "cultures": 2000,
+  "seed": "luria-delbruck"
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "luria-delbruck", "params": … }` or interactively at `/lab/luria-delbruck`._
 
 ---
 

@@ -208,6 +208,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Predator–prey oscillation around (x*, y*) = (4.00, 2.75); conserved-quantity drift 0.000%.",
   },
+  "luria-delbruck": {
+    "metrics": {
+      "estimatedMutationRate": 9.74185e-9,
+      "estimatedMutations": 0.974185,
+      "expectedMutations": 1,
+      "meanResistant": 8.4455,
+      "p0": 0.3775,
+      "peakResistant": 1212,
+      "varianceToMeanRatio": 315.321,
+    },
+    "summary": "Luria–Delbrück (m=1.00): mean 8.4 but variance/mean = 315 (jackpots up to 1212) — mutations arose at random during growth.",
+  },
   "mass-spec": {
     "metrics": {
       "complementarityMaxError": 1.13687e-13,
