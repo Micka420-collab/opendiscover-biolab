@@ -495,6 +495,7 @@ function resolveModel(p: ResolvedParams): {
 /** Evenly-spaced indices into [0, n) keeping first & last, at most maxPoints. */
 function downsampleIndices(n: number, maxPoints: number): number[] {
   if (n <= maxPoints) return Array.from({ length: n }, (_, i) => i);
+  if (maxPoints <= 1) return [n - 1]; // a single summary point → the final state
   const seen = new Set<number>();
   const out: number[] = [];
   const denom = Math.max(maxPoints - 1, 1); // maxPoints === 1 must not divide by zero

@@ -32,6 +32,7 @@
 import { z } from 'zod';
 import { type Derivative, rk4 } from '../core/ode';
 import { createRng } from '../core/prng';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -81,12 +82,6 @@ export function kuramotoDerivative(omega: number[], k: number): Derivative {
 /** Critical coupling for a Gaussian frequency distribution: Kc = 2σ√(2π)/π. */
 export function criticalCoupling(freqSpread: number): number {
   return (2 * freqSpread * Math.sqrt(2 * Math.PI)) / Math.PI;
-}
-
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1); // n === 1 must not divide by zero
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 export function run(rawParams: Partial<KuramotoParams> = {}): SimResult {

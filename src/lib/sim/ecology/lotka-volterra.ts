@@ -35,6 +35,7 @@
 
 import { z } from 'zod';
 import { type Derivative, rk4 } from '../core/ode';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -75,13 +76,6 @@ export function lotkaVolterraDerivative(p: LotkaVolterraParams): Derivative {
 /** Conserved first integral V = δx − γ ln x + βy − α ln y (constant on orbits). */
 export function conservedQuantity(p: LotkaVolterraParams, x: number, y: number): number {
   return p.delta * x - p.gamma * Math.log(x) + p.beta * y - p.alpha * Math.log(y);
-}
-
-/** Evenly pick ~n indices spanning [0, len-1] (keeps endpoints). */
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1); // n === 1 must not divide by zero
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 /** Max of an array without spreading it (spreads overflow the stack at ~1e5). */

@@ -25,6 +25,7 @@
 
 import { z } from 'zod';
 import { type Derivative, rk4 } from '../core/ode';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -89,12 +90,6 @@ export function fixedPoint(
   }
   const v = (lo + hi) / 2;
   return { v, w: (v + a) / b, residual: h(v) };
-}
-
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 export function run(rawParams: Partial<FitzHughNagumoParams> = {}): SimResult {

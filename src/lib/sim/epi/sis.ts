@@ -27,6 +27,7 @@
 
 import { z } from 'zod';
 import { type Derivative, rk45 } from '../core/ode';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -61,12 +62,6 @@ export function sisDerivative(p: SisParams): Derivative {
     const i = Math.min(Math.max(y[0] ?? 0, 0), 1);
     return [p.beta * i * (1 - i) - p.gamma * i];
   };
-}
-
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 export function run(rawParams: Partial<SisParams> = {}): SimResult {

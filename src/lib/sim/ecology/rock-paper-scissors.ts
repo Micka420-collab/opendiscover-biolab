@@ -31,6 +31,7 @@
 
 import { z } from 'zod';
 import type { Derivative, OdeTrajectory } from '../core/ode';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -125,12 +126,6 @@ function integrateOnSimplex(
     traj.push([...y]);
   }
   return { t, y: traj };
-}
-
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
 }
 
 export function run(rawParams: Partial<RockPaperScissorsParams> = {}): SimResult {
