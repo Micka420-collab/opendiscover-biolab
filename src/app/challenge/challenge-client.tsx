@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { recordEngineRun } from '@/lib/lab/achievements';
 import {
   type Challenge,
   TARGET_TOLERANCE,
@@ -71,6 +72,7 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
       const score = challengeScore(challenge, value);
       const met = meetsBar(challenge, value);
       setAttempt({ knob, value, score, met });
+      recordEngineRun(challenge.engine); // count toward the lab dex
 
       if (!best || score > best.score) {
         const next: Best = { knob, value, score };
