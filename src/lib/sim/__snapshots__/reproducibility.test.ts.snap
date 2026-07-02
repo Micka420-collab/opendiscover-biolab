@@ -440,6 +440,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "SIS endemic at R₀=3.00: prevalence settles to i*=0.667.",
   },
+  "two-state-folding": {
+    "metrics": {
+      "deltaG25": 11.0124,
+      "deltaGmax": 11.367,
+      "deltaHm": 250,
+      "fractionFolded25": 0.988368,
+      "maxStabilityTemp": 30.1709,
+      "meltingTemp": 60,
+    },
+    "summary": "Two-state folding: Tm=60°C, ΔG(25°C)=11.0 kJ/mol (98.8% folded), peak stability 11.4 kJ/mol at 30.2°C.",
+  },
   "wilson-cowan": {
     "metrics": {
       "amplitudeE": 0.316775,

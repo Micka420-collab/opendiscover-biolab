@@ -50,6 +50,7 @@ import { spec as hpFolding } from './protein/hp-folding';
 import { spec as massSpec } from './protein/mass-spec';
 import { spec as proteinProperties } from './protein/properties';
 import { spec as secondaryStructure } from './protein/secondary-structure';
+import { spec as twoStateFolding } from './protein/two-state-folding';
 import { spec as rnaFold } from './structural/rna-fold';
 import { spec as branchingGrowth } from './systems/branching-growth';
 import { spec as fba } from './systems/fba';
@@ -72,6 +73,7 @@ export const engines: AnyEngine[] = [
   secondaryStructure,
   hpFolding,
   massSpec,
+  twoStateFolding,
   hodgkinHuxley,
   fitzHughNagumo,
   wilsonCowan,

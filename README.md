@@ -45,6 +45,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `secondary-structure` | Chou–Fasman helix/sheet/coil prediction |
 | | `hp-folding` | HP lattice-model folding via seeded Monte-Carlo energy minimization |
 | | `mass-spec` | Peptide MS/MS b/y fragment-ion prediction; residue masses derived from CODATA atomic masses |
+| | `two-state-folding` | Thermodynamic folding stability curve: ΔG(T), Tm, fraction folded, heat & cold denaturation |
 | ⚙️ Systems biology | `enzyme-kinetics` | Michaelis–Menten, competitive/non-competitive inhibition, Hill cooperativity |
 | | `grn` | Gene regulatory networks: repressilator, toggle switch, feed-forward loops |
 | | `gillespie` | Exact stochastic simulation (SSA) of the chemical master equation |
@@ -188,7 +189,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 45 engines + the lab layer: **950+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 46 engines + the lab layer: **960+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

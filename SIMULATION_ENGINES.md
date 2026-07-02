@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **45 deterministic simulation engines** across
+The OpenDiscover BioLab ships **46 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -18,7 +18,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 ## Catalog
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
-- **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
+- **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
@@ -331,6 +331,42 @@ Predicts monoisotopic b/y fragment-ion m/z values for a peptide under CID/HCD ta
 ```
 
 _Run it: `POST /api/lab/run { "engine": "mass-spec", "params": … }` or interactively at `/lab/mass-spec`._
+
+---
+
+### `two-state-folding` — Two-State Protein Folding (thermal stability)
+
+The thermodynamic two-state model of protein folding: ΔG(T) = ΔHm(1−T/Tm) − ΔCp[(Tm−T)+T·ln(T/Tm)] (Gibbs–Helmholtz), giving the fraction folded f_F = 1/(1+e^(−ΔG/RT)). Reports the melting temperature Tm, the free energy and fraction folded at 25°C, and — because ΔCp>0 — the stability maximum T_maxstab = Tm·exp(−ΔHm/(Tm·ΔCp)) with its peak ΔG. The ΔG(T) stability curve captures both heat and cold denaturation. Closed-form and deterministic; f_F never leaves [0,1].
+
+**References**
+- Becktel, W.J. & Schellman, J.A. (1987) Protein stability curves. Biopolymers 26:1859-1877.
+- Privalov, P.L. (1990) Cold denaturation of proteins. Crit. Rev. Biochem. Mol. Biol. 25:281-305.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `deltaHm` | number | `250` | ≥ 0, ≤ 5000 |  |
+| `tmCelsius` | number | `60` | ≥ -20, ≤ 150 |  |
+| `deltaCp` | number | `8` | ≥ 0, ≤ 100 |  |
+| `tMinCelsius` | number | `-20` | ≥ -50, ≤ 150 |  |
+| `tMaxCelsius` | number | `100` | ≥ -40, ≤ 200 |  |
+| `outputPoints` | integer | `240` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "deltaHm": 250,
+  "tmCelsius": 60,
+  "deltaCp": 8,
+  "tMinCelsius": -20,
+  "tMaxCelsius": 100,
+  "outputPoints": 240
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "two-state-folding", "params": … }` or interactively at `/lab/two-state-folding`._
 
 
 ## 🧠 Neuroscience
