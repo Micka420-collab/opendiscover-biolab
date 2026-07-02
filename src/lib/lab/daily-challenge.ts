@@ -196,6 +196,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.8,
     hint: 'Below the critical coupling Kc ≈ 1.6·σ nothing happens; above it, coherence climbs toward 1. Crank K well past Kc.',
   },
+  {
+    id: 'sis-endemic-half',
+    engine: 'sis',
+    title: 'Set the endemic level to half',
+    brief:
+      'Adjust the transmission rate β of an SIS infection (no immunity — recovered become susceptible again) so its persistent endemic prevalence settles at exactly half the population.',
+    baseParams: { gamma: 0.1, i0: 0.01, tEnd: 200 },
+    knob: {
+      param: 'beta',
+      label: 'Transmission rate β',
+      min: 0.05,
+      max: 0.4,
+      step: 0.005,
+      default: 0.15,
+      unit: '1/day',
+    },
+    metricKey: 'endemicPrevalence',
+    metricLabel: 'Endemic prevalence i*',
+    goal: 'target',
+    target: 0.5,
+    hint: 'Endemic prevalence i* = 1 − 1/R₀ with R₀ = β/γ. Half the population endemic means R₀ = 2, i.e. β = 2γ.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

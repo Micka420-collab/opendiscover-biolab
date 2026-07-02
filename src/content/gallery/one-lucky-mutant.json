@@ -1,0 +1,14 @@
+{
+  "slug": "one-lucky-mutant",
+  "title": "Can one beneficial mutant take over?",
+  "engine": "moran-process",
+  "params": {
+    "populationSize": 100,
+    "initialMutants": 1,
+    "relativeFitness": 1.5,
+    "replicates": 1000
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A single mutant with a 50% fitness edge appears in a population of 100. Selection helps, but drift is brutal — the exact fixation probability is only about 1 in 3, confirmed by a thousand seeded Monte-Carlo runs."
+}

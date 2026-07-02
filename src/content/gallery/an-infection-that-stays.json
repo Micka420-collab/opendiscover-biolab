@@ -1,0 +1,13 @@
+{
+  "slug": "an-infection-that-stays",
+  "title": "An infection that never goes away",
+  "engine": "sis",
+  "params": {
+    "beta": 0.3,
+    "gamma": 0.1,
+    "i0": 0.01
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Without immunity (recovered go straight back to susceptible), an SIS infection with R0=3 doesn't burn out like an SIR epidemic — it climbs from a tiny seed to a persistent endemic steady state at exactly 1 - 1/R0 = 66.7% of the population."
+}
