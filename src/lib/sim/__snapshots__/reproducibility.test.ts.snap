@@ -198,6 +198,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "64 oscillators at K=2 (Kc≈1.60): steady-state coherence ⟨r⟩=0.763 — synchronized.",
   },
+  "levins-metapopulation": {
+    "metrics": {
+      "colonization": 0.5,
+      "equilibriumOccupancy": 0.8,
+      "extinction": 0.1,
+      "extinctionThreshold": 0.8,
+      "finalOccupancy": 0.8,
+      "habitableFraction": 1,
+      "persists": 1,
+    },
+    "summary": "Levins metapopulation: persists at p*=0.800 of patches (0% habitat destroyed; up to 80% is survivable).",
+  },
   "logistic-map": {
     "metrics": {
       "attractorPeriod": 0,

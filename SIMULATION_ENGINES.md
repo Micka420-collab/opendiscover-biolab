@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **38 deterministic simulation engines** across
+The OpenDiscover BioLab ships **39 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1277,6 +1277,45 @@ Two species competing for one limiting substrate in a chemostat. Tilman's R* rul
 ```
 
 _Run it: `POST /api/lab/run { "engine": "chemostat-competition", "params": … }` or interactively at `/lab/chemostat-competition`._
+
+---
+
+### `levins-metapopulation` — Levins Metapopulation (habitat destruction)
+
+A species occupying a network of habitat patches, colonizing empty ones and going locally extinct. With colonization c, extinction e, and habitable fraction h = 1 − destroyed, the regional occupancy settles at p* = h − e/c when h > e/c, else the species is regionally extinct. The consequence is an extinction threshold: destroying more than 1 − e/c of the habitat wipes out the whole metapopulation — often after a delay while occupied patches remain (the extinction debt).
+
+**References**
+- Levins, R. (1969) Some demographic and genetic consequences of environmental heterogeneity for biological control. Bull. Entomol. Soc. Am. 15:237-240.
+- Tilman, D., May, R.M., Lehman, C.L. & Nowak, M.A. (1994) Habitat destruction and the extinction debt. Nature 371:65-66.
+- Hanski, I. (1999) Metapopulation Ecology. Oxford University Press.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `colonization` | number | `0.5` | ≥ 0 |  |
+| `extinction` | number | `0.1` | ≥ 0 |  |
+| `destroyed` | number | `0` | ≥ 0, ≤ 1 |  |
+| `p0` | number | `0.5` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `120` | ≥ 0, ≤ 100000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+| `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "colonization": 0.5,
+  "extinction": 0.1,
+  "destroyed": 0,
+  "p0": 0.5,
+  "tEnd": 120,
+  "tol": 1e-8,
+  "outputPoints": 400
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "levins-metapopulation", "params": … }` or interactively at `/lab/levins-metapopulation`._
 
 
 ## 🏭 Bioprocess

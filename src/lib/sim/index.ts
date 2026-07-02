@@ -18,6 +18,7 @@ import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as chemostatCompetition } from './ecology/chemostat-competition';
+import { spec as levinsMetapopulation } from './ecology/levins-metapopulation';
 import { spec as logisticMap } from './ecology/logistic-map';
 import { spec as lotkaVolterra } from './ecology/lotka-volterra';
 import { spec as nicholsonBailey } from './ecology/nicholson-bailey';
@@ -86,6 +87,7 @@ export const engines: AnyEngine[] = [
   rockPaperScissors,
   nicholsonBailey,
   chemostatCompetition,
+  levinsMetapopulation,
   bioreactor,
   compartmental,
   sis,
