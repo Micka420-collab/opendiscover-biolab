@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **30 deterministic simulation engines** across
+The OpenDiscover BioLab ships **31 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1027,6 +1027,53 @@ Robert May's logistic map x → r·x·(1−x): a one-line discrete population mo
 ```
 
 _Run it: `POST /api/lab/run { "engine": "logistic-map", "params": … }` or interactively at `/lab/logistic-map`._
+
+---
+
+### `rosenzweig-macarthur` — Rosenzweig–MacArthur Predator–Prey
+
+A realistic predator–prey model: logistic (self-limiting) prey and a saturating Holling type-II predator. It has a genuine attractor — a stable coexistence equilibrium or a stable limit cycle — and exhibits the paradox of enrichment: raising the prey carrying capacity K destabilizes the equilibrium into boom–bust oscillations past the Hopf threshold K_H = 2N* + 1/(a·h). Reports the exact interior equilibrium, the enrichment threshold, and both the time course and (N, P) phase portrait.
+
+**References**
+- Rosenzweig, M.L. & MacArthur, R.H. (1963) Graphical representation and stability conditions of predator-prey interactions. Am. Nat. 97:209-223.
+- Rosenzweig, M.L. (1971) Paradox of enrichment: destabilization of exploitation ecosystems in ecological time. Science 171:385-387.
+- Murray, J.D. (2002) Mathematical Biology I: An Introduction, 3rd ed., ch. 3.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `r` | number | `1` | ≥ 0 |  |
+| `k` | number | `6` | ≥ 0 |  |
+| `a` | number | `1` | ≥ 0 |  |
+| `h` | number | `0.5` | ≥ 0 |  |
+| `e` | number | `0.5` | ≥ 0 |  |
+| `m` | number | `0.2` | ≥ 0 |  |
+| `n0` | number | `1` | ≥ 0 |  |
+| `p0` | number | `1` | ≥ 0 |  |
+| `tEnd` | number | `300` | ≥ 0, ≤ 10000 |  |
+| `steps` | integer | `6000` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `600` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "r": 1,
+  "k": 6,
+  "a": 1,
+  "h": 0.5,
+  "e": 0.5,
+  "m": 0.2,
+  "n0": 1,
+  "p0": 1,
+  "tEnd": 300,
+  "steps": 6000,
+  "outputPoints": 600
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "rosenzweig-macarthur", "params": … }` or interactively at `/lab/rosenzweig-macarthur`._
 
 
 ## 🏭 Bioprocess

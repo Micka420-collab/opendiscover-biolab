@@ -264,6 +264,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "4 base pairs over 12 nt (67% paired, 3 stacks, ΔG≈-9.0 kcal/mol): ((((....))))",
   },
+  "rosenzweig-macarthur": {
+    "metrics": {
+      "carryingCapacity": 6,
+      "enrichmentThreshold": 3,
+      "limitCycle": 1,
+      "oscillationAmplitude": 4.78229,
+      "predatorEquilibrium": 1.14583,
+      "preyEquilibrium": 0.5,
+    },
+    "summary": "Rosenzweig–MacArthur: limit cycle (K=6 > K_H=3.00).",
+  },
   "secondary-structure": {
     "metrics": {
       "coilFraction": 0,
