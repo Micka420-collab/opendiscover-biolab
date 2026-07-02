@@ -1,0 +1,9 @@
+{
+  "slug": "a-cortical-neuron-firing",
+  "title": "A cortical neuron, firing",
+  "engine": "izhikevich",
+  "params": { "a": 0.02, "b": 0.2, "c": -65, "d": 8, "current": 10, "tEnd": 300 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Inject a steady current and this two-equation neuron settles into a regular tonic rhythm — spike, reset, recover, repeat. Izhikevich's 2003 model is famous because those four numbers (a, b, c, d) are a dial: nudge them and the same equations become a fast-spiking interneuron, a chattering cell, or an intrinsic burster. Here it's a classic regular-spiking pyramidal cell. The trace is the membrane potential; each vertical stroke is an action potential clipped at its +30 mV peak."
+}

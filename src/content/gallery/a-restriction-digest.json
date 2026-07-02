@@ -1,0 +1,13 @@
+{
+  "slug": "a-restriction-digest",
+  "title": "A restriction digest, cut by cut",
+  "engine": "cloning",
+  "params": {
+    "sequence": "AAAAGAATTCCCCCCGGATCCTTTT",
+    "enzymes": ["EcoRI", "BamHI"],
+    "circular": false
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Restriction enzymes are molecular scissors that cut DNA only at their recognition site — EcoRI at GAATTC, BamHI at GGATCC. Feed this fragment through both and it finds every site, cuts, and reports the resulting pieces and their sticky ends. Matching those overhangs is how you paste genes into plasmids. This little multiple-cloning-site cassette is the workhorse motif of classic molecular cloning, decades before Gibson assembly made it seamless."
+}

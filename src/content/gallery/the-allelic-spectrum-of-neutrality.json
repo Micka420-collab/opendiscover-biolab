@@ -1,0 +1,9 @@
+{
+  "slug": "the-allelic-spectrum-of-neutrality",
+  "title": "The allelic spectrum of neutrality",
+  "engine": "ewens-sampling",
+  "params": { "sampleSize": 50, "theta": 1 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Sample 50 genes at a neutral locus and ask: how do they fall into allele classes? Ewens' 1972 sampling formula answers exactly, from a single number θ = 4Nμ. Most alleles are singletons (seen once), a few are common — a lopsided spectrum that is the fingerprint of pure drift and mutation with no selection. Expected distinct alleles E[K] = Σ θ/(θ+i); expected homozygosity 1/(1+θ). Deviations from this curve are how the Ewens–Watterson test detects selection in real data."
+}

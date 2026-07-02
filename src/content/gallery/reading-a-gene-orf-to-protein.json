@@ -1,0 +1,12 @@
+{
+  "slug": "reading-a-gene-orf-to-protein",
+  "title": "Reading a gene, ORF to protein",
+  "engine": "sequence",
+  "params": {
+    "sequence": "CACAATGGCTAGCAAAGATCTGTTTTGGCATCCGGTTATGGAAAAGCTGAGCGATTTTTGGCATTAAGTGT",
+    "minOrfCodons": 20
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Hand it a stretch of DNA and it does what a molecular biologist does first: find the open reading frame (ATG … stop), translate it through the genetic code, and profile the sequence — GC content, melting temperature, codon count. This synthetic construct hides a 20-codon ORF between short UTRs. From bases to amino acids in one deterministic pass — the reading step behind every gene annotation."
+}

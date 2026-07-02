@@ -1,0 +1,18 @@
+{
+  "slug": "a-pcr-that-actually-amplifies",
+  "title": "A PCR that actually amplifies",
+  "engine": "pcr",
+  "params": {
+    "template": "CAGTCAGTCAATGCGTACCGGATCCAAGCTCGATTAGCGCTAGGTTCACCTGATCGATCACTGGATCCTTAGCACGTTACGGATCGTACATTGCAGCTAAGGCATCGTACGGATCCGGAT",
+    "forwardPrimer": "ATGCGTACCGGATCCAAGCT",
+    "reversePrimer": "GTACGATGCCTTAGCTGCAA",
+    "primerLength": 20,
+    "tmTarget": 58,
+    "tmMethod": "auto",
+    "maxMismatches": 0,
+    "seed": "pcr"
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Two 20-mer primers, one template — will they amplify, and what comes out? This finds each primer's binding site, checks the orientation, and reports the amplicon plus the melting temperatures that decide your annealing step. Primer design is the make-or-break of every PCR: mismatched Tm's, off-target sites, or primers pointing the wrong way all kill the reaction. Here the pair frames a clean product from a synthetic template — the everyday sanity check before ordering oligos."
+}

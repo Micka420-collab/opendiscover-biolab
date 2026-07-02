@@ -1,0 +1,16 @@
+{
+  "slug": "aligning-two-sequences",
+  "title": "Aligning two sequences, base by base",
+  "engine": "alignment",
+  "params": {
+    "seqA": "GATTACAGTC",
+    "seqB": "GCATGCAGTC",
+    "mode": "global",
+    "match": 2,
+    "mismatch": -1,
+    "gap": -2
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "How similar are two sequences — and exactly where do they differ? Needleman–Wunsch fills a scoring matrix (reward matches, penalize mismatches and gaps) and traces back the single best global alignment, the foundation of all of bioinformatics. Change 'global' to 'local' and it becomes Smith–Waterman, finding the best-matching sub-region instead. Every BLAST hit, every variant call, every phylogeny starts with an alignment like this one."
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "a-crispr-guide-and-its-off-targets",
+  "title": "A CRISPR guide and its off-targets",
+  "engine": "crispr",
+  "params": {
+    "sequence": "ACGTACGTACGTACGTACGTAGGCTAGCTAGCTAGCTAGCTTTTACCGGTACCGGTACCGGTACCGG",
+    "enzyme": "SpCas9",
+    "maxMismatch": 3,
+    "seed": "crispr"
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Cas9 only cuts where a 20-nt guide matches next to a PAM (for SpCas9, an NGG). This scans a sequence for every valid protospacer, then hunts the rest of the DNA for near-matches — the off-target sites (up to 3 mismatches here) that make or break a genome edit. Off-target prediction is the central safety question of CRISPR therapeutics: the ideal guide is the one whose 20-mer is unique. Swap the enzyme to Cas12a and the PAM rules — and the whole candidate list — change."
+}
