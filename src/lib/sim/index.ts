@@ -23,6 +23,7 @@ import { spec as nicholsonBailey } from './ecology/nicholson-bailey';
 import { spec as rockPaperScissors } from './ecology/rock-paper-scissors';
 import { spec as rosenzweigMacArthur } from './ecology/rosenzweig-macarthur';
 import { spec as compartmental } from './epi/compartmental';
+import { spec as sirEndemic } from './epi/sir-endemic';
 import { spec as sis } from './epi/sis';
 import { spec as breeding } from './genetics/breeding';
 import { spec as alignment } from './molbio/alignment';
@@ -86,6 +87,7 @@ export const engines: AnyEngine[] = [
   bioreactor,
   compartmental,
   sis,
+  sirEndemic,
   admet,
   docking,
   doseResponse,

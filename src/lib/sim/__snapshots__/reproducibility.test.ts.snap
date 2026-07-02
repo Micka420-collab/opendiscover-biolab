@@ -341,6 +341,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Longest ORF: frame +2 (+), 20 aa — MASKDLFWHPVMEKLSDFWH",
   },
+  "sir-endemic": {
+    "metrics": {
+      "endemic": 1,
+      "endemicPrevalence": 0.0709091,
+      "finalInfected": 0.0709091,
+      "meanInfected": 0.0709091,
+      "r0": 4.54545,
+      "susceptibleEquilibrium": 0.22,
+    },
+    "summary": "Endemic SIR (R₀=4.55): damped oscillations settle to I*=0.0709, S*=0.220.",
+  },
   "sis": {
     "metrics": {
       "endemic": 1,

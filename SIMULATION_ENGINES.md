@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **36 deterministic simulation engines** across
+The OpenDiscover BioLab ships **37 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
-- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis)
+- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
 - **🔬 Structural** — [`rna-fold`](#rna-fold)
 
@@ -1375,6 +1375,47 @@ The SIS model for infections that confer no lasting immunity: the infected recov
 ```
 
 _Run it: `POST /api/lab/run { "engine": "sis", "params": … }` or interactively at `/lab/sis`._
+
+---
+
+### `sir-endemic` — Endemic SIR (with demography)
+
+SIR with vital dynamics: births continually replenish susceptibles, so an infection can persist as an endemic steady state reached through damped oscillations — the recurrent epidemics of measles and pertussis. With R0 = beta/(gamma+mu), it dies out for R0 ≤ 1 and settles at S* = 1/R0, I* = mu·(R0−1)/beta for R0 > 1.
+
+**References**
+- Anderson, R.M. & May, R.M. (1991) Infectious Diseases of Humans: Dynamics and Control, ch. 6.
+- Hethcote, H.W. (2000) The mathematics of infectious diseases. SIAM Review 42:599-653.
+- Keeling, M.J. & Rohani, P. (2008) Modeling Infectious Diseases in Humans and Animals, ch. 2.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `beta` | number | `0.5` | ≥ 0 |  |
+| `gamma` | number | `0.1` | ≥ 0 |  |
+| `mu` | number | `0.01` | ≥ 0 |  |
+| `i0` | number | `0.001` | ≥ 0, ≤ 1 |  |
+| `r0` | number | `0` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `2000` | ≥ 0, ≤ 100000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+| `outputPoints` | integer | `600` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "beta": 0.5,
+  "gamma": 0.1,
+  "mu": 0.01,
+  "i0": 0.001,
+  "r0": 0,
+  "tEnd": 2000,
+  "tol": 1e-8,
+  "outputPoints": 600
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "sir-endemic", "params": … }` or interactively at `/lab/sir-endemic`._
 
 
 ## 💊 Drug discovery
