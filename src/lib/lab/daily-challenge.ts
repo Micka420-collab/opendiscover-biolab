@@ -175,6 +175,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0,
     hint: 'Below the Feigenbaum point (~3.5699) the map is periodic and λ < 0; above it, chaotic with λ > 0. The edge of chaos is exactly where λ = 0.',
   },
+  {
+    id: 'firefly-sync',
+    engine: 'kuramoto',
+    title: 'Make the fireflies sync',
+    brief:
+      'Raise the coupling strength K between a swarm of oscillators until they lock into a common rhythm — push the steady-state coherence ⟨r⟩ as high as you can.',
+    baseParams: {
+      oscillators: 40,
+      freqSpread: 1,
+      tEnd: 30,
+      steps: 800,
+      outputPoints: 100,
+      seed: 'firefly-daily',
+    },
+    knob: { param: 'coupling', label: 'Coupling K', min: 0, max: 8, step: 0.25, default: 0 },
+    metricKey: 'meanOrderParameter',
+    metricLabel: 'Steady-state coherence ⟨r⟩',
+    goal: 'maximize',
+    par: 0.8,
+    hint: 'Below the critical coupling Kc ≈ 1.6·σ nothing happens; above it, coherence climbs toward 1. Crank K well past Kc.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

@@ -1,0 +1,13 @@
+{
+  "slug": "population-out-of-hwe",
+  "title": "A population out of Hardy-Weinberg",
+  "engine": "hardy-weinberg",
+  "params": {
+    "countAA": 60,
+    "countAa": 20,
+    "countaa": 20
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "A clear heterozygote deficit: far fewer Aa individuals than random mating predicts. The chi-square test rejects Hardy-Weinberg and the inbreeding coefficient F comes out around 0.5 — a textbook signature of inbreeding or population structure."
+}

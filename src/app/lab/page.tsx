@@ -1,4 +1,5 @@
 import { ExplorationProgress } from '@/components/lab/exploration-progress';
+import { SurpriseMe } from '@/components/lab/surprise-me';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listDomains, listEngines } from '@/lib/sim';
@@ -24,13 +25,16 @@ export default function LabPage() {
 
   return (
     <div className="space-y-10">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold">Lab</h1>
-        <p className="text-muted-foreground max-w-2xl">
-          {listEngines().length} deterministic simulation engines. Pick one to set parameters and
-          run it — no account, no database, no secrets. Every run is content-hashed and
-          reproducible.
-        </p>
+      <header className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Lab</h1>
+          <p className="text-muted-foreground max-w-2xl">
+            {listEngines().length} deterministic simulation engines. Pick one to set parameters and
+            run it — no account, no database, no secrets. Every run is content-hashed and
+            reproducible.
+          </p>
+        </div>
+        <SurpriseMe slugs={listEngines().map((e) => e.slug)} />
       </header>
 
       <ExplorationProgress

@@ -1,0 +1,15 @@
+{
+  "slug": "firefly-synchronization",
+  "title": "Fireflies finding a rhythm",
+  "engine": "kuramoto",
+  "params": {
+    "oscillators": 64,
+    "coupling": 2.5,
+    "freqSpread": 1,
+    "tEnd": 40,
+    "seed": "fireflies"
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Sixty-four oscillators with different natural frequencies, coupled just above the critical strength — watch the order parameter climb as an incoherent swarm spontaneously locks into a shared rhythm, the same math behind synchronized fireflies and pacemaker cells."
+}
