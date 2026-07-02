@@ -165,6 +165,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
   },
+  "kuramoto": {
+    "metrics": {
+      "coupling": 2,
+      "criticalCoupling": 1.59577,
+      "finalOrderParameter": 0.80666,
+      "meanOrderParameter": 0.762934,
+      "oscillators": 64,
+      "synchronized": 1,
+    },
+    "summary": "64 oscillators at K=2 (Kc≈1.60): steady-state coherence ⟨r⟩=0.763 — synchronized.",
+  },
   "logistic-map": {
     "metrics": {
       "attractorPeriod": 0,

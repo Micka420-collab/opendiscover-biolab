@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **28 deterministic simulation engines** across
+The OpenDiscover BioLab ships **29 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -20,7 +20,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
-- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
+- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
@@ -501,6 +501,45 @@ Exact stochastic simulation of the chemical master equation via Gillespie’s di
 ```
 
 _Run it: `POST /api/lab/run { "engine": "gillespie", "params": … }` or interactively at `/lab/gillespie`._
+
+---
+
+### `kuramoto` — Kuramoto Synchronization
+
+A population of coupled phase oscillators (fireflies, pacemaker cells, neurons) that spontaneously synchronize once the global coupling K exceeds a critical value Kc. Integrates the mean-field Kuramoto equations and tracks the order parameter r (0 = incoherent, 1 = fully synchronized) over time. Natural frequencies and initial phases are drawn from a seeded PRNG, so runs are reproducible.
+
+**References**
+- Kuramoto, Y. (1975) Self-entrainment of a population of coupled non-linear oscillators. LNP 39:420-422.
+- Strogatz, S.H. (2000) From Kuramoto to Crawford. Physica D 143:1-20.
+- Acebrón, J.A. et al. (2005) The Kuramoto model. Rev. Mod. Phys. 77:137-185.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `oscillators` | integer | `64` | ≥ 2, ≤ 2000 |  |
+| `coupling` | number | `2` | ≥ 0 |  |
+| `freqSpread` | number | `1` | ≥ 0 |  |
+| `tEnd` | number | `40` | ≥ 0, ≤ 10000 |  |
+| `steps` | integer | `2000` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
+| `seed` | json | `kuramoto` |  |  |
+
+**Example**
+
+```json
+{
+  "oscillators": 64,
+  "coupling": 2,
+  "freqSpread": 1,
+  "tEnd": 40,
+  "steps": 2000,
+  "outputPoints": 400,
+  "seed": "kuramoto"
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "kuramoto", "params": … }` or interactively at `/lab/kuramoto`._
 
 ---
 

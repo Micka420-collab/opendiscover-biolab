@@ -39,6 +39,7 @@ import { spec as branchingGrowth } from './systems/branching-growth';
 import { spec as fba } from './systems/fba';
 import { spec as gillespie } from './systems/gillespie';
 import { spec as grn } from './systems/grn';
+import { spec as kuramoto } from './systems/kuramoto';
 import { spec as metabolicPathway } from './systems/metabolic-pathway';
 
 import type { SimResult } from './core/types';
@@ -59,6 +60,7 @@ export const engines: AnyEngine[] = [
   enzymeKinetics,
   grn,
   gillespie,
+  kuramoto,
   branchingGrowth,
   fba,
   metabolicPathway,
