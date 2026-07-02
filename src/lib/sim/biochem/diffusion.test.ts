@@ -66,6 +66,16 @@ describe('diffusion (Stokes–Einstein)', () => {
     expect(metric(big, 'timeToCrossCell')).toBeGreaterThan(metric(small, 'timeToCrossCell'));
   });
 
+  it('rejects a denormal radius/viscosity and keeps D finite at the bounds (regression)', () => {
+    // Previously radius=5e-324 passed positive() then rM=radius*1e-9 underflowed to 0 → D=Infinity.
+    expect(() => run({ radius: 5e-324 })).toThrow();
+    expect(() => run({ radius: 1e-160, viscosity: 1e-160 })).toThrow();
+    // At the tightest allowed radius/viscosity D is still finite and positive.
+    const d = metric(run({ radius: 1e-3, viscosity: 1e-6 }), 'diffusionCoefficient');
+    expect(Number.isFinite(d)).toBe(true);
+    expect(d).toBeGreaterThan(0);
+  });
+
   it('exposes the displacement curve and is deterministic', () => {
     const r = run({ radius: 5, outputPoints: 30 });
     expect(r.series?.[0]?.x).toHaveLength(30);

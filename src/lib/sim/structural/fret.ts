@@ -29,10 +29,10 @@ import { provenance } from '../core/types';
 
 export const paramsSchema = z
   .object({
-    /** Donor–acceptor distance r (nm). */
-    distance: z.number().positive().max(1000).default(5),
-    /** Förster radius R0 (nm) — the distance of 50% transfer efficiency. */
-    forsterRadius: z.number().positive().max(1000).default(5),
+    /** Donor–acceptor distance r (nm). Lower bound is sub-atomic — keeps (r/R0)⁶ finite. */
+    distance: z.number().min(0.01).max(1000).default(5),
+    /** Förster radius R0 (nm) — the distance of 50% transfer. Lower bound keeps r/R0 finite. */
+    forsterRadius: z.number().min(0.01).max(1000).default(5),
     /** Points in the plotted E-vs-r curve. */
     outputPoints: z.number().int().min(4).max(4000).default(200),
   })

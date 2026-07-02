@@ -36,15 +36,16 @@ export const paramsSchema = z
     /** Eddy-diffusion term A (mm) — the velocity-independent floor. */
     aTerm: z.number().min(0).max(100).default(0.5),
     /** Longitudinal-diffusion term B (mm·mm/s) — dominates at low velocity. */
-    bTerm: z.number().positive().max(1e4).default(2),
-    /** Mass-transfer term C (mm·s/mm) — dominates at high velocity. */
-    cTerm: z.number().positive().max(1e4).default(0.05),
+    bTerm: z.number().min(1e-6).max(1e4).default(2),
+    /** Mass-transfer term C (mm·s/mm) — dominates at high velocity. Lower bound keeps
+     * u_opt=√(B/C) finite. */
+    cTerm: z.number().min(1e-6).max(1e4).default(0.05),
     /** Mobile-phase velocity u at which to report the plate height (mm/s). */
-    velocity: z.number().positive().max(1e4).default(2),
+    velocity: z.number().min(1e-6).max(1e4).default(2),
     /** Column length L (mm), for the plate-count N = L/H. */
     columnLength: z.number().positive().max(1e6).default(100),
-    /** Highest velocity plotted (mm/s). */
-    velocityMax: z.number().positive().max(1e4).default(12),
+    /** Highest velocity plotted (mm/s). Lower bound keeps B/uMin finite in the curve. */
+    velocityMax: z.number().min(1e-3).max(1e4).default(12),
     /** Points in the plotted van Deemter curve. */
     outputPoints: z.number().int().min(4).max(4000).default(200),
   })
@@ -61,8 +62,9 @@ export function run(rawParams: Partial<VanDeemterParams> = {}): SimResult {
   const p = paramsSchema.parse(rawParams);
   const { aTerm: a, bTerm: b, cTerm: c } = p;
 
-  // Closed-form optimum from dH/du = −B/u² + C = 0.
-  const uOpt = Math.sqrt(b / c);
+  // Closed-form optimum from dH/du = −B/u² + C = 0. Compute as √B/√C (not √(B/C)) so the
+  // intermediate ratio cannot overflow to Infinity for extreme B/C.
+  const uOpt = Math.sqrt(b) / Math.sqrt(c);
   const hMin = a + 2 * Math.sqrt(b * c);
   const hAtU = plateHeight(p.velocity, a, b, c);
   const platesPerMetre = 1000 / hAtU; // H in mm → plates per 1000 mm

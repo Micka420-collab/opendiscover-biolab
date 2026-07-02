@@ -74,6 +74,17 @@ describe('van-deemter (chromatography plate height)', () => {
     expect(metric(tight, 'minPlateHeight')).toBeLessThan(metric(wide, 'minPlateHeight'));
   });
 
+  it('rejects extreme B/C and tiny velocityMax; u_opt and the curve stay finite (regression)', () => {
+    // Previously cTerm=1e-305 passed positive() and √(B/C) overflowed → optimalVelocity=Infinity.
+    expect(() => run({ bTerm: 1e4, cTerm: 1e-305 })).toThrow();
+    // Previously velocityMax=1e-305 made uMin subnormal and B/uMin overflowed the plotted curve.
+    expect(() => run({ velocityMax: 1e-305, outputPoints: 4000, bTerm: 1e4 })).toThrow();
+    // At the extreme in-bounds ratio u_opt is still finite (√B/√C form, no √(B/C) overflow).
+    const r = run({ bTerm: 1e4, cTerm: 1e-6 });
+    expect(Number.isFinite(metric(r, 'optimalVelocity'))).toBe(true);
+    expect(r.series?.[0]?.y.plateHeight.every((v) => Number.isFinite(v))).toBe(true);
+  });
+
   it('exposes the van Deemter curve and is deterministic', () => {
     const r = run({ outputPoints: 40 });
     expect(r.series?.[0]?.x).toHaveLength(40);

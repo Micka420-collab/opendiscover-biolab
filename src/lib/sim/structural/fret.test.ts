@@ -66,6 +66,17 @@ describe('fret (Förster molecular ruler)', () => {
     expect(tooClose.metrics.find((m) => m.key === 'sensitivity')?.note).toMatch(/poor ruler/);
   });
 
+  it('rejects a sub-physical Förster radius and keeps sensitivity finite at the bound (regression)', () => {
+    // Previously forsterRadius=1e-60 passed positive() and (r/R0)^6 overflowed → sensitivity NaN.
+    expect(() => run({ distance: 1000, forsterRadius: 1e-60 })).toThrow();
+    // At the tightest allowed radius the sensitivity metric is still finite.
+    const r = run({ distance: 1000, forsterRadius: 0.01 });
+    expect(Number.isFinite(r.metrics.find((m) => m.key === 'sensitivity')?.value as number)).toBe(
+      true,
+    );
+    expect(r.series?.[0]?.y.sensitivity.every((v) => Number.isFinite(v))).toBe(true);
+  });
+
   it('exposes an E-vs-r curve and is deterministic', () => {
     const r = run({ distance: 5, forsterRadius: 5, outputPoints: 40 });
     expect(r.series?.[0]?.x).toHaveLength(40);

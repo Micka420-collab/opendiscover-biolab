@@ -33,10 +33,11 @@ const CELL_DIAMETER_UM = 10;
 
 export const paramsSchema = z
   .object({
-    /** Hydrodynamic radius of the particle (nm). */
-    radius: z.number().positive().max(1e6).default(5),
-    /** Solvent viscosity η (mPa·s; water ≈ 1). */
-    viscosity: z.number().positive().max(1e6).default(1),
+    /** Hydrodynamic radius of the particle (nm). Lower bound (1 pm) keeps 6π·η·r from
+     * underflowing to 0 after the nm→m conversion. */
+    radius: z.number().min(1e-3).max(1e6).default(5),
+    /** Solvent viscosity η (mPa·s; water ≈ 1). Lower bound keeps the denominator finite. */
+    viscosity: z.number().min(1e-6).max(1e6).default(1),
     /** Temperature (°C). */
     temperatureC: z.number().min(-20).max(200).default(20),
     /** Spatial dimensions for the mean-squared displacement (1, 2, or 3). */
