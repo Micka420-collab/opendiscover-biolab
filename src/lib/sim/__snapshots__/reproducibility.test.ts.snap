@@ -137,6 +137,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "repressilator oscillates with period ≈ 8.41 time units across 3 genes.",
   },
+  "hardy-weinberg": {
+    "metrics": {
+      "chiSquare": 0.00616929,
+      "expectedHeterozygosity": 0.4838,
+      "freqA": 0.59,
+      "freqa": 0.41,
+      "inbreedingCoefficient": 0.00785449,
+      "observedHeterozygosity": 0.48,
+      "rejectedHW": 0,
+    },
+    "summary": "Consistent with Hardy–Weinberg (χ²=0.01 ≤ 3.841); p(A)=0.590.",
+  },
   "hodgkin-huxley": {
     "metrics": {
       "peakPotential": 39.0387,

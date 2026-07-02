@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **27 deterministic simulation engines** across
+The OpenDiscover BioLab ships **28 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -21,7 +21,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`breeding`](#breeding)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental)
@@ -737,6 +737,37 @@ Reconstructs a phylogenetic tree from aligned nucleotide sequences (DNA or RNA; 
 ```
 
 _Run it: `POST /api/lab/run { "engine": "phylogenetics", "params": … }` or interactively at `/lab/phylogenetics`._
+
+---
+
+### `hardy-weinberg` — Hardy–Weinberg Equilibrium
+
+Tests observed genotype counts (AA, Aa, aa) at a biallelic locus against Hardy–Weinberg equilibrium. Estimates allele frequencies p and q, computes the expected p²:2pq:q² genotype proportions, runs a chi-square goodness-of-fit test (df=1), and reports the inbreeding coefficient F = 1 − H_obs/H_exp. A large χ² flags departure from random mating (selection, inbreeding, structure).
+
+**References**
+- Hardy, G.H. (1908) Mendelian proportions in a mixed population. Science 28:49-50.
+- Weinberg, W. (1908) Über den Nachweis der Vererbung beim Menschen.
+- Hartl, D.L. & Clark, A.G. (2007) Principles of Population Genetics, 4th ed.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `countAA` | integer | `35` | ≥ 0 |  |
+| `countAa` | integer | `48` | ≥ 0 |  |
+| `countaa` | integer | `17` | ≥ 0 |  |
+
+**Example**
+
+```json
+{
+  "countAA": 35,
+  "countAa": 48,
+  "countaa": 17
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "hardy-weinberg", "params": … }` or interactively at `/lab/hardy-weinberg`._
 
 ---
 
