@@ -1,6 +1,22 @@
 # Contributing to OpenDiscover
 
-Thank you for your interest in contributing to OpenDiscover, the citizen-science discovery platform for in-silico biology. This document covers everything you need to get started.
+Thank you for your interest in contributing to OpenDiscover BioLab, the open-source in-silico biology lab. This document covers everything you need to get started.
+
+## Two contribution tracks
+
+There are two ways to contribute, and the first needs **no database, no keys, and no secrets**:
+
+1. **The simulation / lab track (no infrastructure).** Add a deterministic simulation engine, or
+   contribute an interesting run to the community gallery. Everything runs on pure functions —
+   `pnpm install && pnpm test:sim` and you have a green-check loop with zero setup. Start here.
+   → [Add a simulation engine](#add-a-simulation-engine-no-infrastructure) ·
+   [Submit an experiment to the gallery](#submit-an-experiment-to-the-gallery)
+2. **The discovery-pipeline track (DB-backed).** Add a citizen-science *protocol* to the
+   discovery pipeline. This track needs Postgres + pgvector and is where dual-use screening applies.
+   → [Adding a new science protocol](#adding-a-new-science-protocol)
+
+If you're new, the simulation track is the fun, fast on-ramp — you can ship a new engine or a gallery
+entry without provisioning anything.
 
 ---
 
@@ -67,6 +83,58 @@ All tests live under `src/` next to the code they cover, using the `*.test.ts` n
 
 ---
 
+## Add a simulation engine (no infrastructure)
+
+Simulation engines are the heart of the lab: pure, deterministic functions (no clock, no network,
+no unseeded randomness) that turn parameters into a hashed, reproducible `SimResult`. No database or
+secrets are involved, so the whole loop is `pnpm test:sim`.
+
+Full walkthrough with a copy-paste template: **[`docs/ADDING_AN_ENGINE.md`](./docs/ADDING_AN_ENGINE.md)**.
+In short:
+
+1. Create `src/lib/sim/<domain>/<engine>.ts` — a Zod `paramsSchema`, a pure `run(params)` returning a
+   `SimResult`, an `example`, and an exported `spec: EngineSpec`. Copy an existing engine (e.g.
+   `src/lib/sim/bioprocess/bioreactor.ts`) as your starting point.
+2. Register it: one `import` + one array entry in [`src/lib/sim/index.ts`](./src/lib/sim/index.ts).
+3. Add `src/lib/sim/<domain>/<engine>.test.ts` that checks the output against a **known analytical or
+   textbook value** — not just "it runs" — and includes a determinism assertion (same input → same hash).
+4. `pnpm test:sim` (engines only, no secrets) then `pnpm docs:engines` to regenerate
+   [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md) from the registry so the catalog can't drift.
+
+Your engine then shows up automatically in `/lab`, gets a share/remix permalink, an OG card, and an
+OBS overlay — for free.
+
+---
+
+## Submit an experiment to the gallery
+
+Found a run worth sharing? Add it to the [community gallery](./src/content/gallery) with a
+**one-file pull request** — full credit to you.
+
+1. Copy an existing entry in `src/content/gallery/` (e.g. `chemostat-peak-productivity.json`) to a new
+   `your-slug.json`.
+2. Fill in the fields:
+
+   ```json
+   {
+     "slug": "kebab-case-unique-id",
+     "title": "A short, human title",
+     "engine": "bioreactor",
+     "params": { "mode": "chemostat", "d": 0.77 },
+     "author": "Your name or handle",
+     "credit": "https://your-profile-or-@handle",
+     "blurb": "One or two sentences on what makes this run interesting."
+   }
+   ```
+
+3. `pnpm test` — the gallery loader validates every entry against the target engine's own Zod schema
+   at build time, so an unknown engine or malformed params **fails CI and never renders**.
+4. Open a PR. Curation is a human merge review — no auto-accept.
+
+Your entry appears on `/gallery` with an "Open in Lab" button that loads the exact run.
+
+---
+
 ## Adding a New Science Protocol
 
 OpenDiscover protocols are self-describing pipelines that citizen scientists run against biological data. Each protocol registers itself through the central dispatcher.
@@ -105,6 +173,8 @@ If your protocol could plausibly be used to design harmful biological agents, it
 - [ ] `pnpm lint` passes
 - [ ] `pnpm typecheck` passes
 - [ ] `pnpm test` passes
+- [ ] New engines have a known-value + determinism test, and `pnpm docs:engines` was re-run
+- [ ] New gallery entries validate (`pnpm test`)
 - [ ] New/updated protocols have tests
 - [ ] `pnpm db:push` still works (no broken migrations)
 

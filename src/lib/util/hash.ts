@@ -7,7 +7,7 @@
  */
 
 export async function canonicalHash(value: unknown): Promise<string> {
-  const json = canonicalize(value);
+  const json = canonicalJson(value);
   const bytes = new TextEncoder().encode(json);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return Array.from(new Uint8Array(digest))
@@ -15,11 +15,16 @@ export async function canonicalHash(value: unknown): Promise<string> {
     .join('');
 }
 
-function canonicalize(v: unknown): string {
+/**
+ * Canonical JSON string of a value: stable (sorted) key order, no whitespace.
+ * Two semantically-equal values always stringify identically — the basis for
+ * both {@link canonicalHash} and stable, dedup-friendly share tokens.
+ */
+export function canonicalJson(v: unknown): string {
   if (v === null || typeof v !== 'object') return JSON.stringify(v);
-  if (Array.isArray(v)) return `[${v.map(canonicalize).join(',')}]`;
+  if (Array.isArray(v)) return `[${v.map(canonicalJson).join(',')}]`;
   const keys = Object.keys(v as Record<string, unknown>).sort();
   return `{${keys
-    .map((k) => `${JSON.stringify(k)}:${canonicalize((v as Record<string, unknown>)[k])}`)
+    .map((k) => `${JSON.stringify(k)}:${canonicalJson((v as Record<string, unknown>)[k])}`)
     .join(',')}}`;
 }

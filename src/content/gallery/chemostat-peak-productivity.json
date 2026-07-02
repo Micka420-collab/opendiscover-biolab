@@ -1,0 +1,19 @@
+{
+  "slug": "chemostat-peak-productivity",
+  "title": "Chemostat tuned near peak productivity",
+  "engine": "bioreactor",
+  "params": {
+    "mode": "chemostat",
+    "muMax": 0.9,
+    "ks": 0.2,
+    "yxs": 0.5,
+    "sin": 10,
+    "d": 0.77,
+    "x0": 0.1,
+    "s0": 10,
+    "tEnd": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "A continuous fermenter tuned to a dilution rate just below washout, where steady-state biomass productivity D-X* peaks — the same optimization as today's daily challenge."
+}

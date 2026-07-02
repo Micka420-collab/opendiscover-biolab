@@ -1,0 +1,16 @@
+{
+  "slug": "sir-r0-3-outbreak",
+  "title": "An SIR outbreak at R0 = 3",
+  "engine": "compartmental",
+  "params": {
+    "model": "SIR",
+    "beta": 0.3,
+    "gamma": 0.1,
+    "population": 1000000,
+    "i0": 10,
+    "tMax": 160
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A classic susceptible-infectious-removed epidemic with basic reproduction number 3: a ~94% final attack rate and a sharp mid-outbreak peak in the infectious curve."
+}

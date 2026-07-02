@@ -143,10 +143,10 @@ src/
 │   └── discovery/                        MoleculeViewer (Mol*), LiveDiscoveryFeed (SSE)
 ├── lib/
 │   ├── ai/
-│   │   ├── agents/novelty-agent.ts       Opus 4.7 agent + tool use
+│   │   ├── agents/novelty-agent.ts       Opus 4.8 agent + tool use
 │   │   ├── tools/                        Europe PMC, UniProt, internal corpus tools
 │   │   ├── triage.ts                     Haiku 4.5 noise filter
-│   │   ├── vulgarize.ts                  Sonnet 4.6 card + Vega-Lite generator
+│   │   ├── vulgarize.ts                  Sonnet 5 card + Vega-Lite generator
 │   │   ├── embeddings.ts                 text-embedding-3-large via gateway
 │   │   ├── novelty.ts                    Composite scoring
 │   │   └── pattern-detect.ts             Embedding-based corroboration clustering

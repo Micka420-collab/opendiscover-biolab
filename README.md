@@ -68,6 +68,34 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 
 ---
 
+## Streamers & creators
+
+Because every run is deterministic, **any experiment is already a shareable link** — the whole
+lab is built to be streamed, shared, and remixed with no account and no infrastructure.
+
+- **🔗 Share & remix permalinks.** Every engine playground has a **Share / Remix** button that packs
+  the exact engine + parameters into a `?x=` link. Whoever opens it reproduces your run
+  byte-for-byte (same numbers, same content hash), then tweaks a value and re-shares their remix.
+  The link is self-contained — nothing is uploaded or stored server-side.
+- **🎯 Daily challenge — [`/challenge`](./src/app/challenge).** One puzzle a day, derived purely from
+  the date, so it's the *same for everyone on Earth* with no server and no RNG. Tune one parameter,
+  beat the target, and share your best attempt as a normal `?x=` link. A ready-made "today's episode"
+  hook for a stream. Your personal best is stored locally in your browser — no global leaderboard.
+- **🖼️ Rich social cards.** Every engine page and every shared run unfurls into a branded
+  1200×630 Open Graph image. A shared `?x=` link shows the engine, its headline metric, and the
+  reproducibility hash — so links dropped in Discord/X/Twitch chat look alive.
+- **📺 OBS overlay mode.** Append `/overlay` to any engine link —
+  `/lab/<engine>/overlay?x=<token>` — for a transparent, chrome-less, big-type result card that
+  auto-runs on load. Add it as a **Browser Source** in OBS (1920×1080, transparent background) and
+  your stream shows live engine output with its hash as proof. The **📺 OBS overlay** button in the
+  playground builds the URL for you.
+- **🖼️ Community gallery — [`/gallery`](./src/app/gallery).** A curated, credited collection of
+  interesting runs. Each opens in the Lab in one click. Adding yours is a **one-file pull request**
+  (see [`CONTRIBUTING.md`](./CONTRIBUTING.md)); a build-time check validates every entry against its
+  engine's schema, so a broken run can never merge.
+
+---
+
 ## The autonomous scientist
 
 ```ts
@@ -140,7 +168,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 20 engines + the lab layer: **500+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 25 engines + the lab layer: **700+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

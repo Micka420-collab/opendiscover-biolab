@@ -1,0 +1,30 @@
+{
+  "slug": "mendel-dihybrid-peas",
+  "title": "Mendel's 9:3:3:1 dihybrid cross",
+  "engine": "breeding",
+  "params": {
+    "genes": [
+      {
+        "symbol": "A",
+        "name": "Seed shape",
+        "alleles": [{ "symbol": "A", "label": "Round" }, { "symbol": "a", "label": "Wrinkled" }],
+        "mode": "complete",
+        "dominant": "A"
+      },
+      {
+        "symbol": "B",
+        "name": "Seed colour",
+        "alleles": [{ "symbol": "B", "label": "Yellow" }, { "symbol": "b", "label": "Green" }],
+        "mode": "complete",
+        "dominant": "B"
+      }
+    ],
+    "parentA": { "A": ["A", "a"], "B": ["B", "b"] },
+    "parentB": { "A": ["A", "a"], "B": ["B", "b"] },
+    "offspringCount": 16,
+    "seed": "peas"
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "The textbook AaBb x AaBb pea cross — round/wrinkled x yellow/green — reproducing Mendel's classic 9:3:3:1 phenotypic ratio."
+}

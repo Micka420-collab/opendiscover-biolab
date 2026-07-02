@@ -195,9 +195,9 @@ export default async function DiscoveriesPage({
           <CardContent className="text-xs text-muted-foreground space-y-2">
             <p>1. Triage filters noise.</p>
             <p>2. Embedding clusters find independent corroborators.</p>
-            <p>3. Opus 4.7 agent searches UniProt + Europe PMC live.</p>
+            <p>3. Opus 4.8 agent searches UniProt + Europe PMC live.</p>
             <p>4. Composite novelty ≥ 0.75 AND ≥ 2 disjoint corroborators.</p>
-            <p>5. Sonnet 4.6 generates the Discovery Card.</p>
+            <p>5. Sonnet 5 generates the Discovery Card.</p>
             <p>6. Canary replication confirms determinism.</p>
           </CardContent>
         </Card>

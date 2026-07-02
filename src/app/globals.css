@@ -29,3 +29,22 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/* Respect users who prefer reduced motion: neutralize animations/transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* OBS browser-source overlay: transparent page so only the result card composites
+   over the stream. Applied by the /lab/[engine]/overlay segment. */
+.obs-overlay,
+.obs-overlay body {
+  background: transparent !important;
+}

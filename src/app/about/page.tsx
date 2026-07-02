@@ -16,7 +16,7 @@ export default function AboutPage() {
       <p>
         A signal is provisionally promoted when (a) its embedding distance from the literature
         corpus is high, (b) at least two independent contributors on disjoint input slices produced
-        converging results, and (c) a frontier LLM (Claude Opus 4.7) reading the closest literature
+        converging results, and (c) a frontier LLM (Claude Opus 4.8) reading the closest literature
         judges the signal materially novel. None of these alone is sufficient. The promotion
         threshold is intentionally strict and tunable per protocol.
       </p>

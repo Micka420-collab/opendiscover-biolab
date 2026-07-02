@@ -1,20 +1,55 @@
 import { Badge } from '@/components/ui/badge';
+import { SHARE_PARAM, decodeExperiment } from '@/lib/lab/share';
 import { describeEngine, getEngine } from '@/lib/sim';
 import { notFound } from 'next/navigation';
 import { Playground } from './playground';
 
-export async function generateMetadata({ params }: { params: Promise<{ engine: string }> }) {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ engine: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { engine } = await params;
   const spec = getEngine(engine);
-  return { title: spec ? `${spec.title} — Lab` : 'Lab' };
+  if (!spec) return { title: 'Lab' };
+
+  const title = `${spec.title} — Lab`;
+  // A shared run (`?x=`) unfurls into a card showing its headline metric + hash.
+  const sp = await searchParams;
+  const token = typeof sp[SHARE_PARAM] === 'string' ? sp[SHARE_PARAM] : undefined;
+  const decoded = decodeExperiment(token);
+  if (decoded && decoded.engine === engine && token) {
+    const ogUrl = `/api/lab/og?e=${encodeURIComponent(engine)}&x=${token}`;
+    return {
+      title,
+      openGraph: { title, images: [ogUrl] },
+      twitter: { card: 'summary_large_image' as const, title, images: [ogUrl] },
+    };
+  }
+  return { title };
 }
 
-export default async function EnginePage({ params }: { params: Promise<{ engine: string }> }) {
+export default async function EnginePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ engine: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { engine: slug } = await params;
   const spec = getEngine(slug);
   if (!spec) notFound();
 
   const engine = describeEngine(spec);
+
+  // A shared/remixed experiment permalink (`?x=<token>`) seeds the form with the
+  // exact params someone else ran — but only if the token targets this engine.
+  const sp = await searchParams;
+  const token = typeof sp[SHARE_PARAM] === 'string' ? sp[SHARE_PARAM] : undefined;
+  const shared = decodeExperiment(token);
+  const initialParams = shared && shared.engine === slug ? shared.params : undefined;
 
   return (
     <div className="space-y-8">
@@ -39,7 +74,7 @@ export default async function EnginePage({ params }: { params: Promise<{ engine:
         )}
       </header>
 
-      <Playground engine={engine} />
+      <Playground engine={engine} initialParams={initialParams} />
     </div>
   );
 }

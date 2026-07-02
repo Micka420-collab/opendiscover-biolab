@@ -30,9 +30,9 @@
                               │    2. embed       (text-embedding-3-large) │
                               │    3. cluster     (pgvector kNN + DBSCAN)  │
                               │    4. corpus kNN  (pgvector + HNSW)        │
-                              │    5. novelty     (Opus 4.7 agent w/ tools)│
+                              │    5. novelty     (Opus 4.8 agent w/ tools)│
                               │    6. promotion gate                       │
-                              │    7. card + viz  (Sonnet 4.6, parallel)   │
+                              │    7. card + viz  (Sonnet 5, parallel)     │
                               │    8. persist + emit "discovery/promoted"  │
                               │                                            │
                               │  • notify-discovery (email + SSE)          │
@@ -90,7 +90,7 @@ Our novelty step is a **bounded agentic loop** (max 6 steps):
 
 ```ts
 const noveltyAgent = new Agent({
-  model: 'anthropic/claude-opus-4-7',
+  model: 'anthropic/claude-opus-4-8',
   tools: { search_internal_corpus, search_uniprot, search_europe_pmc },
   stopWhen: stepCountIs(6),
 });

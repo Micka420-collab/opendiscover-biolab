@@ -6,22 +6,30 @@
  *
  * Models by task:
  *   - Triage           → anthropic/claude-haiku-4-5    (fast, cheap)
- *   - Novelty reasoning → anthropic/claude-opus-4-7    (hardest reasoning)
- *   - Vulgarization    → anthropic/claude-sonnet-4-6   (writing quality)
+ *   - Novelty reasoning → anthropic/claude-opus-4-8    (hardest reasoning)
+ *   - Vulgarization    → anthropic/claude-sonnet-5     (writing quality)
  *   - Embeddings       → openai/text-embedding-3-large (3072-d)
+ *
+ * This is the single source of truth for model names — the UI imports MODELS
+ * rather than hardcoding version strings, so the site never drifts out of date.
  */
 
 import { embed, generateObject, generateText } from 'ai';
 
 export const MODELS = {
   triage: 'anthropic/claude-haiku-4-5',
-  novelty: 'anthropic/claude-opus-4-7',
-  vulgarize: 'anthropic/claude-sonnet-4-6',
-  visualize: 'anthropic/claude-sonnet-4-6',
+  novelty: 'anthropic/claude-opus-4-8',
+  vulgarize: 'anthropic/claude-sonnet-5',
+  visualize: 'anthropic/claude-sonnet-5',
   /** Autonomous BioLab scientist — hardest reasoning, longest horizon. */
   scientist: 'anthropic/claude-opus-4-8',
   embed: 'openai/text-embedding-3-large',
 } as const;
+
+/** A model id with the `provider/` prefix stripped, for display in the UI. */
+export function modelDisplayName(key: ModelKey): string {
+  return MODELS[key].split('/').pop() ?? MODELS[key];
+}
 
 /**
  * System prompts kept short + stable for prompt-cache hits.

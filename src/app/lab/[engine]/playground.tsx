@@ -1,114 +1,11 @@
 'use client';
 
-import { VegaLiteEmbed } from '@/components/charts/vega-lite-embed';
-import { Badge } from '@/components/ui/badge';
+import { ResultView, type RunResult } from '@/components/lab/result-view';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { distributionToVegaLiteSpec, seriesToVegaLiteSpec } from '@/lib/lab/charts';
-import {
-  type GraphEdge,
-  type StoichiometryEdge,
-  metabolicNetworkSpec,
-  networkGraphSpec,
-} from '@/lib/lab/network-chart';
-import type { Metric, ParamField, SimResult } from '@/lib/sim';
-import { useMemo, useState } from 'react';
-
-/** Detects the `{ genes: string[], edges: {from,to,sign}[] }` shape some
- * engines (e.g. `grn`) expose in `detail`, without assuming every engine has it. */
-function extractNetwork(detail: unknown): { genes: string[]; edges: GraphEdge[] } | null {
-  if (!detail || typeof detail !== 'object') return null;
-  const d = detail as Record<string, unknown>;
-  if (!Array.isArray(d.genes) || !Array.isArray(d.edges)) return null;
-  if (!d.genes.every((g) => typeof g === 'string')) return null;
-  const validEdge = (e: unknown): e is GraphEdge =>
-    typeof e === 'object' &&
-    e !== null &&
-    typeof (e as GraphEdge).from === 'string' &&
-    typeof (e as GraphEdge).to === 'string' &&
-    ((e as GraphEdge).sign === 1 || (e as GraphEdge).sign === -1);
-  if (!d.edges.every(validEdge)) return null;
-  return { genes: d.genes as string[], edges: d.edges as GraphEdge[] };
-}
-
-/** Detects the bipartite `{ metabolites, reactions, stoichiometryEdges }` shape
- * `fba` exposes in `detail`, without assuming every engine has it. */
-function extractMetabolicNetwork(
-  detail: unknown,
-): { metabolites: string[]; reactions: string[]; edges: StoichiometryEdge[] } | null {
-  if (!detail || typeof detail !== 'object') return null;
-  const d = detail as Record<string, unknown>;
-  if (
-    !Array.isArray(d.metabolites) ||
-    !Array.isArray(d.reactions) ||
-    !Array.isArray(d.stoichiometryEdges)
-  ) {
-    return null;
-  }
-  if (!d.metabolites.every((m) => typeof m === 'string')) return null;
-  if (!d.reactions.every((r) => typeof r === 'string')) return null;
-  const validEdge = (e: unknown): e is StoichiometryEdge =>
-    typeof e === 'object' &&
-    e !== null &&
-    typeof (e as StoichiometryEdge).metabolite === 'string' &&
-    typeof (e as StoichiometryEdge).reaction === 'string' &&
-    typeof (e as StoichiometryEdge).coefficient === 'number';
-  if (!d.stoichiometryEdges.every(validEdge)) return null;
-  return {
-    metabolites: d.metabolites as string[],
-    reactions: d.reactions as string[],
-    edges: d.stoichiometryEdges as StoichiometryEdge[],
-  };
-}
-
-/**
- * Detects any top-level `detail` field shaped like a categorical probability
- * distribution — an array of objects each carrying a `probability: number`
- * plus exactly one other string field (the class label), e.g. `breeding`'s
- * `phenotypeDistribution: { phenotype: string; probability: number }[]` or
- * `genotypeDistribution: { genotype: string; probability: number }[]`. Works
- * for any engine exposing this shape, not just `breeding` — same duck-typed
- * pattern as `extractNetwork`/`extractMetabolicNetwork` above.
- *
- * Requires the probabilities to sum to ~1: that's what distinguishes a real
- * partition of outcomes (chartable as one distribution) from a list of
- * independent per-item scores that merely happen to be named "probability"
- * (e.g. `secondary-structure`'s `turns[].probability`, one bend likelihood
- * per candidate tetrapeptide — those don't sum to 1 and aren't mutually
- * exclusive classes, so they must NOT be picked up here).
- */
-function extractDistributions(
-  detail: unknown,
-): { key: string; title: string; rows: { label: string; probability: number }[] }[] {
-  if (!detail || typeof detail !== 'object') return [];
-  const charts: { key: string; title: string; rows: { label: string; probability: number }[] }[] =
-    [];
-  for (const [key, value] of Object.entries(detail as Record<string, unknown>)) {
-    if (!Array.isArray(value) || value.length === 0) continue;
-    const isRow = (v: unknown): v is Record<string, unknown> =>
-      typeof v === 'object' &&
-      v !== null &&
-      typeof (v as Record<string, unknown>).probability === 'number';
-    if (!value.every(isRow)) continue;
-    const rows = value as Record<string, unknown>[];
-    const labelKey = Object.keys(rows[0]).find(
-      (k) => k !== 'probability' && typeof rows[0][k] === 'string',
-    );
-    if (!labelKey) continue;
-    if (!rows.every((r) => typeof r[labelKey] === 'string')) continue;
-    const sum = rows.reduce((s, r) => s + (r.probability as number), 0);
-    if (Math.abs(sum - 1) > 1e-6) continue;
-    charts.push({
-      key,
-      title: key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()),
-      rows: rows.map((r) => ({
-        label: r[labelKey] as string,
-        probability: r.probability as number,
-      })),
-    });
-  }
-  return charts;
-}
+import { experimentOverlayPath, experimentSharePath } from '@/lib/lab/share';
+import type { ParamField } from '@/lib/sim';
+import { useEffect, useRef, useState } from 'react';
 
 interface EngineView {
   slug: string;
@@ -122,25 +19,23 @@ type FieldValue = string | number | boolean;
 type RunState =
   | { kind: 'idle' }
   | { kind: 'running' }
-  | {
-      kind: 'done';
-      engine: string;
-      version: string;
-      inputHash: string;
-      outputHash: string;
-      summary: string;
-      metrics: Metric[];
-      result: SimResult;
-    }
+  | ({ kind: 'done' } & RunResult)
   | { kind: 'error'; message: string };
 
 /** Seed form state from the engine's documented example, falling back to each
- * field's own default. `json`-kind fields are kept as pretty-printed text. */
-function initialValues(fields: ParamField[], example: unknown): Record<string, FieldValue> {
+ * field's own default. An `override` (from a shared/remixed permalink) takes
+ * precedence over both. `json`-kind fields are kept as pretty-printed text. */
+function initialValues(
+  fields: ParamField[],
+  example: unknown,
+  override?: Record<string, unknown>,
+): Record<string, FieldValue> {
   const ex = (example as Record<string, unknown>) ?? {};
+  const ov = override ?? {};
   const values: Record<string, FieldValue> = {};
   for (const field of fields) {
-    const raw = field.name in ex ? ex[field.name] : field.default;
+    const raw =
+      field.name in ov ? ov[field.name] : field.name in ex ? ex[field.name] : field.default;
     if (raw === undefined) continue;
     if (field.kind === 'json') {
       values[field.name] = JSON.stringify(raw, null, 2);
@@ -178,14 +73,23 @@ function buildParams(
   return { params };
 }
 
-export function Playground({ engine }: { engine: EngineView }) {
+export function Playground({
+  engine,
+  initialParams,
+}: {
+  engine: EngineView;
+  initialParams?: Record<string, unknown>;
+}) {
   const [values, setValues] = useState<Record<string, FieldValue>>(() =>
-    initialValues(engine.fields, engine.example),
+    initialValues(engine.fields, engine.example, initialParams),
   );
   const [state, setState] = useState<RunState>({ kind: 'idle' });
+  const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const openedFromShare = initialParams != null;
 
   function setField(name: string, v: FieldValue) {
     setValues((prev) => ({ ...prev, [name]: v }));
+    setShareMsg(null);
   }
 
   async function run() {
@@ -203,14 +107,62 @@ export function Playground({ engine }: { engine: EngineView }) {
       });
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error ?? `HTTP ${resp.status}`);
-      setState({ kind: 'done', ...json });
+      setState({ kind: 'done', ...(json as RunResult) });
     } catch (e) {
       setState({ kind: 'error', message: (e as Error).message });
     }
   }
 
+  /** Copy a permalink that reproduces the *current* parameters exactly. */
+  async function share() {
+    const { params, error } = buildParams(engine.fields, values);
+    if (error) {
+      setState({ kind: 'error', message: error });
+      return;
+    }
+    const path = experimentSharePath({ engine: engine.slug, params });
+    const url =
+      typeof window !== 'undefined' ? new URL(path, window.location.origin).toString() : path;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareMsg('Link copied — whoever opens it reproduces this exact run, then can remix it.');
+    } catch {
+      setShareMsg(url);
+    }
+  }
+
+  /** Open the current run as a transparent OBS browser-source overlay. */
+  function openOverlay() {
+    const { params, error } = buildParams(engine.fields, values);
+    if (error) {
+      setState({ kind: 'error', message: error });
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.open(experimentOverlayPath({ engine: engine.slug, params }), '_blank', 'noopener');
+    }
+  }
+
+  // Opened from a shared/remixed link: reproduce the run immediately so the
+  // viewer lands on the result, not an unrun form. Runs once, on mount.
+  const didAutoRun = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally mount-only — reproduce the shared run once
+  useEffect(() => {
+    if (openedFromShare && !didAutoRun.current) {
+      didAutoRun.current = true;
+      void run();
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
+      {openedFromShare && (
+        <div className="rounded-md border border-accent/40 bg-accent/5 px-4 py-2 text-sm text-muted-foreground">
+          🔗 Opened from a shared experiment — the parameters below reproduce it exactly. Tweak
+          anything and hit <span className="text-foreground font-medium">Share / Remix</span> to
+          pass on your own version.
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Parameters</CardTitle>
@@ -226,14 +178,40 @@ export function Playground({ engine }: { engine: EngineView }) {
               />
             ))}
           </div>
-          <Button onClick={run} disabled={state.kind === 'running'}>
-            {state.kind === 'running' ? 'Running…' : 'Run engine'}
-          </Button>
-          {state.kind === 'error' && <p className="text-sm text-red-400">{state.message}</p>}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={run}
+              disabled={state.kind === 'running'}
+              aria-busy={state.kind === 'running'}
+            >
+              {state.kind === 'running' ? 'Running…' : 'Run engine'}
+            </Button>
+            <Button variant="outline" onClick={share} disabled={state.kind === 'running'}>
+              🔗 Share / Remix
+            </Button>
+            <Button variant="outline" onClick={openOverlay} disabled={state.kind === 'running'}>
+              📺 OBS overlay
+            </Button>
+          </div>
+          {shareMsg && <p className="text-sm text-accent break-all">{shareMsg}</p>}
+          {state.kind === 'error' && (
+            <p className="text-sm text-red-400" role="alert">
+              Error: {state.message}
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {state.kind === 'done' && <ResultView state={state} />}
+      {state.kind === 'idle' && (
+        <p className="text-sm text-muted-foreground">
+          Set parameters and hit <span className="text-foreground">Run engine</span> to see metrics,
+          charts, and the reproducibility hash. Then{' '}
+          <span className="text-foreground">Share / Remix</span> to hand the exact run to someone
+          else.
+        </p>
+      )}
+
+      {state.kind === 'done' && <ResultView result={state} />}
     </div>
   );
 }
@@ -248,6 +226,12 @@ function FieldInput({
   onChange: (v: FieldValue) => void;
 }) {
   const inputClass = 'w-full bg-muted/30 border border-border rounded px-2 py-1 font-mono text-sm';
+  const descId = field.description ? `${field.name}-desc` : undefined;
+  const helper = field.description ? (
+    <span id={descId} className="text-[11px] text-muted-foreground">
+      {field.description}
+    </span>
+  ) : null;
 
   if (field.kind === 'enum') {
     return (
@@ -257,6 +241,8 @@ function FieldInput({
           value={(value as string) ?? ''}
           onChange={(e) => onChange(e.target.value)}
           className={inputClass}
+          aria-describedby={descId}
+          aria-required={!field.optional}
         >
           {field.options.map((opt) => (
             <option key={opt} value={opt}>
@@ -264,19 +250,24 @@ function FieldInput({
             </option>
           ))}
         </select>
+        {helper}
       </label>
     );
   }
 
   if (field.kind === 'boolean') {
     return (
-      <label className="text-sm flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={Boolean(value)}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-        <FieldLabel field={field} />
+      <label className="text-sm space-y-1 block">
+        <span className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={Boolean(value)}
+            onChange={(e) => onChange(e.target.checked)}
+            aria-describedby={descId}
+          />
+          <FieldLabel field={field} />
+        </span>
+        {helper}
       </label>
     );
   }
@@ -290,7 +281,10 @@ function FieldInput({
           onChange={(e) => onChange(e.target.value)}
           rows={4}
           className={`${inputClass} text-xs`}
+          aria-describedby={descId}
+          aria-required={!field.optional}
         />
+        {helper}
       </label>
     );
   }
@@ -308,116 +302,23 @@ function FieldInput({
           onChange(field.kind === 'number' ? e.target.valueAsNumber : e.target.value)
         }
         className={inputClass}
+        aria-describedby={descId}
+        aria-required={!field.optional}
       />
+      {helper}
     </label>
   );
 }
 
 function FieldLabel({ field }: { field: ParamField }) {
   return (
-    <span className="text-muted-foreground flex items-center gap-1.5" title={field.description}>
+    <span className="text-muted-foreground flex items-center gap-1.5">
       {field.label}
-      {!field.optional && <span className="text-red-400">*</span>}
+      {!field.optional && (
+        <span className="text-red-400" aria-hidden="true">
+          *
+        </span>
+      )}
     </span>
-  );
-}
-
-function ResultView({ state }: { state: Extract<RunState, { kind: 'done' }> }) {
-  const specs = useMemo(
-    () => (state.result.series ?? []).map((s, i) => ({ i, spec: seriesToVegaLiteSpec(s) })),
-    [state.result.series],
-  );
-  const network = useMemo(() => extractNetwork(state.result.detail), [state.result.detail]);
-  const networkSpec = useMemo(
-    () => (network ? networkGraphSpec(network.genes, network.edges) : null),
-    [network],
-  );
-  const metabolicNetwork = useMemo(
-    () => extractMetabolicNetwork(state.result.detail),
-    [state.result.detail],
-  );
-  const metabolicSpec = useMemo(
-    () =>
-      metabolicNetwork
-        ? metabolicNetworkSpec(
-            metabolicNetwork.metabolites,
-            metabolicNetwork.reactions,
-            metabolicNetwork.edges,
-          )
-        : null,
-    [metabolicNetwork],
-  );
-  const distributions = useMemo(
-    () => extractDistributions(state.result.detail),
-    [state.result.detail],
-  );
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between flex-wrap gap-2">
-          <span>{state.summary}</span>
-          <code className="text-xs font-mono text-muted-foreground">
-            hash {state.outputHash.slice(0, 16)}…
-          </code>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {state.metrics.length > 0 && (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {state.metrics.map((m) => (
-              <div key={m.key} className="border border-border rounded p-3">
-                <div className="text-xs text-muted-foreground">{m.label}</div>
-                <div className="text-lg font-mono">
-                  {Number.isInteger(m.value) ? m.value : m.value.toPrecision(4)}
-                  {m.unit && <span className="text-xs text-muted-foreground ml-1">{m.unit}</span>}
-                </div>
-                {m.note && <div className="text-xs text-muted-foreground mt-1">{m.note}</div>}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {networkSpec && (
-          <div>
-            <div className="text-xs text-muted-foreground mb-2">Regulatory network topology</div>
-            <VegaLiteEmbed spec={networkSpec} />
-          </div>
-        )}
-
-        {metabolicSpec && (
-          <div>
-            <div className="text-xs text-muted-foreground mb-2">
-              Metabolic network (● metabolites, ■ reactions)
-            </div>
-            <VegaLiteEmbed spec={metabolicSpec} />
-          </div>
-        )}
-
-        {distributions.map(({ key, title, rows }) => (
-          <div key={key}>
-            <div className="text-xs text-muted-foreground mb-2">{title}</div>
-            <VegaLiteEmbed spec={distributionToVegaLiteSpec(rows, title)} />
-          </div>
-        ))}
-
-        {specs.map(({ i, spec }) => (
-          <VegaLiteEmbed key={i} spec={spec} />
-        ))}
-
-        <details className="text-xs">
-          <summary className="cursor-pointer text-muted-foreground">Raw result JSON</summary>
-          <pre className="mt-2 overflow-x-auto bg-muted/30 border border-border rounded p-3">
-            {JSON.stringify(state.result, null, 2)}
-          </pre>
-        </details>
-
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="muted">engine {state.engine}</Badge>
-          <Badge variant="outline">v{state.version}</Badge>
-          <code>input {state.inputHash.slice(0, 12)}…</code>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
