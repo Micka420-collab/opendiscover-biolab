@@ -262,6 +262,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.05,
     hint: 'p* = (1 − destroyed) − e/c. With c=0.5 and e=0.1 the extinction threshold sits at 80% destroyed; p*=0.05 lands at exactly 75%.',
   },
+  {
+    id: 'replicator-hawk-dove',
+    engine: 'replicator-dynamics',
+    title: 'Tune the Hawk–Dove balance',
+    brief:
+      'In a Hawk–Dove game, aggressive hawks and peaceful doves settle into a stable mix set by the payoffs. Raise the prize a hawk seizes from a dove until the evolutionarily stable population lands at exactly 60% hawks.',
+    baseParams: { aa: -1, ba: 0, bb: 1, x0: 0.3, tEnd: 80 },
+    knob: {
+      param: 'ab',
+      label: 'Hawk’s prize (Hawk vs Dove payoff)',
+      min: 1.2,
+      max: 6,
+      step: 0.05,
+      default: 2,
+    },
+    metricKey: 'essFractionA',
+    metricLabel: 'Stable fraction of hawks',
+    goal: 'target',
+    target: 0.6,
+    hint: 'With these payoffs the stable hawk share is x* = 1 − 1/ab. For 60% hawks you need ab = 2.5.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

@@ -1,0 +1,16 @@
+{
+  "slug": "the-stag-hunt-tips-to-cooperation",
+  "title": "The stag hunt tips to cooperation",
+  "engine": "replicator-dynamics",
+  "params": {
+    "aa": 4,
+    "ab": 0,
+    "ba": 3,
+    "bb": 3,
+    "x0": 0.8,
+    "tEnd": 80
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "The Stag Hunt is the classic model of risky cooperation: hunt a stag together for a big reward, or play it safe alone for a sure but smaller one. It is bistable — everyone cooperating and everyone defecting are BOTH evolutionarily stable, split by an unstable threshold at 75% stag-hunters. This run starts just above that line (80%) and tips the whole population into full cooperation. Start even slightly below 75% and the same dynamics collapse it to all-safe instead. History, not just payoffs, decides the outcome (Skyrms, 2004)."
+}
