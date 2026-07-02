@@ -488,6 +488,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 60,
     hint: 'Tm = ΔH° / (ΔS° + R·ln(C_T/4)). With ΔS°=−1 and C_T=1e−5 the denominator is ≈ −1.107, so Tm(°C) ≈ −ΔH°/1.107 − 273.15. Target 60°C ⇒ ΔH° ≈ −369 kJ/mol.',
   },
+  {
+    id: 'haldane-sweet-spot',
+    engine: 'substrate-inhibition',
+    title: 'Find the substrate sweet spot',
+    brief:
+      'On a substrate that turns toxic at high dose, growth peaks at a “just right” concentration S_opt = √(Ks·Ki). Dial the inhibition constant Ki so that this optimum lands at 15 g/L — too tolerant and the peak drifts high, too sensitive and it collapses toward zero.',
+    baseParams: { muMax: 0.8, ks: 1 },
+    knob: {
+      param: 'ki',
+      label: 'Inhibition constant Ki',
+      min: 50,
+      max: 500,
+      step: 5,
+      default: 100,
+      unit: 'g/L',
+    },
+    metricKey: 'optimalSubstrate',
+    metricLabel: 'Optimal substrate S_opt',
+    unit: 'g/L',
+    goal: 'target',
+    target: 15,
+    hint: 'S_opt = √(Ks·Ki). With Ks = 1 that is just √Ki, so a peak at 15 g/L needs Ki ≈ 225.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

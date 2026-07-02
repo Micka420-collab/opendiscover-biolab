@@ -1,0 +1,9 @@
+{
+  "slug": "helix-turn-sheet-in-one-strand",
+  "title": "Helix, turn, sheet — all in one strand",
+  "engine": "secondary-structure",
+  "params": { "sequence": "AAAAAAAAANPGKVVVVVVVVV" },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Long before AlphaFold, biochemists could already guess a protein's shape from its letters. Chou and Fasman noticed that each amino acid has a personality: alanine loves to coil into an α-helix, valine prefers to lie flat in a β-sheet, and proline with glycine tends to snap the chain into a turn. This little designer peptide puts all three on display — nine alanines that spiral up, an N-P-G-K hinge that turns the corner, and nine valines that flatten into a strand. Slide any sequence in and watch the propensities vote, residue by residue, on whether the backbone helixes, sheets, or bends. Deterministic: the same sequence always folds to the same call."
+}
