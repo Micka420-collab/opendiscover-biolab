@@ -15,6 +15,7 @@ type AnyEngine = import('./core/types').EngineSpec<any, any>;
 import { spec as acidBaseTitration } from './biochem/acid-base-titration';
 import { spec as beerLambert } from './biochem/beer-lambert';
 import { spec as diffusion } from './biochem/diffusion';
+import { spec as gibbsEquilibrium } from './biochem/gibbs-equilibrium';
 import { spec as osmoticPressure } from './biochem/osmotic-pressure';
 import { spec as oxygenHemoglobin } from './biochem/oxygen-hemoglobin';
 import { spec as vanDeemter } from './biochem/van-deemter';
@@ -126,6 +127,7 @@ export const engines: AnyEngine[] = [
   vanDeemter,
   osmoticPressure,
   oxygenHemoglobin,
+  gibbsEquilibrium,
   compartmental,
   sis,
   sirEndemic,

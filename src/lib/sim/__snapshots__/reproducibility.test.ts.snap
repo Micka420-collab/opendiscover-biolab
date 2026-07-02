@@ -219,6 +219,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "FRET at r=5 nm with R0=5 nm: efficiency E=50.0% (inside the 3.5–7.2 nm ruler range); the sixth-power law makes this a nanometre ruler.",
   },
+  "gibbs-equilibrium": {
+    "metrics": {
+      "crossoverTemperature": 126.85,
+      "deltaG": -10.185,
+      "deltaG0": -10.185,
+      "log10K": 1.78433,
+      "productFraction": 0.983835,
+    },
+    "summary": "Gibbs equilibrium at 25°C: ΔG°=-10.2 kJ/mol, log₁₀K=1.78 → equilibrium is 98.4% product; at Q=1 the actual ΔG=-10.2 kJ/mol so the reaction runs forward (spontaneous as written).",
+  },
   "gillespie": {
     "metrics": {
       "endTime": 50,
