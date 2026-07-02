@@ -1,3 +1,4 @@
+import { ExplorationProgress } from '@/components/lab/exploration-progress';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listDomains, listEngines } from '@/lib/sim';
@@ -31,6 +32,10 @@ export default function LabPage() {
           reproducible.
         </p>
       </header>
+
+      <ExplorationProgress
+        catalog={listEngines().map((e) => ({ slug: e.slug, title: e.title, domain: e.domain }))}
+      />
 
       <Link href="/lab/breeding" className="block group">
         <Card className="border-fuchsia-500/40 bg-fuchsia-500/5 hover:border-fuchsia-500/70 transition-colors">

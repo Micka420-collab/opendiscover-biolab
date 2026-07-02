@@ -3,6 +3,7 @@
 import { ResultView, type RunResult } from '@/components/lab/result-view';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { recordEngineRun } from '@/lib/lab/achievements';
 import { experimentOverlayPath, experimentSharePath } from '@/lib/lab/share';
 import type { ParamField } from '@/lib/sim';
 import { useEffect, useRef, useState } from 'react';
@@ -108,6 +109,7 @@ export function Playground({
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error ?? `HTTP ${resp.status}`);
       setState({ kind: 'done', ...(json as RunResult) });
+      recordEngineRun(engine.slug); // light this engine up in the lab dex
     } catch (e) {
       setState({ kind: 'error', message: (e as Error).message });
     }
