@@ -17,6 +17,7 @@ import { spec as admet } from './drug/admet';
 import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
+import { spec as chemostatCompetition } from './ecology/chemostat-competition';
 import { spec as logisticMap } from './ecology/logistic-map';
 import { spec as lotkaVolterra } from './ecology/lotka-volterra';
 import { spec as nicholsonBailey } from './ecology/nicholson-bailey';
@@ -84,6 +85,7 @@ export const engines: AnyEngine[] = [
   rosenzweigMacArthur,
   rockPaperScissors,
   nicholsonBailey,
+  chemostatCompetition,
   bioreactor,
   compartmental,
   sis,

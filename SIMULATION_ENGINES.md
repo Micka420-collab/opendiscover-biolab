@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **37 deterministic simulation engines** across
+The OpenDiscover BioLab ships **38 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1224,6 +1224,59 @@ The classic discrete host–parasitoid map: hosts reproduce at rate R and escape
 ```
 
 _Run it: `POST /api/lab/run { "engine": "nicholson-bailey", "params": … }` or interactively at `/lab/nicholson-bailey`._
+
+---
+
+### `chemostat-competition` — Chemostat Competition (competitive exclusion)
+
+Two species competing for one limiting substrate in a chemostat. Tilman's R* rule: each species has a break-even substrate concentration R* = Ks·D/(µmax−D), and the one with the LOWER R* draws the substrate below its competitor's break-even and excludes it — Gause's competitive exclusion principle, mechanistically. Two species cannot coexist on a single resource (unless the lower R* exceeds the feed, in which case both wash out).
+
+**References**
+- Hardin, G. (1960) The competitive exclusion principle. Science 131:1292-1297.
+- Tilman, D. (1982) Resource Competition and Community Structure. Princeton.
+- Smith, H.L. & Waltman, P. (1995) The Theory of the Chemostat.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `muMax1` | number | `0.5` | ≥ 0 |  |
+| `ks1` | number | `1` | ≥ 0 |  |
+| `y1` | number | `0.5` | ≥ 0 |  |
+| `muMax2` | number | `0.5` | ≥ 0 |  |
+| `ks2` | number | `3` | ≥ 0 |  |
+| `y2` | number | `0.5` | ≥ 0 |  |
+| `d` | number | `0.2` | ≥ 0 |  |
+| `sin` | number | `10` | ≥ 0 |  |
+| `s0` | number | `10` | ≥ 0 |  |
+| `x1_0` | number | `0.1` | ≥ 0 |  |
+| `x2_0` | number | `0.1` | ≥ 0 |  |
+| `tEnd` | number | `300` | ≥ 0, ≤ 100000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+| `outputPoints` | integer | `500` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "muMax1": 0.5,
+  "ks1": 1,
+  "y1": 0.5,
+  "muMax2": 0.5,
+  "ks2": 3,
+  "y2": 0.5,
+  "d": 0.2,
+  "sin": 10,
+  "s0": 10,
+  "x1_0": 0.1,
+  "x2_0": 0.1,
+  "tEnd": 300,
+  "tol": 1e-8,
+  "outputPoints": 500
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "chemostat-competition", "params": … }` or interactively at `/lab/chemostat-competition`._
 
 
 ## 🏭 Bioprocess

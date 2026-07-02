@@ -54,6 +54,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Aa Bb × Aa Bb → 4 phenotype(s) in 9:3:3:1; most common "Round, Yellow" (56.3%).",
   },
+  "chemostat-competition": {
+    "metrics": {
+      "finalBiomass1": 4.66667,
+      "finalBiomass2": 3.45438e-14,
+      "finalSubstrate": 0.666667,
+      "rStar1": 0.666667,
+      "rStar2": 2,
+      "winner": 1,
+    },
+    "summary": "Chemostat competition: species 1 wins (R*=0.667); the competitor is excluded to 3.5e-14 g/L.",
+  },
   "cloning": {
     "metrics": {
       "fragmentCount": 3,
