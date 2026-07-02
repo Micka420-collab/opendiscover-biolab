@@ -1,0 +1,9 @@
+{
+  "slug": "keeping-a-culture-breathing",
+  "title": "Keeping a culture breathing",
+  "engine": "oxygen-transfer",
+  "params": { "kLa": 100, "saturationDO": 8, "our": 400, "initialDO": 8 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Oxygen is the sneaky bottleneck of every aerobic fermentation: it dissolves poorly (only ~8 mg/L saturates water), yet a dense culture can consume it in seconds. Start air-saturated and switch the cells on, and the dissolved O₂ plunges within a few seconds to a new balance where supply meets demand — here 4 mg/L, half saturation, on a sub-minute time constant of 1/kLa. Too weak a kLa and it would crash to zero and starve the cells. This gas–liquid transfer is why bioreactors are stirred so hard and why scale-up is really an oxygen-transfer problem."
+}

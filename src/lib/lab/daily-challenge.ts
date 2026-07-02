@@ -401,6 +401,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 10,
     hint: 'Force blows up as x → 1 via the 1/(1−x)² term. For Lp=50 nm it reaches ~10 pN at about 95.4% extension.',
   },
+  {
+    id: 'oxygen-transfer-aerate',
+    engine: 'oxygen-transfer',
+    title: 'Aerate the fermenter',
+    brief:
+      'Your cells are burning oxygen at 400 mg/L/h and the tank saturates at only 8 mg/L. Turn up the agitation/aeration — the mass-transfer coefficient kLa — until the steady-state dissolved O₂ settles at 4 mg/L (50% of saturation), the usual comfortable set-point.',
+    baseParams: { saturationDO: 8, our: 400, criticalDO: 1, initialDO: 8 },
+    knob: {
+      param: 'kLa',
+      label: 'Mass-transfer coefficient kLa',
+      min: 60,
+      max: 300,
+      step: 1,
+      default: 150,
+      unit: '1/h',
+    },
+    metricKey: 'steadyStateDO',
+    metricLabel: 'Steady-state dissolved O₂',
+    unit: 'mg/L',
+    goal: 'target',
+    target: 4,
+    hint: 'Steady-state DO = C* − OUR/kLa, with diminishing returns as you crank kLa. For C*=8 and OUR=400, hitting 4 mg/L needs kLa = 400/(8−4) = 100 /h.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

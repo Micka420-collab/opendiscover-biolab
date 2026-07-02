@@ -1,0 +1,9 @@
+{
+  "slug": "a-pill-through-the-bloodstream",
+  "title": "A pill through the bloodstream",
+  "engine": "pk-oral-absorption",
+  "params": { "dose": 100, "bioavailability": 1, "ka": 1, "cl": 5, "v": 20, "tEnd": 24 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Swallow a 100 mg tablet and its blood level traces the Bateman curve: nothing at first, then a rise as the gut absorbs it faster than the body clears it, a peak (Cmax) where the two rates cross, and a slow decline once absorption is spent. Here the peak lands around 1.8 h. The total exposure — the area under the curve — is F·Dose/CL, fixed by clearance no matter how fast the pill dissolves. It is the shape behind every dosing schedule, and flipping ka below the elimination rate would make absorption itself the slow, rate-limiting step (flip-flop kinetics)."
+}
