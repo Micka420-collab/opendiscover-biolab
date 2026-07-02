@@ -240,6 +240,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.05,
     hint: 'i* = μ(R₀−1)/β with R₀ = β/(γ+μ). It climbs with β toward a ceiling of μ/(γ+μ) ≈ 0.09; aim for a modest R₀ around 2.2.',
   },
+  {
+    id: 'levins-tipping-point',
+    engine: 'levins-metapopulation',
+    title: 'Bulldoze to the brink',
+    brief:
+      'A species lives across a network of habitat patches. Clear as much habitat as you dare — push the equilibrium patch occupancy p* down to a razor-thin 5%, as close to regional collapse as you can get without tipping the whole metapopulation over the extinction cliff.',
+    baseParams: { colonization: 0.5, extinction: 0.1, p0: 0.5, tEnd: 120 },
+    knob: {
+      param: 'destroyed',
+      label: 'Habitat destroyed',
+      min: 0,
+      max: 0.79,
+      step: 0.005,
+      default: 0,
+      unit: 'fraction',
+    },
+    metricKey: 'equilibriumOccupancy',
+    metricLabel: 'Equilibrium occupancy p*',
+    goal: 'target',
+    target: 0.05,
+    hint: 'p* = (1 − destroyed) − e/c. With c=0.5 and e=0.1 the extinction threshold sits at 80% destroyed; p*=0.05 lands at exactly 75%.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

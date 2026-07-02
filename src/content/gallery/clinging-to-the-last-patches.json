@@ -1,0 +1,15 @@
+{
+  "slug": "clinging-to-the-last-patches",
+  "title": "Clinging to the last patches",
+  "engine": "levins-metapopulation",
+  "params": {
+    "colonization": 0.5,
+    "extinction": 0.1,
+    "destroyed": 0.6,
+    "p0": 0.5,
+    "tEnd": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Sixty percent of the habitat is gone, yet the species holds on — settling at 20% patch occupancy in Levins' metapopulation model. The catch is the extinction threshold: colonization c=0.5 and extinction e=0.1 put the cliff at 80% destroyed (1 − e/c). Bulldoze past it and the whole network collapses, sometimes long after the last patch is cleared. That lag is the 'extinction debt' — species that are already doomed but not yet gone (Tilman et al., 1994)."
+}
