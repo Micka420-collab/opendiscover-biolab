@@ -1,0 +1,16 @@
+{
+  "slug": "a-brain-rhythm-from-two-populations",
+  "title": "A brain rhythm from two populations",
+  "engine": "wilson-cowan",
+  "params": {
+    "cEE": 16,
+    "cEI": 12,
+    "cIE": 15,
+    "cII": 3,
+    "P": 2.2,
+    "tEnd": 100
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab.git",
+  "blurb": "No single neuron here — just two whole populations, one excitatory and one inhibitory, chasing each other. Excitation ramps activity up; inhibition (lagging behind) reins it back in; the overshoot repeats, and the network locks into a self-sustaining rhythm. This is the Wilson–Cowan (1972) mean-field origin of cortical oscillations like the gamma rhythm. The limit cycle exists only inside a band of drive: too little and the tissue is quiet, too much and it saturates. Here P=2.2 sits in the sweet spot."
+}

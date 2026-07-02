@@ -283,6 +283,35 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.6,
     hint: 'With these payoffs the stable hawk share is x* = 1 − 1/ab. For 60% hawks you need ab = 2.5.',
   },
+  {
+    id: 'wilson-cowan-brain-rhythm',
+    engine: 'wilson-cowan',
+    title: 'Crank up the brain rhythm',
+    brief:
+      'Two coupled neural populations (excitatory + inhibitory) only fall into a rhythm for a narrow band of external drive. Tune the drive P to make the excitatory oscillation swing as wide as possible — without pushing the network so hard it saturates and falls silent.',
+    baseParams: {
+      cEE: 16,
+      cEI: 12,
+      cIE: 15,
+      cII: 3,
+      Q: 0,
+      aE: 1.3,
+      thetaE: 4,
+      aI: 2,
+      thetaI: 3.7,
+      tauE: 1,
+      tauI: 1,
+      E0: 0.1,
+      I0: 0.1,
+      tEnd: 120,
+    },
+    knob: { param: 'P', label: 'External drive P', min: 0.8, max: 3.4, step: 0.05, default: 1 },
+    metricKey: 'amplitudeE',
+    metricLabel: 'Excitatory oscillation amplitude',
+    goal: 'maximize',
+    par: 0.6,
+    hint: 'Below P≈1.2 the network is silent; above P≈3.2 it saturates and goes quiet again. The widest swing sits just under that upper edge, around P≈3.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
