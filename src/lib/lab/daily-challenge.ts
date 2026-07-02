@@ -554,6 +554,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'E = 1/(1 + (r/R₀)⁶) equals 0.5 exactly when r = R₀. So dial the distance to 5 nm.',
   },
+  {
+    id: 'size-a-nanoparticle',
+    engine: 'diffusion',
+    title: 'Size a nanoparticle',
+    brief:
+      'Dynamic light scattering watches how fast a particle jiggles and turns that diffusion coefficient into a size. Work it backwards: dial the hydrodynamic radius until the diffusion coefficient matches a measured 10 µm²/s — and you have sized the particle.',
+    baseParams: { viscosity: 1, temperatureC: 20 },
+    knob: {
+      param: 'radius',
+      label: 'Hydrodynamic radius',
+      min: 1,
+      max: 100,
+      step: 0.5,
+      default: 5,
+      unit: 'nm',
+    },
+    metricKey: 'diffusionCoefficient',
+    metricLabel: 'Diffusion coefficient D',
+    unit: 'µm²/s',
+    goal: 'target',
+    target: 10,
+    hint: 'D = kB·T/(6πηr) falls as 1/r. A measured D of 10 µm²/s in water at 20°C means a radius of about 21.5 nm.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

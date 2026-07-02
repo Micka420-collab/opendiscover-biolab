@@ -1,0 +1,13 @@
+{
+  "slug": "the-slowest-enzyme-sets-the-pace",
+  "title": "The slowest enzyme sets the pace",
+  "engine": "metabolic-pathway",
+  "params": {
+    "sourceConcentration": 10,
+    "steps": [{ "vmax": 5, "km": 2 }, { "vmax": 6, "km": 3 }, { "vmax": 8, "km": 1.5 }],
+    "tEnd": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A metabolic pathway is a bucket brigade: a starting metabolite is passed down a line of enzymes, each converting it a step further. Watch this three-enzyme cascade run and a familiar truth emerges — the flux through the whole chain is throttled by its weakest link, the enzyme with the lowest capacity. Intermediates pile up in front of the bottleneck and stay scarce after it, exactly as they do in a real cell where one rate-limiting step governs a pathway. Every concentration here comes from integrating the coupled Michaelis–Menten rates, so the same enzymes always produce the same steady flux."
+}
