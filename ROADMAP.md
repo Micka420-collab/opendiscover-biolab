@@ -65,15 +65,19 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       requires the probabilities to sum to 1 so it doesn't misfire on unrelated per-item scores
       like `secondary-structure`'s independent beta-turn bend probabilities). 3 new chart tests.
       **Advanced genetics panel**: `/lab/breeding` now has a live, client-side (no API round-trip —
-      these three helpers are pure functions) demo of the three previously-invisible standalone
-      genetics helpers: X-linked inheritance (`crossXLinked`, pick mother/father genotype, see the
+      these helpers are pure functions) demo of four previously-invisible standalone genetics
+      helpers: X-linked inheritance (`crossXLinked`, pick mother/father genotype, see the
       4 sex/genotype/phenotype classes update instantly — default carrier-mother × normal-father
       case verified live to render exactly 25%/25%/25%/25% with no affected daughters), epistasis
       (`crossEpistatic`, pick one of the 4 classical interaction kinds, bar-charted via
-      `distributionToVegaLiteSpec`), and lethal alleles (`applyLethality`, Cuénot's mouse
-      yellow-coat cross, side-by-side "at conception" 1:2:1 vs "among survivors" 2:1 bar charts).
-      Confirmed rendering live against a real dev server response (curled HTML, not just unit
-      tests) — the default X-linked case's exact percentages were read back from the served page.
+      `distributionToVegaLiteSpec`), lethal alleles (`applyLethality`, Cuénot's mouse
+      yellow-coat cross, side-by-side "at conception" 1:2:1 vs "among survivors" 2:1 bar charts),
+      and linkage/recombination (`recombinantGametes`, pick a recombination frequency r from
+      0/0.1/0.2/0.3/0.5, see the 4 gamete frequencies re-chart — reuses the exact `(1-r)/2` /
+      `r/2` fractions already hand-verified in `breeding.test.ts`, so no new math needed
+      re-verifying, only its live wiring). Confirmed rendering live against a real dev server
+      response (curled HTML, not just unit tests) — the default X-linked case's exact percentages
+      and the linkage demo's description text were both read back from the served page.
 - [x] **Lab API routes** — `/api/lab/engines` (catalog + per-engine spec), `/api/lab/run`
       (run engine, hashed record), `/api/lab/campaigns` (bounded autonomous campaign).
       Covered by `src/lib/lab/runner.test.ts` (registry + determinism, 9 tests).

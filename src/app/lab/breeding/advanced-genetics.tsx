@@ -11,14 +11,16 @@ import {
   spec as breedingSpec,
   crossEpistatic,
   crossXLinked,
+  recombinantGametes,
 } from '@/lib/sim/genetics/breeding';
 import { useMemo, useState } from 'react';
 
-// These three demos run entirely client-side — crossXLinked, crossEpistatic
-// and applyLethality are pure functions (no RNG, no network), so results are
-// instant and exactly reproduce the same textbook ratios verified in
-// src/lib/sim/genetics/breeding.test.ts. They are deliberately NOT part of
-// the main breeding engine's run() — see that engine's own description.
+// These demos run entirely client-side — crossXLinked, crossEpistatic,
+// applyLethality and recombinantGametes are pure functions (no RNG, no
+// network), so results are instant and exactly reproduce the same textbook
+// ratios verified in src/lib/sim/genetics/breeding.test.ts. They are
+// deliberately NOT part of the main breeding engine's run() — see that
+// engine's own description.
 
 const inputClass = 'bg-muted/30 border border-border rounded px-2 py-1 text-sm';
 
@@ -256,22 +258,76 @@ function LethalityDemo() {
   );
 }
 
+// --- 4. Linkage & recombination ---------------------------------------------
+
+// Classic cis-coupling phase: parent carries A and B on the same chromosome
+// (and a, b on the homolog). r=0 -> complete linkage (only AB/ab gametes);
+// r=0.5 -> independent assortment (all 4 gametes at 0.25). These exact
+// fractions ((1-r)/2 parental, r/2 recombinant) are already hand-verified in
+// breeding.test.ts ("parental gametes get (1-r)/2 and recombinants r/2").
+const LINKAGE_PHASE: [[string, string], [string, string]] = [
+  ['A', 'B'],
+  ['a', 'b'],
+];
+const R_OPTIONS = [0, 0.1, 0.2, 0.3, 0.5];
+
+function LinkageDemo() {
+  const [rIdx, setRIdx] = useState(2); // r = 0.2
+  const r = R_OPTIONS[rIdx];
+  const gametes = useMemo(() => recombinantGametes(LINKAGE_PHASE, r), [r]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Linkage & recombination</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-xs text-muted-foreground">
+          Parent's coupling is AB / ab (cis). At recombination frequency <code>r</code>, parental
+          gametes (AB, ab) each get <code>(1-r)/2</code> and recombinants (Ab, aB) each get{' '}
+          <code>r/2</code>. r = 0.5 recovers ordinary independent assortment.
+        </p>
+        <label className="text-xs space-y-1 block max-w-xs">
+          <span className="text-muted-foreground">Recombination frequency r</span>
+          <select
+            className={`${inputClass} w-full`}
+            value={rIdx}
+            onChange={(e) => setRIdx(Number(e.target.value))}
+          >
+            {R_OPTIONS.map((v, i) => (
+              <option key={v} value={i}>
+                r = {v} {v === 0 ? '(complete linkage)' : v === 0.5 ? '(unlinked)' : ''}
+              </option>
+            ))}
+          </select>
+        </label>
+        <VegaLiteEmbed
+          spec={distributionToVegaLiteSpec(
+            gametes.map((g) => ({ label: g.gamete.join(''), probability: g.frequency })),
+          )}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
 export function AdvancedGenetics() {
   return (
     <section className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold">Advanced genetics</h2>
         <p className="text-sm text-muted-foreground">
-          Three classical inheritance patterns beyond the simple Punnett square above, each backed
-          by a hand-verified standalone helper in the <code>breeding</code> engine (not used by the
+          Four classical inheritance patterns beyond the simple Punnett square above, each backed by
+          a hand-verified standalone helper in the <code>breeding</code> engine (not used by the
           Glowzoa crosses themselves).
         </p>
       </div>
       <div className="grid lg:grid-cols-2 gap-4">
         <XLinkedDemo />
         <EpistasisDemo />
+        <LinkageDemo />
+        <LethalityDemo />
       </div>
-      <LethalityDemo />
     </section>
   );
 }
