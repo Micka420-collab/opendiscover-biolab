@@ -313,6 +313,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "40-residue protein: 4777.5 Da, pI 10.62, GRAVY -0.16, instability 34.4 (stable).",
   },
+  "replicator-dynamics": {
+    "metrics": {
+      "essFractionA": 0.5,
+      "finalFraction": 0.5,
+      "gameType": 3,
+      "initialFraction": 0.2,
+      "interiorFixedPoint": 0.5,
+    },
+    "summary": "Replicator dynamics: coexistence (stable mixed ESS) — stable coexistence at 50% A.",
+  },
   "rna-fold": {
     "metrics": {
       "basePairs": 4,

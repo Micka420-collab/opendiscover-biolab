@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **39 deterministic simulation engines** across
+The OpenDiscover BioLab ships **40 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation)
+- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
@@ -1316,6 +1316,47 @@ A species occupying a network of habitat patches, colonizing empty ones and goin
 ```
 
 _Run it: `POST /api/lab/run { "engine": "levins-metapopulation", "params": … }` or interactively at `/lab/levins-metapopulation`._
+
+---
+
+### `replicator-dynamics` — Replicator Dynamics (evolutionary game)
+
+The replicator equation for a symmetric 2×2 game: dx/dt = x(1−x)(f_A − f_B), where x is the fraction playing strategy A and the fitnesses come from a payoff matrix. It classifies any such game — dominance (one strategy wins), coexistence (a stable mixed ESS, as in Hawk–Dove), bistable (two pure ESS with an unstable threshold, as in the Stag Hunt), or neutral — and locates the evolutionarily stable outcome. Adaptive RK45, x clamped to [0,1].
+
+**References**
+- Taylor, P.D. & Jonker, L.B. (1978) Evolutionarily stable strategies and game dynamics. Math. Biosci. 40:145-156.
+- Maynard Smith, J. (1982) Evolution and the Theory of Games. Cambridge University Press.
+- Hofbauer, J. & Sigmund, K. (1998) Evolutionary Games and Population Dynamics. Cambridge University Press.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `aa` | number | `-1` |  |  |
+| `ab` | number | `2` |  |  |
+| `ba` | number | `0` |  |  |
+| `bb` | number | `1` |  |  |
+| `x0` | number | `0.2` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `60` | ≥ 0, ≤ 100000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+| `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "aa": -1,
+  "ab": 2,
+  "ba": 0,
+  "bb": 1,
+  "x0": 0.2,
+  "tEnd": 60,
+  "tol": 1e-8,
+  "outputPoints": 400
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "replicator-dynamics", "params": … }` or interactively at `/lab/replicator-dynamics`._
 
 
 ## 🏭 Bioprocess
