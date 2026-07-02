@@ -30,7 +30,7 @@
  */
 
 import { z } from 'zod';
-import { type Derivative, rk4 } from '../core/ode';
+import { type Derivative, rk45 } from '../core/ode';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -42,8 +42,8 @@ export const paramsSchema = z
     k: z.number().positive().default(6),
     /** Attack rate a. */
     a: z.number().positive().default(1),
-    /** Handling time h (Holling type-II saturation). */
-    h: z.number().min(0).default(0.5),
+    /** Handling time h > 0 (Holling type-II saturation; h→0 is the linear type-I limit). */
+    h: z.number().positive().default(0.5),
     /** Conversion efficiency e (prey eaten → predators). */
     e: z.number().positive().default(0.5),
     /** Predator mortality m. */
@@ -54,8 +54,8 @@ export const paramsSchema = z
     p0: z.number().positive().default(1),
     /** Integration horizon. */
     tEnd: z.number().positive().max(10_000).default(300),
-    /** Fixed RK4 steps. */
-    steps: z.number().int().positive().max(200_000).default(6000),
+    /** Adaptive RK45 tolerance. */
+    tol: z.number().positive().default(1e-8),
     /** Points kept for the plotted series. */
     outputPoints: z.number().int().positive().max(2000).default(600),
   })
@@ -107,18 +107,27 @@ function downsampleIndices(len: number, n: number): number[] {
 
 export function run(rawParams: Partial<RosenzweigMacArthurParams> = {}): SimResult {
   const p = paramsSchema.parse(rawParams);
-  const traj = rk4(rosenzweigMacArthurDerivative(p), [p.n0, p.p0], 0, p.tEnd, p.steps);
-  const prey = traj.y.map((row) => row[0] ?? 0);
-  const pred = traj.y.map((row) => row[1] ?? 0);
+  // Adaptive RK45: near a deep boom–bust trough a large fixed step would overshoot
+  // N below zero and the logistic term would then run it to −∞; the adaptive
+  // stepper tracks the (always-positive) true solution instead.
+  const traj = rk45(rosenzweigMacArthurDerivative(p), [p.n0, p.p0], 0, p.tEnd, {
+    tol: p.tol,
+    outputPoints: p.outputPoints,
+  });
+  // Populations are physical: clamp to ≥0 to guard against any tiny numerical undershoot.
+  const prey = traj.y.map((row) => Math.max(0, row[0] ?? 0));
+  const pred = traj.y.map((row) => Math.max(0, row[1] ?? 0));
 
   const eq = interiorEquilibrium(p);
   const enrichmentThreshold = eq ? 2 * eq.n + 1 / (p.a * p.h) : Number.NaN;
 
-  // Steady-state behaviour over the second half.
+  // Classify the regime from the exact Hopf condition (K > K_H), not a fragile
+  // amplitude cutoff that a still-decaying transient would trip. Amplitude is a
+  // diagnostic only.
   const half = Math.floor(prey.length / 2);
   const { min: nMin, max: nMax } = arrayMinMax(prey.slice(half));
   const amplitude = nMax - nMin;
-  const limitCycle = amplitude > 0.05;
+  const limitCycle = eq ? p.k > enrichmentThreshold : false;
 
   const metrics: Metric[] = [
     {

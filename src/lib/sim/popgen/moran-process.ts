@@ -61,6 +61,14 @@ export function moranFixationProbability(n: number, i: number, r: number): numbe
   if (i >= n) return 1;
   if (Math.abs(r - 1) < 1e-12) return i / n;
   const q = 1 / r;
+  if (q > 1) {
+    // Deleterious mutant (r < 1): q**i and q**n would overflow to +Infinity, making
+    // (1-Inf)/(1-Inf) = NaN. Divide through by q**n and use NEGATIVE exponents, which
+    // underflow harmlessly to 0.
+    const a = q ** -n;
+    const b = q ** -(n - i);
+    return (a - b) / (a - 1);
+  }
   return (1 - q ** i) / (1 - q ** n);
 }
 
@@ -109,7 +117,7 @@ export function run(rawParams: Partial<MoranProcessParams> = {}): SimResult {
   // Monte-Carlo ensemble: independent seeded realizations.
   let fixations = 0;
   let absorbedCount = 0;
-  let totalSteps = 0;
+  let absorbedSteps = 0;
   for (let k = 0; k < p.replicates; k++) {
     const rng = createRng(`${p.seed}#${k}`);
     const res = simulateMoran(
@@ -119,12 +127,17 @@ export function run(rawParams: Partial<MoranProcessParams> = {}): SimResult {
       rng,
       p.maxSteps,
     );
-    if (res.fixed) fixations++;
-    if (res.absorbed) absorbedCount++;
-    totalSteps += res.steps;
+    // Only absorbed realizations inform the estimate; runs capped at maxSteps are
+    // neither fixed nor lost and would bias the fixation frequency toward 0.
+    if (res.absorbed) {
+      absorbedCount++;
+      absorbedSteps += res.steps;
+      if (res.fixed) fixations++;
+    }
   }
-  const empirical = fixations / p.replicates;
-  const meanAbsorptionTime = totalSteps / p.replicates;
+  const empirical = absorbedCount > 0 ? fixations / absorbedCount : Number.NaN;
+  const meanAbsorptionTime = absorbedCount > 0 ? absorbedSteps / absorbedCount : Number.NaN;
+  const nonAbsorbedFraction = (p.replicates - absorbedCount) / p.replicates;
 
   // One example trajectory for the chart.
   const example = simulateMoran(
@@ -147,13 +160,20 @@ export function run(rawParams: Partial<MoranProcessParams> = {}): SimResult {
       key: 'empiricalFixationProbability',
       label: 'Fixation probability (Monte-Carlo)',
       value: empirical,
-      note: `over ${p.replicates} realizations`,
+      note: `over ${absorbedCount} absorbed realizations`,
     },
     {
       key: 'meanAbsorptionTime',
       label: 'Mean absorption time',
       value: meanAbsorptionTime,
       unit: 'steps',
+      note: 'over absorbed realizations',
+    },
+    {
+      key: 'nonAbsorbedFraction',
+      label: 'Non-absorbed fraction',
+      value: nonAbsorbedFraction,
+      note: 'runs that hit maxSteps without fixing or losing (excluded from the estimate)',
     },
     { key: 'populationSize', label: 'Population size N', value: p.populationSize },
     { key: 'relativeFitness', label: 'Relative fitness r', value: p.relativeFitness },

@@ -44,6 +44,26 @@ describe('moran-process', () => {
     expect(last === 0 || last === 20).toBe(true);
   });
 
+  it('stays finite for a strongly deleterious mutant (no overflow → NaN)', () => {
+    const rho = moranFixationProbability(200, 155, 0.01);
+    expect(Number.isFinite(rho)).toBe(true);
+    expect(rho).toBeGreaterThan(0);
+    expect(rho).toBeLessThan(1e-50); // a 100×-deleterious mutant essentially never fixes
+  });
+
+  it('excludes non-absorbed (maxSteps-capped) runs from the estimate', () => {
+    // maxSteps far too small for N=100 to ever reach 0 or N.
+    const r = run({
+      populationSize: 100,
+      initialMutants: 50,
+      relativeFitness: 1,
+      replicates: 20,
+      maxSteps: 5,
+    });
+    expect(metric(r, 'nonAbsorbedFraction')).toBe(1);
+    expect(Number.isNaN(metric(r, 'empiricalFixationProbability'))).toBe(true);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('moran-process', { seed: 7, replicates: 100 });
     const b = runEngine('moran-process', { seed: 7, replicates: 100 });

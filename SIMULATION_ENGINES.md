@@ -1091,7 +1091,7 @@ A realistic predator–prey model: logistic (self-limiting) prey and a saturatin
 | `n0` | number | `1` | ≥ 0 |  |
 | `p0` | number | `1` | ≥ 0 |  |
 | `tEnd` | number | `300` | ≥ 0, ≤ 10000 |  |
-| `steps` | integer | `6000` | ≥ 0, ≤ 200000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
 | `outputPoints` | integer | `600` | ≥ 0, ≤ 2000 |  |
 
 **Example**
@@ -1107,7 +1107,7 @@ A realistic predator–prey model: logistic (self-limiting) prey and a saturatin
   "n0": 1,
   "p0": 1,
   "tEnd": 300,
-  "steps": 6000,
+  "tol": 1e-8,
   "outputPoints": 600
 }
 ```
