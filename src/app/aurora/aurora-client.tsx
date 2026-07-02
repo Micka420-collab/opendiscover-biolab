@@ -35,8 +35,8 @@ import { SignalScope } from './components/signal-scope';
 import { VerdictGauge } from './components/verdict-gauge';
 import { useReducedMotion } from './hooks/use-reduced-motion';
 import { scoreRound } from './lib/gauntlet';
-import { autoTune, sampleLandscape, signalAtKnob, valueAtKnob } from './lib/landscape';
-import { scoreToColor } from './lib/palette';
+import { autoTune, sampleLandscape, signalAtKnob, signalFor, valueAtKnob } from './lib/landscape';
+import { readableScoreColor, scoreToColor } from './lib/palette';
 import { auroraIndex, decodeLit, encodeLit, nextMilestone, planetFor } from './lib/planet';
 import { registerLit, litIds as storedLitIds } from './lib/progress';
 
@@ -96,7 +96,15 @@ export function AuroraClient({
   const [lock, setLock] = useState<LockInfo | null>(null);
   const [pulseKey, setPulseKey] = useState(0);
   const [streak, setStreak] = useState<StreakState>(EMPTY_STREAK);
-  const [litSet, setLitSet] = useState<Set<string>>(new Set());
+  // Two DISJOINT sets: `verified` are bands truly cleared by a live meetsBar pass
+  // (seeded from localStorage, grown only by doLock) — the honest count and the only
+  // thing ever re-broadcast. `relay` are cosmetic ids from a shared ?lit= link that
+  // only pre-light the Earth's glow and never count as earned.
+  const [verifiedSet, setVerifiedSet] = useState<Set<string>>(new Set());
+  const [relaySet, setRelaySet] = useState<Set<string>>(new Set());
+  // Bumped on any mode/round reset so the scan intro restarts even when the round's
+  // challenge reference is unchanged (e.g. a play↔watch toggle on round 0).
+  const [runNonce, setRunNonce] = useState(0);
   const [narration, setNarration] = useState<string>('');
   const [relayMsg, setRelayMsg] = useState<string | null>(null);
 
@@ -110,15 +118,22 @@ export function AuroraClient({
     [challenge],
   );
 
-  // Seed streak + lit-set (stored truths ∪ cosmetic ?lit= relay) once on mount.
+  // Seed the streak, the verified set (stored truths) and the cosmetic relay set.
   useEffect(() => {
     setStreak(getStreak());
-    const merged = new Set<string>(storedLitIds());
-    for (const id of decodeLit(litParam)) merged.add(id);
-    setLitSet(merged);
+    setVerifiedSet(new Set(storedLitIds()));
+    setRelaySet(decodeLit(litParam));
   }, [litParam]);
 
+  // The Earth glows for verified ∪ relay bands; the honest index counts verified only.
+  const litSet = useMemo(() => {
+    const u = new Set(verifiedSet);
+    for (const id of relaySet) u.add(id);
+    return u;
+  }, [verifiedSet, relaySet]);
+
   // New round → reset dial to the default and run the scan reveal.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runNonce is an intentional re-run trigger (restarts the intro when the challenge reference is unchanged, e.g. a play↔watch toggle at round 0).
   useEffect(() => {
     if (!challenge || !landscape) return;
     setKnob(challenge.knob.default);
@@ -144,21 +159,23 @@ export function AuroraClient({
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [challenge, landscape, reduced]);
+    // runNonce forces the intro to restart on a mode/round reset even when the
+    // challenge reference is unchanged (fixes the play↔watch soft-lock).
+  }, [challenge, landscape, reduced, runNonce]);
 
   const liveValue = landscape ? valueAtKnob(landscape, knob) : Number.NaN;
   const liveSignal = landscape ? signalAtKnob(landscape, knob) : 0;
 
   const advance = useCallback(() => {
-    setRoundIndex((i) => {
-      const next = i + 1;
-      if (mode !== 'endless' && next >= rounds.length) {
-        setStreak(registerClear(date)); // bank the 🔥 streak on a full gauntlet clear
-        setPhase('complete');
-      }
-      return next;
-    });
-  }, [mode, rounds.length, date]);
+    // Side effects live OUTSIDE the state updater (updaters must be pure — React may
+    // re-invoke them, which would double-bank the streak).
+    const next = roundIndex + 1;
+    if (mode !== 'endless' && next >= rounds.length) {
+      setStreak(registerClear(date)); // bank the 🔥 streak on a full gauntlet clear
+      setPhase('complete');
+    }
+    setRoundIndex(next);
+  }, [mode, rounds.length, date, roundIndex]);
 
   const doLock = useCallback(
     (atKnob: number) => {
@@ -173,7 +190,16 @@ export function AuroraClient({
       }
       if (!Number.isFinite(value) || !meetsBar(challenge, value)) return false;
 
-      const perfect = judgePerfect(challenge, value, signalAtKnob(landscape, atKnob));
+      // PERFECT is judged from the AUTHORITATIVE value, never the interpolated display
+      // signal: for maximize/minimize we derive the signal from the real value against
+      // the landscape's value range (target goals use the value directly in judgePerfect).
+      const authSignal = signalFor(
+        challenge,
+        value,
+        landscape.valueRange[0],
+        landscape.valueRange[1],
+      );
+      const perfect = judgePerfect(challenge, value, authSignal);
       const params = challengeParams(challenge, atKnob);
       const permalink = experimentSharePath({ engine: challenge.engine, params });
       const overlay = experimentOverlayPath({ engine: challenge.engine, params });
@@ -183,7 +209,7 @@ export function AuroraClient({
       setCombo(nextCombo);
       setScore((s) => s + scoreRound({ combo: nextCombo, perfect }).total);
       recordEngineRun(challenge.engine);
-      setLitSet((prev) => {
+      setVerifiedSet((prev) => {
         const n = new Set(prev);
         n.add(challenge.id);
         return n;
@@ -250,7 +276,7 @@ export function AuroraClient({
     return () => clearTimeout(id);
   }, [phase, mode, advance, reduced]);
 
-  const index = auroraIndex(litSet.size);
+  const index = auroraIndex(verifiedSet.size); // honest: verified confirmations only
   const milestone = nextMilestone(index);
 
   async function copy(text: string, msg: string) {
@@ -264,14 +290,17 @@ export function AuroraClient({
 
   function shareRelay() {
     const base = typeof window !== 'undefined' ? window.location.origin : '';
-    const url = `${base}/aurora?lit=${encodeLit(litSet)}`;
+    // Only VERIFIED bands are relayed — cosmetic relay lights are never re-broadcast as earned.
+    const url = `${base}/aurora?lit=${encodeLit(verifiedSet)}`;
     copy(
       url,
       `Relay link copied — hands over your Earth at ${Math.round(index * 100)}%. Pass it on.`,
     );
   }
 
-  const accent = scoreToColor(complete ? 1 : liveSignal);
+  // Readable (lightness-floored) colour for the big numeric readout — a low signal must
+  // never render as dark-indigo-on-dark.
+  const accent = readableScoreColor(complete ? 1 : liveSignal);
 
   return (
     <div
@@ -282,6 +311,11 @@ export function AuroraClient({
       }}
     >
       <style>{auroraCss}</style>
+
+      {/* Single polite live region: announces every copy/relay action once, wherever triggered. */}
+      <output aria-live="polite" className="sr-only">
+        {relayMsg}
+      </output>
 
       <div className="mx-auto max-w-6xl grid gap-5 lg:grid-cols-[1.6fr_1fr]">
         {/* ── Left column: banner, scope, gauge, dial ───────────────────── */}
@@ -299,6 +333,7 @@ export function AuroraClient({
               setCombo(0);
               setScore(0);
               setPhase('scan');
+              setRunNonce((n) => n + 1); // restart the intro even if round 0's challenge is unchanged
             }}
           />
 
@@ -362,6 +397,7 @@ export function AuroraClient({
                   mode={mode}
                   onNext={advance}
                   onCopy={copy}
+                  relayMsg={relayMsg}
                 />
               )}
             </>
@@ -373,7 +409,10 @@ export function AuroraClient({
               onEndless={() => {
                 setMode('endless');
                 setRoundIndex(0);
+                setCombo(0);
+                setScore(0);
                 setPhase('scan');
+                setRunNonce((n) => n + 1);
               }}
               onShareRelay={shareRelay}
             />
@@ -395,7 +434,8 @@ export function AuroraClient({
           </div>
 
           <PlanetMeter
-            litCount={litSet.size}
+            litCount={verifiedSet.size}
+            relayCount={relaySet.size}
             index={index}
             milestone={milestone?.label ?? 'Planetary dawn'}
             onRelay={shareRelay}
@@ -430,7 +470,10 @@ function Hud({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
-        <span className="font-mono text-lg font-bold tabular-nums" aria-label="score">
+        <span
+          className="font-mono text-lg font-bold tabular-nums"
+          aria-label={`Score ${score.toLocaleString()}`}
+        >
           {score.toLocaleString()}
         </span>
         {combo > 1 && (
@@ -439,8 +482,12 @@ function Hud({
         {streak > 0 && <Badge variant="muted">🔥 {streak}</Badge>}
       </div>
       <div className="flex items-center gap-2">
-        {mode !== 'endless' && (
-          <div className="flex gap-1" aria-label="round progress">
+        {mode !== 'endless' && roundIds.length > 0 && (
+          <div
+            className="flex gap-1"
+            role="img"
+            aria-label={`Round ${Math.min(roundIndex + 1, roundIds.length)} of ${roundIds.length}`}
+          >
             {roundIds.map((id, i) => (
               <span
                 key={id}
@@ -455,12 +502,16 @@ function Hud({
             ))}
           </div>
         )}
-        <div className="flex rounded-md border border-[hsl(240_6%_16%)] overflow-hidden text-xs">
+        <div
+          className="flex rounded-md border border-[hsl(240_6%_16%)] overflow-hidden text-xs"
+          aria-label="Game mode"
+        >
           {modes.map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => onMode(m)}
+              aria-pressed={mode === m}
               className={`px-2.5 py-1 capitalize ${
                 mode === m
                   ? 'bg-[hsl(142_71%_45%)] text-[hsl(240_10%_4%)] font-medium'
@@ -501,7 +552,7 @@ function TuningDial({
   onChange: (v: number) => void;
   onCommit: () => void;
 }) {
-  const color = scoreToColor(signal);
+  const color = readableScoreColor(signal);
   return (
     <div className="rounded-xl border border-[hsl(240_6%_16%)] bg-[hsl(240_8%_8%/0.6)] backdrop-blur p-4 space-y-2">
       <div className="flex items-center justify-between text-sm">
@@ -556,12 +607,14 @@ function RoundSummary({
   mode,
   onNext,
   onCopy,
+  relayMsg,
 }: {
   challenge: Challenge;
   lock: LockInfo;
   mode: Mode;
   onNext: () => void;
   onCopy: (text: string, msg: string) => void;
+  relayMsg: string | null;
 }) {
   const base = typeof window !== 'undefined' ? window.location.origin : '';
   return (
@@ -594,18 +647,21 @@ function RoundSummary({
         </Button>
         {mode === 'play' && <Button onClick={onNext}>Next round →</Button>}
       </div>
+      {relayMsg && <p className="text-xs text-[hsl(142_71%_60%)] break-all">{relayMsg}</p>}
     </div>
   );
 }
 
 function PlanetMeter({
   litCount,
+  relayCount,
   index,
   milestone,
   onRelay,
   relayMsg,
 }: {
   litCount: number;
+  relayCount: number;
   index: number;
   milestone: string;
   onRelay: () => void;
@@ -617,7 +673,10 @@ function PlanetMeter({
         <span className="text-xs uppercase tracking-widest text-[hsl(240_5%_65%)]">
           AURORA index
         </span>
-        <span className="font-mono tabular-nums text-lg" style={{ color: scoreToColor(index) }}>
+        <span
+          className="font-mono tabular-nums text-lg"
+          style={{ color: readableScoreColor(index) }}
+        >
           {Math.round(index * 100)}%
         </span>
       </div>
@@ -635,6 +694,14 @@ function PlanetMeter({
         {litCount} technique{litCount === 1 ? '' : 's'} confirmed — next:{' '}
         <span className="text-[hsl(0_0%_92%)]">{milestone}</span>. These are your verified
         discoveries, not a live population.
+        {relayCount > 0 && (
+          <>
+            {' '}
+            <span className="text-[hsl(240_5%_55%)]">
+              (+{relayCount} pre-lit from a shared link — re-solve to make them yours.)
+            </span>
+          </>
+        )}
       </p>
       <Button variant="outline" className="h-7 text-xs" onClick={onRelay}>
         🌍 Pass on your Earth

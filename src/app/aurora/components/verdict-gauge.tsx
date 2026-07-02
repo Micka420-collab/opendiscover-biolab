@@ -60,11 +60,10 @@ export function VerdictGauge({ signal, locked, perfect, children }: Props) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
         {children}
-        <div
-          className="mt-1 text-[11px] uppercase tracking-widest font-mono"
-          style={{ color }}
-          aria-live="polite"
-        >
+        {/* Not a live region: the signal % updates every animation frame while tuning;
+            announcing it would spam a screen reader. Lock status is announced via the
+            narration ticker + round summary instead. */}
+        <div className="mt-1 text-[11px] uppercase tracking-widest font-mono" style={{ color }}>
           {locked ? (perfect ? 'PERFECT LOCK' : 'LOCKED') : `${Math.round(s * 100)}% signal`}
         </div>
       </div>

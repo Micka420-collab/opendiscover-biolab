@@ -71,3 +71,14 @@ export function hslString({ h, s, l }: Hsl, alpha = 1): string {
   const base = `${h.toFixed(1)} ${s.toFixed(1)}% ${l.toFixed(1)}%`;
   return alpha >= 1 ? `hsl(${base})` : `hsl(${base} / ${clamp01(alpha)})`;
 }
+
+/**
+ * A text-safe version of the ramp: keeps the hue but floors lightness so a low
+ * signal never renders dark-indigo-on-dark (unreadable on the abyss background /
+ * on a stream). Use for coloured numbers and labels; the gauge arc keeps the full
+ * ramp because it is a thick, glowing stroke.
+ */
+export function readableScoreColor(signal: number, minL = 62): string {
+  const { h, s, l } = scoreToHsl(signal);
+  return `hsl(${h.toFixed(1)} ${Math.max(s, 55).toFixed(1)}% ${Math.max(l, minL).toFixed(1)}%)`;
+}

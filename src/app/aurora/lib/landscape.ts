@@ -52,6 +52,8 @@ export interface Landscape {
   marker: Marker | null;
   yDomain: [number, number];
   knobDomain: [number, number];
+  /** Raw finite [min, max] of the sampled metric values (unpadded) — for authoritative signal. */
+  valueRange: [number, number];
 }
 
 /** Read the scored metric for one knob value; NaN if the engine can't produce it. */
@@ -208,6 +210,7 @@ export function sampleLandscape(c: Challenge, runner: Runner, n = 72): Landscape
     marker: findMarker(c, samples),
     yDomain: [yLo - pad, yHi + pad],
     knobDomain: [min, max],
+    valueRange: [lo, hi],
   };
 }
 
