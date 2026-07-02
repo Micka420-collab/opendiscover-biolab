@@ -27,6 +27,7 @@ import { spec as replicatorDynamics } from './ecology/replicator-dynamics';
 import { spec as rockPaperScissors } from './ecology/rock-paper-scissors';
 import { spec as rosenzweigMacArthur } from './ecology/rosenzweig-macarthur';
 import { spec as compartmental } from './epi/compartmental';
+import { spec as reedFrost } from './epi/reed-frost';
 import { spec as sirEndemic } from './epi/sir-endemic';
 import { spec as sis } from './epi/sis';
 import { spec as breeding } from './genetics/breeding';
@@ -105,6 +106,7 @@ export const engines: AnyEngine[] = [
   compartmental,
   sis,
   sirEndemic,
+  reedFrost,
   admet,
   docking,
   doseResponse,

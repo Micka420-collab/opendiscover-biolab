@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **46 deterministic simulation engines** across
+The OpenDiscover BioLab ships **47 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
-- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
+- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment)
 - **🔬 Structural** — [`rna-fold`](#rna-fold)
 
@@ -1743,6 +1743,40 @@ SIR with vital dynamics: births continually replenish susceptibles, so an infect
 ```
 
 _Run it: `POST /api/lab/run { "engine": "sir-endemic", "params": … }` or interactively at `/lab/sir-endemic`._
+
+---
+
+### `reed-frost` — Reed–Frost Chain-Binomial Epidemic
+
+The Reed–Frost chain-binomial epidemic: a discrete-generation model where the expected new cases are I_{t+1}=S_t(1−(1−p)^{I_t}) with p=R₀/(N−1). The discrete, binomial-escape counterpart of the continuous SIR ODE. Reports the attack rate and full incidence curve, the peak generation, epidemic duration, the herd-immunity threshold 1−1/R₀, and the large-N analytic final size z=1−e^(−R₀z) for comparison. Deterministic expectation, all counts clamped to [0,N].
+
+**References**
+- Abbey, H. (1952) An examination of the Reed-Frost theory of epidemics. Human Biology 24:201-233.
+- Bailey, N.T.J. (1975) The Mathematical Theory of Infectious Diseases, 2nd ed. Griffin.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `population` | integer | `1000` | ≥ 2, ≤ 10000000 |  |
+| `r0` | number | `2.5` | ≥ 0, ≤ 50 |  |
+| `initialInfectives` | integer | `1` | ≥ 1 |  |
+| `initialImmune` | integer | `0` | ≥ 0 |  |
+| `maxGenerations` | integer | `200` | ≥ 1, ≤ 1000 |  |
+
+**Example**
+
+```json
+{
+  "population": 1000,
+  "r0": 2.5,
+  "initialInfectives": 1,
+  "initialImmune": 0,
+  "maxGenerations": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "reed-frost", "params": … }` or interactively at `/lab/reed-frost`._
 
 
 ## 💊 Drug discovery

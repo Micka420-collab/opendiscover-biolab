@@ -69,6 +69,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
 | | `sis` | SIS (no immunity): endemic prevalence i* = 1 − 1/R₀, disease-free threshold |
 | | `sir-endemic` | SIR with demography: damped recurrent epidemics to S* = 1/R₀, I* = μ(R₀−1)/β |
+| | `reed-frost` | Discrete chain-binomial epidemic: I_{t+1}=S_t(1−(1−p)^{I_t}), attack rate, final size z=1−e^(−R₀z) |
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |
 | | `docking` | Geometric rigid-body docking — Lennard-Jones pose scoring & ranking |
 | | `dose-response` | Hill dose–response, IC₅₀/EC₅₀ fitting, drug-combination indices |
@@ -189,7 +190,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 46 engines + the lab layer: **960+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 47 engines + the lab layer: **970+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

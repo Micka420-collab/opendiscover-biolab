@@ -359,6 +359,19 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "40-residue protein: 4777.5 Da, pI 10.62, GRAVY -0.16, instability 34.4 (stable).",
   },
+  "reed-frost": {
+    "metrics": {
+      "analyticFinalSize": 0.892645,
+      "attackRate": 0.893526,
+      "basicReproductionNumber": 2.5,
+      "epidemicDuration": 28,
+      "herdImmunityThreshold": 0.6,
+      "peakGeneration": 7,
+      "peakIncidence": 229.598,
+      "totalInfected": 893.526,
+    },
+    "summary": "Reed–Frost (R₀=2.5): epidemic infects 89.4% over 28 generations, peaking at generation 7.",
+  },
   "replicator-dynamics": {
     "metrics": {
       "essFractionA": 0.5,
