@@ -40,6 +40,22 @@ describe('levins-metapopulation', () => {
     }
   });
 
+  it('a single-point series reports the FINAL occupancy, not the stale initial p0 (regression)', () => {
+    const r = run({
+      colonization: 0.5,
+      extinction: 0.1,
+      destroyed: 0,
+      p0: 0.1,
+      tEnd: 200,
+      outputPoints: 1,
+    });
+    const s = r.series?.[0];
+    const lastValue = s?.y.occupied.at(-1) ?? Number.NaN;
+    // The one kept point must be the converged state (≈ finalOccupancy), not p0=0.1.
+    expect(lastValue).toBeCloseTo(metric(r, 'finalOccupancy'), 10);
+    expect(lastValue).toBeGreaterThan(0.5);
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('levins-metapopulation', { colonization: 0.6, extinction: 0.2 });
     const b = runEngine('levins-metapopulation', { colonization: 0.6, extinction: 0.2 });

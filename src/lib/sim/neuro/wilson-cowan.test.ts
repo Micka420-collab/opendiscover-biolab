@@ -77,6 +77,45 @@ describe('wilson-cowan', () => {
     expect(flat.mean).toBeCloseTo(0.42, 10);
   });
 
+  it('classifies a monotone ramp as a transient, not an oscillation (regression)', () => {
+    const t = Array.from({ length: 100 }, (_, i) => i * 0.1);
+    const ramp = t.map((_, i) => 1 - 0.3 * (i / 99)); // monotone decay, no periodicity
+    const s = analyzeOscillation(t, ramp);
+    expect(s.status).toBe('transient');
+    expect(s.oscillates).toBe(false);
+    expect(s.period).toBe(0); // never report a period without a real oscillation
+  });
+
+  it('does not label a slow un-converged transient as a sustained oscillation (regression: finding #2)', () => {
+    // Pure exponential relaxation E(t)=e^{-t/50} over [0,60]: moves a lot but is NOT
+    // periodic. Must not be reported as a limit cycle, and must never be
+    // oscillates=1 with period=0.
+    const r = run({ cEE: 0, cEI: 0, cIE: 0, cII: 0, P: 0, Q: 0, E0: 1, I0: 0, tauE: 50, tEnd: 60 });
+    expect(metric(r, 'oscillates')).toBe(0);
+    expect(metric(r, 'periodE')).toBe(0);
+    expect(r.summary).not.toContain('sustained oscillation');
+  });
+
+  it('does not claim a slow un-converged transient has settled at a false fixed point (regression: finding #3)', () => {
+    // τ_E=5000 ≫ tEnd=60: E has barely moved off E0 and the true fixed point (0) is
+    // far away. It must be flagged as not-settled, not "settles to a fixed point".
+    const r = run({
+      cEE: 0,
+      cEI: 0,
+      cIE: 0,
+      cII: 0,
+      P: 0,
+      Q: 0,
+      E0: 1,
+      I0: 0,
+      tauE: 5000,
+      tEnd: 60,
+    });
+    expect(metric(r, 'oscillates')).toBe(0);
+    expect(r.summary).toContain('not settled');
+    expect(r.summary).not.toContain('settles to a fixed point');
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('wilson-cowan', { P: 1.25 });
     const b = runEngine('wilson-cowan', { P: 1.25 });

@@ -26,6 +26,7 @@
 
 import { z } from 'zod';
 import { type Derivative, rk45 } from '../core/ode';
+import { downsampleIndices } from '../core/series';
 import type { EngineSpec, Metric, Series, SimResult } from '../core/types';
 import { provenance } from '../core/types';
 
@@ -91,23 +92,47 @@ export function wilsonCowanDerivative(p: WilsonCowanParams): Derivative {
   };
 }
 
+/**
+ * Three-way outcome of a run over its analysis window:
+ *   - 'oscillating' : a genuine limit cycle (real periodicity, not a one-off drift);
+ *   - 'settled'     : converged to a fixed point (window essentially flat);
+ *   - 'transient'   : still relaxing at t=tEnd — no rhythm, but not yet converged.
+ */
+export type OscillationStatus = 'oscillating' | 'settled' | 'transient';
+
 export interface OscillationStats {
+  status: OscillationStatus;
+  /** True only when status === 'oscillating'. */
   oscillates: boolean;
   amplitude: number;
   mean: number;
+  /** Dominant period; > 0 iff oscillating, always 0 otherwise. */
   period: number;
+  /** The final sample (where a still-relaxing transient currently sits). */
+  terminal: number;
 }
 
+/** Peak-to-peak below this over the analysis window ⇒ treated as converged. */
+const SETTLE_AMPLITUDE = 5e-3;
+/** A rhythm must swing at least this much — guards against noise & slow drift. */
+const MIN_OSCILLATION_AMPLITUDE = 5e-3;
+
 /**
- * Characterize the steady behavior of a signal over its second half (after the
- * transient): peak-to-peak amplitude, mean, and — if it oscillates — the dominant
- * period from successive upward mean-crossings. Pure and well-guarded.
+ * Classify the steady behavior of a signal over its second half (after the
+ * transient). A limit cycle is distinguished from a fixed point by genuine
+ * PERIODICITY — at least two upward mean-crossings giving a finite period AND a
+ * meaningful swing — not by mere variation of the window (a slow monotone transient
+ * moves a lot without being periodic). This prevents a un-converged relaxation from
+ * being mislabeled an oscillation (and the contradictory oscillates=1 / period=0),
+ * and prevents a still-drifting run from being reported as a settled fixed point.
+ * Pure and well-guarded.
  */
 export function analyzeOscillation(t: number[], v: number[]): OscillationStats {
   const n = v.length;
+  const terminal = n > 0 ? (v[n - 1] ?? 0) : 0;
   if (n < 4) {
     const mean = n > 0 ? v.reduce((s, x) => s + x, 0) / n : 0;
-    return { oscillates: false, amplitude: 0, mean, period: 0 };
+    return { status: 'settled', oscillates: false, amplitude: 0, mean, period: 0, terminal };
   }
   const start = Math.floor(n / 2);
   let max = Number.NEGATIVE_INFINITY;
@@ -123,35 +148,33 @@ export function analyzeOscillation(t: number[], v: number[]): OscillationStats {
   }
   const mean = count > 0 ? sum / count : 0;
   const amplitude = max - min;
-  const oscillates = amplitude > 0.02;
 
-  let period = 0;
-  if (oscillates) {
-    // Times where the signal crosses its mean going upward (linear interpolation).
-    const crossings: number[] = [];
-    for (let i = start + 1; i < n; i++) {
-      const prev = v[i - 1] ?? 0;
-      const cur = v[i] ?? 0;
-      if (prev < mean && cur >= mean) {
-        const tp = t[i - 1] ?? 0;
-        const tc = t[i] ?? 0;
-        const frac = cur === prev ? 0 : (mean - prev) / (cur - prev);
-        crossings.push(tp + frac * (tc - tp));
-      }
-    }
-    if (crossings.length >= 2) {
-      const first = crossings[0] as number;
-      const last = crossings[crossings.length - 1] as number;
-      period = (last - first) / (crossings.length - 1);
+  // Upward mean-crossings (linear interpolation) → dominant period.
+  const crossings: number[] = [];
+  for (let i = start + 1; i < n; i++) {
+    const prev = v[i - 1] ?? 0;
+    const cur = v[i] ?? 0;
+    if (prev < mean && cur >= mean) {
+      const tp = t[i - 1] ?? 0;
+      const tc = t[i] ?? 0;
+      const frac = cur === prev ? 0 : (mean - prev) / (cur - prev);
+      crossings.push(tp + frac * (tc - tp));
     }
   }
-  return { oscillates, amplitude, mean, period };
-}
+  let period = 0;
+  if (crossings.length >= 2) {
+    const first = crossings[0] as number;
+    const last = crossings[crossings.length - 1] as number;
+    period = (last - first) / (crossings.length - 1);
+  }
 
-function downsampleIndices(len: number, n: number): number[] {
-  if (len <= n) return Array.from({ length: len }, (_, i) => i);
-  const denom = Math.max(n - 1, 1);
-  return Array.from({ length: n }, (_, i) => Math.round((i * (len - 1)) / denom));
+  // Genuine rhythm: real periodicity AND a meaningful swing.
+  if (amplitude > MIN_OSCILLATION_AMPLITUDE && crossings.length >= 2 && period > 0) {
+    return { status: 'oscillating', oscillates: true, amplitude, mean, period, terminal };
+  }
+  // No rhythm: either the window is flat (converged) or still drifting (transient).
+  const status: OscillationStatus = amplitude <= SETTLE_AMPLITUDE ? 'settled' : 'transient';
+  return { status, oscillates: false, amplitude, mean, period: 0, terminal };
 }
 
 export function run(rawParams: Partial<WilsonCowanParams> = {}): SimResult {
@@ -165,22 +188,38 @@ export function run(rawParams: Partial<WilsonCowanParams> = {}): SimResult {
   const iSeries = traj.y.map((row) => row[1] ?? 0);
   const eStats = analyzeOscillation(traj.t, eSeries);
   const iStats = analyzeOscillation(traj.t, iSeries);
+  const status = eStats.status;
 
   const metrics: Metric[] = [
     {
       key: 'oscillates',
       label: 'Sustained oscillation',
       value: eStats.oscillates ? 1 : 0,
-      note: eStats.oscillates ? 'limit cycle (rhythmic activity)' : 'settles to a fixed point',
+      note:
+        status === 'oscillating'
+          ? 'limit cycle (rhythmic activity)'
+          : status === 'settled'
+            ? 'settles to a fixed point'
+            : 'still relaxing — not settled within the horizon',
     },
     {
       key: 'meanE',
-      label: eStats.oscillates ? 'Mean excitatory activity' : 'Steady-state E',
+      label:
+        status === 'oscillating'
+          ? 'Mean excitatory activity'
+          : status === 'settled'
+            ? 'Steady-state E'
+            : 'Mean E (not settled)',
       value: eStats.mean,
     },
     {
       key: 'meanI',
-      label: eStats.oscillates ? 'Mean inhibitory activity' : 'Steady-state I',
+      label:
+        status === 'oscillating'
+          ? 'Mean inhibitory activity'
+          : status === 'settled'
+            ? 'Steady-state I'
+            : 'Mean I (not settled)',
       value: iStats.mean,
     },
     { key: 'amplitudeE', label: 'Excitatory peak-to-peak amplitude', value: eStats.amplitude },
@@ -207,9 +246,12 @@ export function run(rawParams: Partial<WilsonCowanParams> = {}): SimResult {
 
   return {
     engine: 'wilson-cowan',
-    summary: eStats.oscillates
-      ? `Wilson–Cowan: sustained oscillation — E swings ${eStats.amplitude.toFixed(3)} peak-to-peak with period ≈ ${eStats.period.toFixed(2)} (a population rhythm).`
-      : `Wilson–Cowan: settles to a fixed point at E*=${eStats.mean.toFixed(3)}, I*=${iStats.mean.toFixed(3)}.`,
+    summary:
+      status === 'oscillating'
+        ? `Wilson–Cowan: sustained oscillation — E swings ${eStats.amplitude.toFixed(3)} peak-to-peak with period ≈ ${eStats.period.toFixed(2)} (a population rhythm).`
+        : status === 'settled'
+          ? `Wilson–Cowan: settles to a fixed point at E*=${eStats.mean.toFixed(3)}, I*=${iStats.mean.toFixed(3)}.`
+          : `Wilson–Cowan: not settled within t=${p.tEnd} — E is at ${eStats.terminal.toFixed(3)} and still drifting; extend the horizon to reach the attractor.`,
     metrics,
     series,
     detail: {
