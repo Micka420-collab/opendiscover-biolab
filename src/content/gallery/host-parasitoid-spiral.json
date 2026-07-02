@@ -1,0 +1,16 @@
+{
+  "slug": "host-parasitoid-spiral",
+  "title": "Host and parasitoid, spiraling apart",
+  "engine": "nicholson-bailey",
+  "params": {
+    "reproduction": 2,
+    "searchEfficiency": 0.05,
+    "parasitoidsPerHost": 1,
+    "host0": 24,
+    "parasitoid0": 12,
+    "generations": 40
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Start a host and its parasitoid a hair off their equilibrium and watch Nicholson and Bailey's 1935 result unfold: the oscillations don't settle, they grow — the host escapes to an outbreak, the parasitoid catches up, both crash, and the next cycle is bigger. Simple coupling can't coexist."
+}

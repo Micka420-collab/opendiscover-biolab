@@ -1,0 +1,11 @@
+{
+  "slug": "the-repressilator",
+  "title": "The repressilator - a synthetic genetic clock",
+  "engine": "grn",
+  "params": {
+    "preset": "repressilator"
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Three genes, each repressing the next in a ring - the repressilator (Elowitz & Leibler 2000), one of the first engineered genetic circuits. No external clock, yet the gene expression levels oscillate on their own. See both the regulatory network topology and the sustained oscillation."
+}

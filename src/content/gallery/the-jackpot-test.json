@@ -1,0 +1,14 @@
+{
+  "slug": "the-jackpot-test",
+  "title": "Mutations before selection - the jackpot test",
+  "engine": "luria-delbruck",
+  "params": {
+    "mutationRate": 1e-8,
+    "finalSize": 1e8,
+    "initialSize": 1,
+    "cultures": 2000
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Luria and Delbruck's 1943 Nobel experiment, in silico: grow 2000 identical cultures and count resistant mutants. Most have a handful, but a few 'jackpot' cultures - where a mutation happened early and founded a huge clone - have hundreds. That wild variance (far above the mean) proved mutations arise at random during growth, not in response to selection."
+}

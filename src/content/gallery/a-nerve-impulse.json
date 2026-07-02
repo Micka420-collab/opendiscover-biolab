@@ -1,0 +1,14 @@
+{
+  "slug": "a-nerve-impulse",
+  "title": "A nerve impulse, spike and all",
+  "engine": "hodgkin-huxley",
+  "params": {
+    "iExt": 10,
+    "stimStart": 5,
+    "stimDuration": 1,
+    "tEnd": 50
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A brief jolt of current fires a single action potential in Hodgkin and Huxley's 1952 model of the squid giant axon - the Nobel-winning equations behind every nerve impulse. Watch the sodium and potassium gates open and close as the membrane voltage spikes and recovers."
+}
