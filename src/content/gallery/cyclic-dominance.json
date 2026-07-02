@@ -1,0 +1,14 @@
+{
+  "slug": "cyclic-dominance",
+  "title": "Rock, paper, scissors - forever",
+  "engine": "rock-paper-scissors",
+  "params": {
+    "winPayoff": 1,
+    "lossPayoff": 1,
+    "rock0": 0.5,
+    "paper0": 0.3
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Three strategies chase each other in a never-ending loop - rock beats scissors beats paper beats rock. In the zero-sum case the frequencies trace a closed orbit that conserves the product xR-xP-xS exactly, the same cyclic dominance seen in side-blotched lizards and E. coli colicin systems."
+}

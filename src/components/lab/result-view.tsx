@@ -21,7 +21,7 @@ import {
   networkGraphSpec,
 } from '@/lib/lab/network-chart';
 import type { Metric, SimResult } from '@/lib/sim';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 /** The `/api/lab/run` response shape (a hashed experiment record, minus params). */
 export interface RunResult {
@@ -121,6 +121,30 @@ export function extractDistributions(
   return charts;
 }
 
+/** The reproducibility hash, click-to-copy in full — proof any viewer can replay. */
+function HashCopyButton({ hash }: { hash: string }) {
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(hash);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable — ignore */
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title="Copy the full reproducibility hash"
+      className="text-xs font-mono text-muted-foreground hover:text-accent transition-colors"
+    >
+      {copied ? 'copied ✓' : `hash ${hash.slice(0, 16)}…`}
+    </button>
+  );
+}
+
 export function ResultView({ result: state }: { result: RunResult }) {
   const specs = useMemo(
     () => (state.result.series ?? []).map((s, i) => ({ i, spec: seriesToVegaLiteSpec(s) })),
@@ -156,9 +180,7 @@ export function ResultView({ result: state }: { result: RunResult }) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between flex-wrap gap-2">
           <span>{state.summary}</span>
-          <code className="text-xs font-mono text-muted-foreground">
-            hash {state.outputHash.slice(0, 16)}…
-          </code>
+          <HashCopyButton hash={state.outputHash} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
