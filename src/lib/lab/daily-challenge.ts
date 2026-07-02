@@ -532,6 +532,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 1,
     hint: 'R_eff = R₀·(1 − εv). With R₀ = 4 and ε = 0.9 you need 1 − 0.9v = 1/4, i.e. coverage v ≈ 0.83 (the critical coverage v_c = (1 − 1/R₀)/ε).',
   },
+  {
+    id: 'fret-measure-distance',
+    engine: 'fret',
+    title: 'Read a molecular ruler',
+    brief:
+      'FRET efficiency reads exactly 50% when the two fluorophores sit one Förster radius apart. With R₀ = 5 nm, tune the donor–acceptor distance until the transfer efficiency lands on 50% — and you have just measured a 5-nanometre ruler.',
+    baseParams: { forsterRadius: 5 },
+    knob: {
+      param: 'distance',
+      label: 'Donor–acceptor distance',
+      min: 1,
+      max: 15,
+      step: 0.05,
+      default: 9,
+      unit: 'nm',
+    },
+    metricKey: 'efficiency',
+    metricLabel: 'Transfer efficiency E',
+    goal: 'target',
+    target: 0.5,
+    hint: 'E = 1/(1 + (r/R₀)⁶) equals 0.5 exactly when r = R₀. So dial the distance to 5 nm.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

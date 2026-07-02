@@ -1,0 +1,9 @@
+{
+  "slug": "the-id-card-of-a-protein",
+  "title": "The ID card of a protein",
+  "engine": "properties",
+  "params": { "sequence": "MKWVTFISLLFLFSSAYSRGVFRRDTHKSEIAHRFKDLGE" },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Hand a biochemist a string of amino acids and, before running a single experiment, they can read off the molecule's vital statistics — the same numbers the classic ProtParam tool reports. From this fragment of serum albumin the engine computes the molecular weight (how heavy the chain is), the isoelectric point (the pH at which it carries no net charge, which decides how it behaves in a gel or a purification column), and the GRAVY hydrophobicity (whether it prefers water or membranes). Every value follows deterministically from the sequence and the standard amino-acid property tables, so it is an instant, reproducible identity card for any protein you can spell."
+}
