@@ -424,6 +424,35 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 4,
     hint: 'Steady-state DO = C* − OUR/kLa, with diminishing returns as you crank kLa. For C*=8 and OUR=400, hitting 4 mg/L needs kLa = 400/(8−4) = 100 /h.',
   },
+  {
+    id: 'beer-lambert-linear-range',
+    engine: 'beer-lambert',
+    title: 'Stay in the linear range',
+    brief:
+      'A spectrophotometer only obeys Beer’s law while the absorbance stays around 1 or below — push higher and stray light and detector saturation wreck the reading. Dilute your dye (set its concentration) so the peak absorbance lands at 0.8: strong signal, still bang in the linear range.',
+    baseParams: {
+      conc2: 0,
+      eMax1: 0.02,
+      peak1: 500,
+      width1: 30,
+      pathLength: 1,
+      lambdaMin: 400,
+      lambdaMax: 600,
+    },
+    knob: {
+      param: 'conc1',
+      label: 'Dye concentration',
+      min: 5,
+      max: 80,
+      step: 0.5,
+      default: 20,
+    },
+    metricKey: 'peakAbsorbance',
+    metricLabel: 'Peak absorbance',
+    goal: 'target',
+    target: 0.8,
+    hint: 'Beer’s law: A = ε·c·l. With ε=0.02 and l=1 cm, a peak absorbance of 0.8 needs a concentration of about 40.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

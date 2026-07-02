@@ -1,0 +1,21 @@
+{
+  "slug": "unmixing-two-dyes",
+  "title": "Un-mixing two overlapping dyes",
+  "engine": "beer-lambert",
+  "params": {
+    "eMax1": 0.02,
+    "peak1": 450,
+    "width1": 30,
+    "conc1": 20,
+    "eMax2": 0.025,
+    "peak2": 550,
+    "width2": 40,
+    "conc2": 15,
+    "pathLength": 1,
+    "lambdaMin": 400,
+    "lambdaMax": 700
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Two coloured compounds in the same cuvette, their absorption bands overlapping across the visible spectrum. By Beer's law the measured absorbance is just their sum — but the inverse question is the useful one: how much of each is there? Fit the mixture spectrum to the two known pure-component shapes by least squares and the concentrations fall right out (here 20 and 15). This spectral un-mixing is how a plate reader tells apart co-eluting metabolites, how pulse oximeters read oxy- vs deoxy-haemoglobin, and how any multi-analyte colorimetric assay is quantified — as long as the two spectra are different enough to be separable."
+}
