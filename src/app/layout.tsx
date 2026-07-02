@@ -42,6 +42,7 @@ const NAV = [
   { href: '/lab', label: 'Lab' },
   { href: '/challenge', label: 'Challenge' },
   { href: '/gallery', label: 'Gallery' },
+  { href: '/tv', label: 'TV' },
   { href: '/discoveries', label: 'Discoveries' },
   { href: '/about', label: 'About' },
 ];

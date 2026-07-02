@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/lab/breeding',
     '/challenge',
     '/gallery',
+    '/tv',
     '/discoveries',
     '/about',
   ];
