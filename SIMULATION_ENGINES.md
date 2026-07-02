@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **43 deterministic simulation engines** across
+The OpenDiscover BioLab ships **44 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -19,7 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
-- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan)
+- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
@@ -475,6 +475,48 @@ The Wilson–Cowan mean-field model of two coupled neural populations — excita
 ```
 
 _Run it: `POST /api/lab/run { "engine": "wilson-cowan", "params": … }` or interactively at `/lab/wilson-cowan`._
+
+---
+
+### `izhikevich` — Izhikevich Spiking Neuron
+
+Izhikevich's 2003 two-variable spiking-neuron model: v' = 0.04v² + 5v + 140 − u + I, u' = a(bv − u), with a reset v←c, u←u+d whenever v reaches 30 mV. Four parameters (a, b, c, d) recreate the full range of cortical firing — regular spiking, fast spiking, chattering, bursting. Reports spike count, firing rate, and inter-spike-interval statistics (mean and CV of regularity). Deterministic fixed-step integration; the reset also fires on any non-finite v so overflow can never leak into the output.
+
+**References**
+- Izhikevich, E.M. (2003) Simple model of spiking neurons. IEEE Transactions on Neural Networks 14(6):1569-1572.
+- Izhikevich, E.M. (2007) Dynamical Systems in Neuroscience. MIT Press.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `a` | number | `0.02` | ≥ 0, ≤ 1 |  |
+| `b` | number | `0.2` | ≥ -1, ≤ 1 |  |
+| `c` | number | `-65` | ≥ -90, ≤ 0 |  |
+| `d` | number | `8` | ≥ 0, ≤ 20 |  |
+| `current` | number | `10` | ≥ -50, ≤ 100 |  |
+| `v0` | number | `-65` | ≥ -90, ≤ 30 |  |
+| `tEnd` | number | `300` | ≥ 0, ≤ 2000 |  |
+| `dt` | number | `0.25` | ≥ 0.02, ≤ 1 |  |
+| `outputPoints` | integer | `600` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "a": 0.02,
+  "b": 0.2,
+  "c": -65,
+  "d": 8,
+  "current": 10,
+  "v0": -65,
+  "tEnd": 300,
+  "dt": 0.25,
+  "outputPoints": 600
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "izhikevich", "params": … }` or interactively at `/lab/izhikevich`._
 
 
 ## ⚙️ Systems biology

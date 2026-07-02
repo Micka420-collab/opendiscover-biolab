@@ -37,6 +37,7 @@ import { spec as pcr } from './molbio/pcr';
 import { spec as sequence } from './molbio/sequence';
 import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
 import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
+import { spec as izhikevich } from './neuro/izhikevich';
 import { spec as wilsonCowan } from './neuro/wilson-cowan';
 import { spec as ewensSampling } from './popgen/ewens-sampling';
 import { spec as hardyWeinberg } from './popgen/hardy-weinberg';
@@ -73,6 +74,7 @@ export const engines: AnyEngine[] = [
   hodgkinHuxley,
   fitzHughNagumo,
   wilsonCowan,
+  izhikevich,
   enzymeKinetics,
   grn,
   gillespie,

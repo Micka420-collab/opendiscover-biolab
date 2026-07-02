@@ -198,6 +198,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Native fold of HPHPPHHPHPPHPHHPPHPH reached ground-state energy E = -8 (8 H–H contacts) after 60000 MC steps.",
   },
+  "izhikevich": {
+    "metrics": {
+      "cvISI": 0.185802,
+      "firingRateHz": 23.3333,
+      "firstSpikeLatency": 3.5,
+      "meanISI": 42.3333,
+      "spikeCount": 7,
+    },
+    "summary": "Izhikevich neuron: 7 spikes, 23.3 Hz — irregular / bursting.",
+  },
   "kuramoto": {
     "metrics": {
       "coupling": 2,
