@@ -50,6 +50,15 @@ describe('two-state-folding', () => {
     }
   });
 
+  it('ΔG and the peak-stability metric stay finite even when maxStab underflows to 0 K (regression)', () => {
+    // Extreme ΔHm/(Tm·ΔCp): maxStabK underflows to exactly 0; the T→0 limit is finite.
+    const tmK = 150 + KELVIN;
+    expect(deltaGUnfold(0, 5000, tmK, 0.01)).toBeCloseTo(5000 - 0.01 * tmK, 6);
+    const r = run({ deltaHm: 5000, tmCelsius: 150, deltaCp: 0.01 });
+    expect(Number.isFinite(metric(r, 'deltaGmax'))).toBe(true);
+    expect(r.summary).not.toContain('NaN');
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('two-state-folding', { tmCelsius: 55, deltaHm: 300 });
     const b = runEngine('two-state-folding', { tmCelsius: 55, deltaHm: 300 });

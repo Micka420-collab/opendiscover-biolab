@@ -48,12 +48,23 @@ export const paramsSchema = z
 
 export type ReedFrostParams = z.infer<typeof paramsSchema>;
 
-/** Final-size fraction z solving z = 1 − e^(−R0·z), by fixed-point iteration. */
+/**
+ * Final-size fraction z: the nontrivial root of z = 1 − e^(−R0·z) on (0,1).
+ * Found by bisection — fixed-point iteration stalls as R0 → 1+ (its convergence
+ * rate → 1), giving wrong values just above the epidemic threshold.
+ */
 export function analyticFinalSize(r0: number): number {
   if (r0 <= 1) return 0;
-  let z = 0.5;
-  for (let i = 0; i < 200; i++) z = 1 - Math.exp(-r0 * z);
-  return z;
+  // g(z) = z − (1 − e^(−R0 z)); g(0+) < 0 and g(1) = e^(−R0) > 0 for R0 > 1.
+  const g = (z: number) => z - (1 - Math.exp(-r0 * z));
+  let lo = 1e-12;
+  let hi = 1;
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    if (g(mid) < 0) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
 }
 
 export interface ReedFrostRun {
@@ -63,6 +74,8 @@ export interface ReedFrostRun {
   totalInfected: number;
   peakIncidence: number;
   peakGeneration: number;
+  /** True if incidence fell below the die-out threshold; false if the generation cap was hit. */
+  diedOut: boolean;
 }
 
 /** Run the deterministic Reed–Frost recurrence over expected counts. */
@@ -79,10 +92,14 @@ export function simulate(p: ReedFrostParams): ReedFrostRun {
   let totalInfected = I;
   let peakIncidence = I;
   let peakGeneration = 0;
+  let diedOut = false;
 
   for (let g = 1; g <= p.maxGenerations; g++) {
     const newI = S * (1 - q ** I); // expected new cases this generation
-    if (newI < 1e-9) break; // incidence has effectively died out
+    if (newI < 1e-9) {
+      diedOut = true; // incidence has effectively died out
+      break;
+    }
     S -= newI;
     I = newI;
     totalInfected += newI;
@@ -95,7 +112,15 @@ export function simulate(p: ReedFrostParams): ReedFrostRun {
     }
   }
 
-  return { generation, newCases, susceptible, totalInfected, peakIncidence, peakGeneration };
+  return {
+    generation,
+    newCases,
+    susceptible,
+    totalInfected,
+    peakIncidence,
+    peakGeneration,
+    diedOut,
+  };
 }
 
 export function run(rawParams: Partial<ReedFrostParams> = {}): SimResult {
@@ -124,7 +149,12 @@ export function run(rawParams: Partial<ReedFrostParams> = {}): SimResult {
     },
     { key: 'peakIncidence', label: 'Peak new cases in a generation', value: sim.peakIncidence },
     { key: 'peakGeneration', label: 'Peak generation', value: sim.peakGeneration },
-    { key: 'epidemicDuration', label: 'Generations to die-out', value: sim.generation.length - 1 },
+    {
+      key: 'epidemicDuration',
+      label: 'Generations to die-out',
+      value: sim.generation.length - 1,
+      note: sim.diedOut ? undefined : 'generation cap reached — outbreak not yet extinct',
+    },
     {
       key: 'herdImmunityThreshold',
       label: 'Herd-immunity threshold',

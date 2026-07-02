@@ -57,7 +57,10 @@ export type TwoStateFoldingParams = z.infer<typeof paramsSchema>;
 
 /** Free energy of unfolding ΔG(T) (kJ/mol); T, Tm in kelvin. */
 export function deltaGUnfold(tK: number, deltaHm: number, tmK: number, deltaCp: number): number {
-  return deltaHm * (1 - tK / tmK) - deltaCp * (tmK - tK + tK * Math.log(tK / tmK));
+  // T·ln(T/Tm) → 0 as T → 0+; guard the 0·(−∞) = NaN case so the T→0 limit is the
+  // finite ΔHm − ΔCp·Tm (reached when maxStabK underflows to exactly 0).
+  const lnTerm = tK > 0 ? tK * Math.log(tK / tmK) : 0;
+  return deltaHm * (1 - tK / tmK) - deltaCp * (tmK - tK + lnTerm);
 }
 
 /** Fraction folded f_F = 1/(1 + e^(−ΔG/RT)); stays in [0,1] for any ΔG. */

@@ -56,6 +56,25 @@ describe('reed-frost', () => {
     }
   });
 
+  it('analytic final size converges for R₀ just above 1 (regression: fixed-point stalled there)', () => {
+    for (const r0 of [1.001, 1.01, 1.05]) {
+      const z = analyticFinalSize(r0);
+      expect(z).toBeCloseTo(1 - Math.exp(-r0 * z), 9); // truly satisfies the equation
+    }
+    expect(analyticFinalSize(1.01)).toBeCloseTo(0.019736, 5);
+    // Matches the simulator's own attack rate near threshold (large N).
+    const sim = run({ population: 1_000_000, r0: 1.05, maxGenerations: 1000 });
+    expect(metric(sim, 'attackRate')).toBeCloseTo(analyticFinalSize(1.05), 3);
+  });
+
+  it('flags when the generation cap is hit instead of true die-out (regression)', () => {
+    const capped = run({ population: 1_000_000, r0: 1.02, maxGenerations: 200 });
+    expect(capped.metrics.find((m) => m.key === 'epidemicDuration')?.note).toMatch(/cap reached/);
+    // A normal outbreak that dies out carries no such caveat.
+    const settled = run({ population: 1000, r0: 2.5 });
+    expect(settled.metrics.find((m) => m.key === 'epidemicDuration')?.note).toBeUndefined();
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('reed-frost', { population: 2000, r0: 2.2 });
     const b = runEngine('reed-frost', { population: 2000, r0: 2.2 });
