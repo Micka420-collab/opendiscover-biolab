@@ -12,6 +12,7 @@ import { runExperiment } from '@/lib/lab/runner';
 import { decodeExperiment } from '@/lib/lab/share';
 import { OG_SIZE, experimentCard } from '@/lib/og/experiment-card';
 import { formatMetric } from '@/lib/og/format-metric';
+import { buildSparkline } from '@/lib/og/sparkline';
 import { getEngine } from '@/lib/sim';
 import { ImageResponse } from 'next/og';
 
@@ -42,6 +43,12 @@ export async function GET(req: Request) {
     try {
       const record = await runExperiment(slug, decoded.params);
       const top = record.metrics[0];
+      // Mini-chart of the run's first plotted series, if any — so each share card
+      // previews a distinct shape rather than an identical text card.
+      const s = record.result.series?.[0];
+      const firstKey = s ? Object.keys(s.y)[0] : undefined;
+      const sparkline =
+        s && firstKey ? (buildSparkline(s.x, s.y[firstKey] ?? []) ?? undefined) : undefined;
       return new ImageResponse(
         experimentCard({
           eyebrow,
@@ -49,6 +56,7 @@ export async function GET(req: Request) {
           subtitle: record.summary,
           metric: top ? { label: top.label, value: formatMetric(top) } : undefined,
           hash: record.outputHash,
+          sparkline,
         }),
         { ...OG_SIZE },
       );

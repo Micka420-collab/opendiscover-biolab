@@ -8,6 +8,7 @@
  */
 
 import type { ReactElement } from 'react';
+import type { Sparkline } from './sparkline';
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 export const OG_CONTENT_TYPE = 'image/png';
@@ -30,11 +31,13 @@ export interface CardOptions {
   metric?: { label: string; value: string };
   /** Reproducibility hash (shown truncated as proof of determinism). */
   hash?: string;
+  /** Optional mini-chart of the run's first series (from {@link buildSparkline}). */
+  sparkline?: Sparkline;
 }
 
 /** Build the React element passed to `new ImageResponse(...)`. */
 export function experimentCard(opts: CardOptions): ReactElement {
-  const { title, eyebrow, subtitle, metric, hash } = opts;
+  const { title, eyebrow, subtitle, metric, hash, sparkline } = opts;
   return (
     <div
       style={{
@@ -91,6 +94,24 @@ export function experimentCard(opts: CardOptions): ReactElement {
             <div style={{ fontSize: 22, color: MUTED }}>{metric.label}</div>
             <div style={{ fontSize: 46, fontWeight: 700, color: ACCENT }}>{metric.value}</div>
           </div>
+        ) : null}
+        {sparkline ? (
+          <svg
+            width={sparkline.width}
+            height={sparkline.height}
+            viewBox={`0 0 ${sparkline.width} ${sparkline.height}`}
+            style={{ marginTop: 4 }}
+          >
+            <title>run preview</title>
+            <polyline
+              points={sparkline.points}
+              fill="none"
+              stroke={ACCENT}
+              strokeWidth={3}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
         ) : null}
       </div>
 
