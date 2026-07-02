@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **40 deterministic simulation engines** across
+The OpenDiscover BioLab ships **41 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -19,7 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
-- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo)
+- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
@@ -417,6 +417,64 @@ A two-variable reduction of Hodgkin–Huxley capturing neural excitability: a fa
 ```
 
 _Run it: `POST /api/lab/run { "engine": "fitzhugh-nagumo", "params": … }` or interactively at `/lab/fitzhugh-nagumo`._
+
+---
+
+### `wilson-cowan` — Wilson–Cowan (neural populations)
+
+The Wilson–Cowan mean-field model of two coupled neural populations — excitatory E and inhibitory I — each a fraction of active cells that drives itself and the other through weighted connections and a saturating sigmoid response. Depending on the coupling it relaxes to a fixed point or, via a Hopf bifurcation, into a sustained limit cycle: the population-level origin of brain rhythms. Adaptive RK45 with a numerically stable response function.
+
+**References**
+- Wilson, H.R. & Cowan, J.D. (1972) Excitatory and inhibitory interactions in localized populations of model neurons. Biophysical Journal 12(1):1-24.
+- Ermentrout, G.B. & Terman, D.H. (2010) Mathematical Foundations of Neuroscience. Springer.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `cEE` | number | `16` | ≥ 0 |  |
+| `cEI` | number | `12` | ≥ 0 |  |
+| `cIE` | number | `15` | ≥ 0 |  |
+| `cII` | number | `3` | ≥ 0 |  |
+| `P` | number | `1.25` |  |  |
+| `Q` | number | `0` |  |  |
+| `aE` | number | `1.3` | ≥ 0 |  |
+| `thetaE` | number | `4` |  |  |
+| `aI` | number | `2` | ≥ 0 |  |
+| `thetaI` | number | `3.7` |  |  |
+| `tauE` | number | `1` | ≥ 0 |  |
+| `tauI` | number | `1` | ≥ 0 |  |
+| `E0` | number | `0.1` | ≥ 0, ≤ 1 |  |
+| `I0` | number | `0.1` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `60` | ≥ 0, ≤ 100000 |  |
+| `tol` | number | `1e-8` | ≥ 0 |  |
+| `outputPoints` | integer | `600` | ≥ 0, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "cEE": 16,
+  "cEI": 12,
+  "cIE": 15,
+  "cII": 3,
+  "P": 1.25,
+  "Q": 0,
+  "aE": 1.3,
+  "thetaE": 4,
+  "aI": 2,
+  "thetaI": 3.7,
+  "tauE": 1,
+  "tauI": 1,
+  "E0": 0.1,
+  "I0": 0.1,
+  "tEnd": 60,
+  "tol": 1e-8,
+  "outputPoints": 600
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "wilson-cowan", "params": … }` or interactively at `/lab/wilson-cowan`._
 
 
 ## ⚙️ Systems biology

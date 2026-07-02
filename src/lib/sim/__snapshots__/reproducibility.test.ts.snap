@@ -394,6 +394,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "SIS endemic at R₀=3.00: prevalence settles to i*=0.667.",
   },
+  "wilson-cowan": {
+    "metrics": {
+      "amplitudeE": 0.316775,
+      "meanE": 0.109013,
+      "meanI": 0.0751069,
+      "oscillates": 1,
+      "periodE": 7.84997,
+    },
+    "summary": "Wilson–Cowan: sustained oscillation — E swings 0.317 peak-to-peak with period ≈ 7.85 (a population rhythm).",
+  },
   "wright-fisher": {
     "metrics": {
       "fixationProbability": 0.265,

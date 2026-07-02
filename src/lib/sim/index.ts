@@ -36,6 +36,7 @@ import { spec as pcr } from './molbio/pcr';
 import { spec as sequence } from './molbio/sequence';
 import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
 import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
+import { spec as wilsonCowan } from './neuro/wilson-cowan';
 import { spec as hardyWeinberg } from './popgen/hardy-weinberg';
 import { spec as luriaDelbruck } from './popgen/luria-delbruck';
 import { spec as moranProcess } from './popgen/moran-process';
@@ -69,6 +70,7 @@ export const engines: AnyEngine[] = [
   massSpec,
   hodgkinHuxley,
   fitzHughNagumo,
+  wilsonCowan,
   enzymeKinetics,
   grn,
   gillespie,
