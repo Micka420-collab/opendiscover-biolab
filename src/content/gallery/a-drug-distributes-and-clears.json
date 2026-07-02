@@ -1,0 +1,16 @@
+{
+  "slug": "a-drug-distributes-and-clears",
+  "title": "A drug distributes, then clears",
+  "engine": "pk-two-compartment",
+  "params": {
+    "dose": 100,
+    "v1": 10,
+    "cl": 5,
+    "q": 10,
+    "v2": 20,
+    "tEnd": 24
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab.git",
+  "blurb": "One 100 mg intravenous bolus, two phases. First the fast distribution phase: plasma concentration plunges as the drug rushes from blood into tissue (watch the peripheral curve climb to meet it). Then the slow terminal phase, where the two compartments empty together as clearance removes the drug for good. The plasma curve is exactly bi-exponential — a steep α-limb (t½ ≈ 0.37 h) over a shallow β-limb (t½ ≈ 5.2 h) — the everyday shape behind dosing schedules. AUC = Dose/CL = 20 mg·h/L, independent of the distribution details."
+}

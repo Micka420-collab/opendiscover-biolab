@@ -312,6 +312,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.6,
     hint: 'Below P≈1.2 the network is silent; above P≈3.2 it saturates and goes quiet again. The widest swing sits just under that upper edge, around P≈3.',
   },
+  {
+    id: 'pk-terminal-half-life',
+    engine: 'pk-two-compartment',
+    title: 'Design an 8-hour half-life',
+    brief:
+      'A drug hides in tissue: the larger the peripheral reservoir it distributes into, the longer it lingers before being cleared. Adjust the tissue volume V2 so the terminal half-life lands at 8 hours.',
+    baseParams: { dose: 100, v1: 10, cl: 5, q: 10, tEnd: 48 },
+    knob: {
+      param: 'v2',
+      label: 'Peripheral (tissue) volume V2',
+      min: 10,
+      max: 60,
+      step: 0.5,
+      default: 20,
+      unit: 'L',
+    },
+    metricKey: 'terminalHalfLife',
+    metricLabel: 'Terminal half-life t½β',
+    unit: 'h',
+    goal: 'target',
+    target: 8,
+    hint: 'A bigger tissue reservoir (V2) makes the drug linger longer, lengthening the terminal half-life. It reaches 8 h at about V2 = 34 L.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
