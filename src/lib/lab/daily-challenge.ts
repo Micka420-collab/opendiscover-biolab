@@ -453,6 +453,20 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.8,
     hint: 'Beer’s law: A = ε·c·l. With ε=0.02 and l=1 cm, a peak absorbance of 0.8 needs a concentration of about 40.',
   },
+  {
+    id: 'buffer-blood-ph',
+    engine: 'acid-base-titration',
+    title: 'Design a buffer for blood pH',
+    brief:
+      'A buffer resists pH change best exactly at its pKa — the flat plateau at half-equivalence. Choose a weak acid (dial its pKa) so its buffer plateau sits at physiological pH 7.4, the value your bloodstream is held at.',
+    baseParams: { acidConc: 0.1, acidVolume: 25, baseConc: 0.1 },
+    knob: { param: 'pKa', label: 'Acid pKa', min: 3, max: 10, step: 0.05, default: 5 },
+    metricKey: 'phAtHalfEquivalence',
+    metricLabel: 'pH at half-equivalence',
+    goal: 'target',
+    target: 7.4,
+    hint: 'A buffer works best at its pKa, and the half-equivalence pH ≈ pKa. So pick a weak acid with pKa ≈ 7.4 — like phosphate’s second pKa (7.2), the real blood buffer.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
