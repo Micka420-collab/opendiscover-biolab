@@ -21,6 +21,17 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:sim
+      # The engine catalog is generated from the registry — it must be committed
+      # in sync. Regenerate and fail if it differs. No database or secrets needed.
+      - name: Regenerate engine catalog
+        run: pnpm docs:engines
+      - name: Fail on stale SIMULATION_ENGINES.md
+        run: |
+          if ! git diff --quiet SIMULATION_ENGINES.md; then
+            echo "::error::SIMULATION_ENGINES.md is out of date — run 'pnpm docs:engines' and commit the result."
+            git --no-pager diff SIMULATION_ENGINES.md
+            exit 1
+          fi
 
   # Guards a real regression class: a `next build` must never require a live
   # database. Deliberately runs with NO postgres service and NO DATABASE_URL —
