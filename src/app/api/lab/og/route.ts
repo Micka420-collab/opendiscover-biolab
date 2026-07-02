@@ -11,17 +11,12 @@
 import { runExperiment } from '@/lib/lab/runner';
 import { decodeExperiment } from '@/lib/lab/share';
 import { OG_SIZE, experimentCard } from '@/lib/og/experiment-card';
-import type { Metric } from '@/lib/sim';
+import { formatMetric } from '@/lib/og/format-metric';
 import { getEngine } from '@/lib/sim';
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-function formatMetric(m: Metric): string {
-  const num = Number.isInteger(m.value) ? String(m.value) : m.value.toPrecision(4);
-  return m.unit ? `${num} ${m.unit}` : num;
-}
 
 export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
