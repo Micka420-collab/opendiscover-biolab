@@ -307,6 +307,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Longest ORF: frame +2 (+), 20 aa — MASKDLFWHPVMEKLSDFWH",
   },
+  "sis": {
+    "metrics": {
+      "endemic": 1,
+      "endemicPrevalence": 0.666667,
+      "finalPrevalence": 0.666667,
+      "r0": 3,
+    },
+    "summary": "SIS endemic at R₀=3.00: prevalence settles to i*=0.667.",
+  },
   "wright-fisher": {
     "metrics": {
       "fixationProbability": 0.265,

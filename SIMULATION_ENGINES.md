@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **32 deterministic simulation engines** across
+The OpenDiscover BioLab ships **33 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`breeding`](#breeding)
 - **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
-- **🦠 Epidemiology** — [`compartmental`](#compartmental)
+- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response)
 - **🔬 Structural** — [`rna-fold`](#rna-fold)
 
@@ -1227,6 +1227,43 @@ Deterministic SIR / SEIR / SIRD transmission models with standard (frequency-dep
 ```
 
 _Run it: `POST /api/lab/run { "engine": "compartmental", "params": … }` or interactively at `/lab/compartmental`._
+
+---
+
+### `sis` — SIS Endemic Epidemic
+
+The SIS model for infections that confer no lasting immunity: the infected recover straight back to susceptible. In prevalence, di/dt = beta·i·(1−i) − gamma·i is a logistic equation. With R₀ = beta/gamma, the infection dies out for R₀ ≤ 1 and becomes endemic at the persistent steady state i* = 1 − 1/R₀ for R₀ > 1 — unlike the single self-limiting wave of an SIR epidemic.
+
+**References**
+- Kermack, W.O. & McKendrick, A.G. (1932) Contributions to the mathematical theory of epidemics, II. Proc. R. Soc. Lond. A 138:55-83.
+- Hethcote, H.W. (2000) The mathematics of infectious diseases. SIAM Review 42:599-653.
+- Keeling, M.J. & Rohani, P. (2008) Modeling Infectious Diseases in Humans and Animals, ch. 2.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `beta` | number | `0.3` | ≥ 0 |  |
+| `gamma` | number | `0.1` | ≥ 0 |  |
+| `i0` | number | `0.01` | ≥ 0, ≤ 1 |  |
+| `tEnd` | number | `120` | ≥ 0, ≤ 100000 |  |
+| `steps` | integer | `2400` | ≥ 0, ≤ 200000 |  |
+| `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
+
+**Example**
+
+```json
+{
+  "beta": 0.3,
+  "gamma": 0.1,
+  "i0": 0.01,
+  "tEnd": 120,
+  "steps": 2400,
+  "outputPoints": 400
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "sis", "params": … }` or interactively at `/lab/sis`._
 
 
 ## 💊 Drug discovery

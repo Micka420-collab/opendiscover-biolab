@@ -21,6 +21,7 @@ import { spec as logisticMap } from './ecology/logistic-map';
 import { spec as lotkaVolterra } from './ecology/lotka-volterra';
 import { spec as rosenzweigMacArthur } from './ecology/rosenzweig-macarthur';
 import { spec as compartmental } from './epi/compartmental';
+import { spec as sis } from './epi/sis';
 import { spec as breeding } from './genetics/breeding';
 import { spec as alignment } from './molbio/alignment';
 import { cloningSpec as cloning } from './molbio/cloning';
@@ -78,6 +79,7 @@ export const engines: AnyEngine[] = [
   rosenzweigMacArthur,
   bioreactor,
   compartmental,
+  sis,
   admet,
   docking,
   doseResponse,
