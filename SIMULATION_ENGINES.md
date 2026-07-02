@@ -19,10 +19,10 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec)
-- **neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan)
+- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`breeding`](#breeding)
-- **ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
+- **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment)
@@ -333,7 +333,7 @@ Predicts monoisotopic b/y fragment-ion m/z values for a peptide under CID/HCD ta
 _Run it: `POST /api/lab/run { "engine": "mass-spec", "params": … }` or interactively at `/lab/mass-spec`._
 
 
-## neuroscience
+## 🧠 Neuroscience
 
 ### `hodgkin-huxley` — Hodgkin–Huxley Neuron
 
@@ -1072,7 +1072,7 @@ Cross two diploid parents across independent gene loci and get the full offsprin
 _Run it: `POST /api/lab/run { "engine": "breeding", "params": … }` or interactively at `/lab/breeding`._
 
 
-## ecology
+## 🐺 Ecology
 
 ### `lotka-volterra` — Lotka–Volterra Predator–Prey
 
