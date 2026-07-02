@@ -76,12 +76,25 @@ export function fractionDuplex(
   return (2 * beta) / (2 * beta + 1 + Math.sqrt(4 * beta + 1));
 }
 
-/** Temperature (K) at which θ = target, by bisection (θ is monotone decreasing in T). */
+/**
+ * Temperature (K) at which θ = target, by bisection (θ is monotone decreasing in T).
+ * Starts from the physical window [150,500] K but EXPANDS it — colder until θ(lo) ≥ target,
+ * hotter until θ(hi) ≤ target — so the crossing is always bracketed regardless of where Tm
+ * lies. Returns NaN when the crossing does not exist (θ never reaches `target` at any
+ * physical temperature, i.e. the transition never completes), instead of a boundary-pinned
+ * value. The in-range default case leaves [150,500] untouched, so those results are unchanged.
+ */
 function tempAtTheta(target: number, p: DnaMeltingParams): number {
-  let lo = 150;
-  let hi = 500;
   const theta = (tK: number) =>
     fractionDuplex(tK, p.deltaH, p.deltaS, p.strandConc, p.selfComplementary);
+  let lo = 150;
+  let hi = 500;
+  // Expand the cold end down until θ(lo) ≥ target (θ → 1 as T → 0).
+  for (let i = 0; i < 200 && theta(lo) < target && lo > 1e-9; i++) lo *= 0.5;
+  // Expand the hot end up until θ(hi) ≤ target (θ → its high-T limit as T → ∞).
+  for (let i = 0; i < 200 && theta(hi) > target && hi < 1e15; i++) hi *= 2;
+  // If the interval still does not straddle `target`, the crossing does not exist.
+  if (theta(lo) < target || theta(hi) > target) return Number.NaN;
   for (let i = 0; i < 100; i++) {
     const mid = (lo + hi) / 2;
     if (theta(mid) > target) lo = mid;
@@ -102,8 +115,10 @@ export function run(rawParams: Partial<DnaMeltingParams> = {}): SimResult {
   const t37 = 37 + KELVIN;
   const fractionDuplexAt37 = theta(t37);
   const deltaGAt37 = p.deltaH - t37 * p.deltaS;
-  // Sharpness of the melt: the temperature span over which θ falls 0.9 → 0.1.
+  // Sharpness of the melt: the temperature span over which θ falls 0.9 → 0.1. NaN when the
+  // transition does not complete over physical temperatures (θ never reaches 0.9 or 0.1).
   const transitionWidth = tempAtTheta(0.1, p) - tempAtTheta(0.9, p);
+  const widthDefined = Number.isFinite(transitionWidth);
 
   const metrics: Metric[] = [
     { key: 'meltingTemp', label: 'Melting temperature Tm', value: tmCelsius, unit: '°C' },
@@ -125,7 +140,9 @@ export function run(rawParams: Partial<DnaMeltingParams> = {}): SimResult {
       label: 'Melting transition width (θ 0.9→0.1)',
       value: transitionWidth,
       unit: '°C',
-      note: 'narrower = sharper melt (larger |ΔH°|)',
+      note: widthDefined
+        ? 'narrower = sharper melt (larger |ΔH°|)'
+        : 'transition does not complete over physical temperatures',
     },
     { key: 'deltaH', label: 'Association enthalpy ΔH°', value: p.deltaH, unit: 'kJ/mol' },
     { key: 'deltaS', label: 'Association entropy ΔS°', value: p.deltaS, unit: 'kJ/mol/K' },
@@ -148,7 +165,7 @@ export function run(rawParams: Partial<DnaMeltingParams> = {}): SimResult {
 
   return {
     engine: 'dna-melting',
-    summary: `DNA duplex melting: Tm=${tmCelsius.toFixed(1)}°C at ${p.strandConc.toExponential(1)} M strands (${(100 * fractionDuplexAt37).toFixed(0)}% duplex at 37°C); melt spans ${transitionWidth.toFixed(1)}°C.`,
+    summary: `DNA duplex melting: Tm=${tmCelsius.toFixed(1)}°C at ${p.strandConc.toExponential(1)} M strands (${(100 * fractionDuplexAt37).toFixed(0)}% duplex at 37°C); ${widthDefined ? `melt spans ${transitionWidth.toFixed(1)}°C` : 'the transition does not complete over physical temperatures'}.`,
     metrics,
     series,
     detail: { meltingTemp: tmCelsius, fractionDuplexAt37, deltaGAt37, transitionWidth },

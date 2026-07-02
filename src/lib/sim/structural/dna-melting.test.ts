@@ -98,6 +98,26 @@ describe('dna-melting', () => {
     expect(sharp).toBeLessThan(wide);
   });
 
+  it('finds the real transition width when Tm lies outside the old [150,500] K bracket (regression)', () => {
+    // Very low Tm (~4 K): the 0.9/0.1 crossings sit far below 150 K. The old fixed bracket
+    // pinned both to 150 K and reported width 0; the expanding bracket recovers a real width.
+    const r = run({ deltaH: -1, deltaS: -0.001, strandConc: 1e-12, selfComplementary: false });
+    const w = r.metrics.find((m) => m.key === 'transitionWidth')?.value as number;
+    expect(Number.isFinite(w)).toBe(true);
+    expect(w).toBeGreaterThan(0);
+  });
+
+  it('reports an undefined width (not a bracket artifact) when the melt never completes (regression)', () => {
+    // Near-zero entropy: θ stays confined to ~[0.48,0.61] and never reaches 0.9 or 0.1. The
+    // old code fabricated width = 350 °C (the bracket span 500−150); now it must be non-finite.
+    const r = run({ deltaH: -1, deltaS: -0.001, strandConc: 1, selfComplementary: true });
+    const wMetric = r.metrics.find((m) => m.key === 'transitionWidth');
+    expect(Number.isFinite(wMetric?.value as number)).toBe(false);
+    expect(wMetric?.note).toMatch(/does not complete/);
+    expect(r.summary).toMatch(/does not complete/);
+    expect(r.summary).not.toMatch(/350/);
+  });
+
   it('is deterministic', () => {
     const a = run({ deltaH: -380, deltaS: -1, strandConc: 1e-5 });
     const b = run({ deltaH: -380, deltaS: -1, strandConc: 1e-5 });

@@ -56,6 +56,26 @@ describe('beer-lambert', () => {
     expect(Number.isFinite(metric(r, 'recoveredConc2'))).toBe(true);
   });
 
+  it('weak but well-separated bands are flagged separable, not unresolvable (regression)', () => {
+    // Low absorptivities push aa·dd far below 1, where the old absolute floor
+    // (Math.max(aa*dd,1)) falsely reported "not separable" for perfectly orthogonal bands.
+    const r = run({
+      eMax1: 0.001,
+      eMax2: 0.001,
+      peak1: 450,
+      peak2: 650,
+      width1: 30,
+      width2: 30,
+      conc1: 20,
+      conc2: 15,
+    });
+    // Bands are 200 nm (~6.7σ) apart: cleanly separable, recovery near-exact.
+    expect(metric(r, 'wellConditioned')).toBe(1);
+    expect(metric(r, 'recoveredConc1')).toBeCloseTo(20, 2);
+    expect(metric(r, 'recoveredConc2')).toBeCloseTo(15, 2);
+    expect(r.summary).not.toMatch(/too similar/);
+  });
+
   it('minimum %T follows from the peak absorbance (T = 10^(−A))', () => {
     const r = run({});
     expect(metric(r, 'minTransmittancePct')).toBeCloseTo(

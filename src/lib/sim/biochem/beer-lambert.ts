@@ -98,9 +98,14 @@ export function unmix(e1: number[], e2: number[], a: number[]): Unmix {
     q += e2j * aj;
   }
   const det = aa * dd - bb * bb; // ≥ 0 (Gram matrix)
-  const wellConditioned = det > 1e-6 * Math.max(aa * dd, 1);
-  // Ridge keeps the solve finite when the two bands are (nearly) collinear.
-  const ridge = 1e-9 * Math.max(aa, dd, 1);
+  // Scale-invariant conditioning: det/(aa·dd) = sin²(angle) between the two spectral
+  // columns e1,e2. Compare against the Gram scale aa·dd itself — NOT an absolute floor —
+  // so weak (low-absorptivity) but well-separated bands are not mislabelled unresolvable.
+  const wellConditioned = aa * dd > 0 && det > 1e-6 * aa * dd;
+  // Ridge (relative to the matrix scale) keeps the solve finite when the two bands are
+  // (nearly) collinear, without an absolute floor that would bias small-signal fits.
+  const scale = Math.max(aa, dd);
+  const ridge = scale > 0 ? 1e-9 * scale : 1e-12;
   const aR = aa + ridge;
   const dR = dd + ridge;
   const detR = aR * dR - bb * bb;
