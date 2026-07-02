@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **57 deterministic simulation engines** across
+The OpenDiscover BioLab ships **58 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
@@ -1820,6 +1820,44 @@ The titration curve of a weak monoprotic acid with strong base: pH versus titran
 ```
 
 _Run it: `POST /api/lab/run { "engine": "acid-base-titration", "params": … }` or interactively at `/lab/acid-base-titration`._
+
+---
+
+### `diffusion` — Brownian Motion & Stokes–Einstein Diffusion
+
+How fast molecules wander by thermal motion: the Stokes–Einstein relation D=kB·T/(6π·η·r) gives the diffusion coefficient of a sphere of hydrodynamic radius r in a fluid of viscosity η, and the random walk gives a mean-squared displacement ⟨x²⟩=2·d·D·t so distance grows as √t. Reports D, the RMS displacement at a chosen time, the time to diffuse across a 10 µm cell, the thermal energy kBT, and inverts to hydrodynamic radius — the physics behind dynamic light scattering, FRAP and single-particle tracking. Closed-form and deterministic.
+
+**References**
+- Einstein, A. (1905) Über die von der molekularkinetischen Theorie der Wärme geforderte Bewegung… Ann. Phys. 322:549-560.
+- Berg, H.C. (1993) Random Walks in Biology. Princeton University Press.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `radius` | number | `5` | ≥ 0, ≤ 1000000 |  |
+| `viscosity` | number | `1` | ≥ 0, ≤ 1000000 |  |
+| `temperatureC` | number | `20` | ≥ -20, ≤ 200 |  |
+| `dimensions` | integer | `3` | ≥ 1, ≤ 3 |  |
+| `observationTime` | number | `1` | ≥ 0, ≤ 1000000000 |  |
+| `timeMax` | number | `2` | ≥ 0, ≤ 1000000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "radius": 5,
+  "viscosity": 1,
+  "temperatureC": 20,
+  "dimensions": 3,
+  "observationTime": 1,
+  "timeMax": 2,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "diffusion", "params": … }` or interactively at `/lab/diffusion`._
 
 
 ## 🦠 Epidemiology

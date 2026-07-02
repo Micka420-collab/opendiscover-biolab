@@ -128,6 +128,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "5 SpCas9 guide(s); best on-target 0.72, best specificity 1.00.",
   },
+  "diffusion": {
+    "metrics": {
+      "diffusionCoefficient": 42.944,
+      "hydrodynamicRadius": 5,
+      "rmsDisplacement": 16.0519,
+      "thermalEnergy": 4.04737,
+      "timeToCrossCell": 0.388103,
+      "viscosity": 1,
+    },
+    "summary": "Stokes–Einstein: a 5 nm particle in η=1 mPa·s at 20°C has D=42.94 µm²/s, wandering 16.05 µm in 1 s (3D) and crossing a 10 µm cell in 0.39 s.",
+  },
   "dna-melting": {
     "metrics": {
       "deltaGAt37": -69.85,
