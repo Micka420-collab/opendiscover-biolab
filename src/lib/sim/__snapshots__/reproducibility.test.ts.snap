@@ -197,6 +197,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Repetitive firing at I=0.5 (v amplitude 3.82, 0.030 spikes/time).",
   },
+  "fret": {
+    "metrics": {
+      "dynamicRange": 3.74444,
+      "efficiency": 0.5,
+      "forsterRadius": 5,
+      "sensitivity": 0.3,
+      "workingRangeHigh": 7.21125,
+      "workingRangeLow": 3.46681,
+    },
+    "summary": "FRET at r=5 nm with R0=5 nm: efficiency E=50.0% (inside the 3.5–7.2 nm ruler range); the sixth-power law makes this a nanometre ruler.",
+  },
   "gillespie": {
     "metrics": {
       "endTime": 50,

@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **56 deterministic simulation engines** across
+The OpenDiscover BioLab ships **57 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -27,7 +27,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
-- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting)
+- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
 
 ---
 
@@ -2393,6 +2393,36 @@ The thermal melting curve of a DNA/RNA duplex from two-state van't Hoff thermody
 ```
 
 _Run it: `POST /api/lab/run { "engine": "dna-melting", "params": … }` or interactively at `/lab/dna-melting`._
+
+---
+
+### `fret` — FRET — Förster Resonance Energy Transfer (molecular ruler)
+
+The molecular ruler of fluorescence microscopy: the energy-transfer efficiency between a donor and acceptor fluorophore is E=1/(1+(r/R0)⁶), where R0 (the Förster radius) is the distance of 50% transfer. The sixth-power distance dependence makes E swing from ~90% to ~10% over less than a threefold change in r, so FRET reads out donor–acceptor separations across the ~1–10 nm range of protein domains and nucleic-acid helices, and r=R0·((1−E)/E)^(1/6) inverts a fluorescence measurement into a distance. Reports E, the 90%/10% ruler bounds, the distance sensitivity |dE/dr|, and the dynamic range, plus the E-vs-r curve. Closed-form and deterministic.
+
+**References**
+- Förster, T. (1948) Zwischenmolekulare Energiewanderung und Fluoreszenz. Ann. Phys. 437:55-75.
+- Lakowicz, J.R. (2006) Principles of Fluorescence Spectroscopy, 3rd ed. Springer.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `distance` | number | `5` | ≥ 0, ≤ 1000 |  |
+| `forsterRadius` | number | `5` | ≥ 0, ≤ 1000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "distance": 5,
+  "forsterRadius": 5,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "fret", "params": … }` or interactively at `/lab/fret`._
 
 
 ## Authoring an engine

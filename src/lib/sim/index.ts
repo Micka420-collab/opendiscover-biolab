@@ -60,6 +60,7 @@ import { spec as proteinProperties } from './protein/properties';
 import { spec as secondaryStructure } from './protein/secondary-structure';
 import { spec as twoStateFolding } from './protein/two-state-folding';
 import { spec as dnaMelting } from './structural/dna-melting';
+import { spec as fret } from './structural/fret';
 import { spec as rnaFold } from './structural/rna-fold';
 import { spec as wormLikeChain } from './structural/worm-like-chain';
 import { spec as branchingGrowth } from './systems/branching-growth';
@@ -130,6 +131,7 @@ export const engines: AnyEngine[] = [
   rnaFold,
   wormLikeChain,
   dnaMelting,
+  fret,
 ];
 
 const bySlug = new Map<string, AnyEngine>(engines.map((e) => [e.slug, e]));
