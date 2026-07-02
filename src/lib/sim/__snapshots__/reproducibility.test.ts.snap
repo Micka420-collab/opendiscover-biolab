@@ -582,6 +582,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Vaccination vs R₀=3: critical coverage v_c=70% at ε=0.95; at v=50% → 33.0% infected (R_eff=1.58).",
   },
+  "van-deemter": {
+    "metrics": {
+      "efficiencyVsOptimum": 0.707785,
+      "minPlateHeight": 1.13246,
+      "optimalVelocity": 6.32456,
+      "plateCount": 62.5,
+      "plateHeightAtU": 1.6,
+      "platesPerMetre": 625,
+    },
+    "summary": "van Deemter: sharpest peaks at u_opt=6.32 mm/s (H_min=1.132 mm); at u=2 mm/s H=1.600 mm → 63 plates over 100 mm (71% of peak efficiency).",
+  },
   "wilson-cowan": {
     "metrics": {
       "amplitudeE": 0.316775,

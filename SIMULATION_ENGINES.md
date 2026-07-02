@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **58 deterministic simulation engines** across
+The OpenDiscover BioLab ships **59 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
@@ -1858,6 +1858,44 @@ How fast molecules wander by thermal motion: the Stokes–Einstein relation D=kB
 ```
 
 _Run it: `POST /api/lab/run { "engine": "diffusion", "params": … }` or interactively at `/lab/diffusion`._
+
+---
+
+### `van-deemter` — van Deemter Chromatography Efficiency
+
+The efficiency curve of a chromatography column: the plate height H(u)=A+B/u+C·u trades eddy diffusion (A), longitudinal diffusion (B/u, worst at low velocity) and mass-transfer resistance (C·u, worst at high velocity) as a function of mobile-phase velocity u. The opposing velocity terms give a closed-form optimum u_opt=√(B/C) with minimum plate height H_min=A+2√(B·C) — the fastest run that still gives sharp peaks. Reports the optimum, the plate height and theoretical-plate count N=L/H at a chosen velocity, the efficiency versus optimum, and the full van Deemter curve. Closed-form and deterministic.
+
+**References**
+- van Deemter, J.J., Zuiderweg, F.J. & Klinkenberg, A. (1956) Longitudinal diffusion and resistance to mass transfer as causes of nonideality in chromatography. Chem. Eng. Sci. 5:271-289.
+- Giddings, J.C. (1991) Unified Separation Science. Wiley.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `aTerm` | number | `0.5` | ≥ 0, ≤ 100 |  |
+| `bTerm` | number | `2` | ≥ 0, ≤ 10000 |  |
+| `cTerm` | number | `0.05` | ≥ 0, ≤ 10000 |  |
+| `velocity` | number | `2` | ≥ 0, ≤ 10000 |  |
+| `columnLength` | number | `100` | ≥ 0, ≤ 1000000 |  |
+| `velocityMax` | number | `12` | ≥ 0, ≤ 10000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "aTerm": 0.5,
+  "bTerm": 2,
+  "cTerm": 0.05,
+  "velocity": 2,
+  "columnLength": 100,
+  "velocityMax": 12,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "van-deemter", "params": … }` or interactively at `/lab/van-deemter`._
 
 
 ## 🦠 Epidemiology
