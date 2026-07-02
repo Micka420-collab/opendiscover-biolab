@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **47 deterministic simulation engines** across
+The OpenDiscover BioLab ships **48 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -26,7 +26,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment)
-- **🔬 Structural** — [`rna-fold`](#rna-fold)
+- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
 
 ---
 
@@ -2047,6 +2047,40 @@ Predicts RNA secondary structure by the Nussinov maximum-base-pairing dynamic pr
 ```
 
 _Run it: `POST /api/lab/run { "engine": "rna-fold", "params": … }` or interactively at `/lab/rna-fold`._
+
+---
+
+### `worm-like-chain` — Worm-Like Chain (DNA force–extension)
+
+The Marko–Siggia worm-like-chain model of polymer elasticity — the force–extension curve of a stretched semi-flexible chain such as dsDNA. Force to hold fractional extension x=z/L is f·Lp/(k_BT)=x+1/(4(1−x)²)−1/4, with persistence length Lp. Reports the thermal energy, the low-force entropic spring constant 3k_BT/(2·Lp·L), and the force at 50% and near-full extension where the chain stiffens sharply. The curve measured in every optical/magnetic-tweezers single-molecule experiment. Closed-form and deterministic; extension is capped below 1 so the force stays finite.
+
+**References**
+- Marko, J.F. & Siggia, E.D. (1995) Stretching DNA. Macromolecules 28:8759-8770.
+- Bustamante, C., Marko, J.F., Siggia, E.D. & Smith, S. (1994) Entropic elasticity of λ-phage DNA. Science 265:1599-1600.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `persistenceLength` | number | `50` | ≥ 0, ≤ 100000 |  |
+| `contourLength` | number | `1000` | ≥ 0, ≤ 10000000 |  |
+| `temperatureCelsius` | number | `25` | ≥ -50, ≤ 150 |  |
+| `maxFraction` | number | `0.95` | ≥ 0.05, ≤ 0.99 |  |
+| `outputPoints` | integer | `200` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "persistenceLength": 50,
+  "contourLength": 1000,
+  "temperatureCelsius": 25,
+  "maxFraction": 0.95,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "worm-like-chain", "params": … }` or interactively at `/lab/worm-like-chain`._
 
 
 ## Authoring an engine

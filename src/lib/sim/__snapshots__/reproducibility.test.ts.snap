@@ -474,6 +474,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Wilson–Cowan: sustained oscillation — E swings 0.317 peak-to-peak with period ≈ 7.85 (a population rhythm).",
   },
+  "worm-like-chain": {
+    "metrics": {
+      "contourLength": 1000,
+      "entropicStiffness": 0.000123492,
+      "forceAtHalfExtension": 0.10291,
+      "forceAtMaxExtension": 8.29044,
+      "persistenceLength": 50,
+      "thermalEnergy": 4.1164,
+    },
+    "summary": "Worm-like chain (Lp=50 nm, L=1000 nm): entropic spring of 1.23e-4 pN/nm at low force, stiffening to 8.3 pN at 95% extension.",
+  },
   "wright-fisher": {
     "metrics": {
       "fixationProbability": 0.265,
