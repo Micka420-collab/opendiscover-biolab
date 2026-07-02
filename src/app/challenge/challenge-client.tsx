@@ -41,14 +41,23 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
   const [best, setBest] = useState<Best | null>(null);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
 
-  // Load today's personal best from localStorage on mount.
+  // Load today's personal best from localStorage, and keep it in sync when
+  // another tab writes a better score for the same challenge/day.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setBest(JSON.parse(raw) as Best);
-    } catch {
-      /* ignore malformed / unavailable storage */
-    }
+    const read = (): Best | null => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        return raw ? (JSON.parse(raw) as Best) : null;
+      } catch {
+        return null;
+      }
+    };
+    setBest(read());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === storageKey) setBest(read());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [storageKey]);
 
   async function run() {
@@ -74,7 +83,15 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
       setAttempt({ knob, value, score, met });
       recordEngineRun(challenge.engine); // count toward the lab dex
 
-      if (!best || score > best.score) {
+      // Re-read the stored best so a concurrent tab's better score isn't clobbered.
+      let stored: Best | null = best;
+      try {
+        const raw = localStorage.getItem(storageKey);
+        stored = raw ? (JSON.parse(raw) as Best) : null;
+      } catch {
+        /* fall back to in-memory best */
+      }
+      if (!stored || score > stored.score) {
         const next: Best = { knob, value, score };
         setBest(next);
         try {
@@ -82,6 +99,8 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
         } catch {
           /* ignore */
         }
+      } else if (stored.score !== best?.score) {
+        setBest(stored); // adopt a better score written by another tab
       }
     } catch (e) {
       setError((e as Error).message);

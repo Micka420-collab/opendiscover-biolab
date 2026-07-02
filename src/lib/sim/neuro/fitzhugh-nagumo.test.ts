@@ -12,6 +12,13 @@ describe('fitzhugh-nagumo', () => {
     expect(fp.w).toBeCloseTo((fp.v + 0.7) / 0.8, 10); // w-nullcline satisfied
   });
 
+  it('solves the fixed point even when b=1 (Newton would stall at v=0 here)', () => {
+    const fp = fixedPoint(0.7, 1, 0.5);
+    // h(v) = -v³/3 - 0.2 = 0 → v = -cbrt(0.6) ≈ -0.8434, not the bogus v=0.
+    expect(Math.abs(fp.residual)).toBeLessThan(1e-8);
+    expect(fp.v).toBeCloseTo(-Math.cbrt(0.6), 6);
+  });
+
   it('is quiescent (excitable rest) below the oscillatory range', () => {
     const r = run({ current: 0 });
     expect(metric(r, 'oscillationAmplitude')).toBeLessThan(0.2);

@@ -255,3 +255,15 @@ describe('Gillespie SSA — spec surface', () => {
     expect(finalB).toBeGreaterThan(finalA); // t=20 >> 1/rate, so B dominates
   });
 });
+
+describe('gillespie series downsampling', () => {
+  it('handles maxSeriesPoints=1 without NaN series points', () => {
+    const r = spec.run({ ...spec.example, maxSeriesPoints: 1 });
+    for (const s of r.series ?? []) {
+      for (const xv of s.x) expect(Number.isFinite(xv)).toBe(true);
+      for (const key of Object.keys(s.y)) {
+        for (const val of s.y[key]) expect(Number.isFinite(val)).toBe(true);
+      }
+    }
+  });
+});

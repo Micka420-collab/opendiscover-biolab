@@ -63,29 +63,32 @@ export function fitzHughNagumoDerivative(p: FitzHughNagumoParams): Derivative {
 }
 
 /**
- * The unique fixed point via Newton's method on the reduced equation
+ * A fixed point via bracketed bisection on the reduced equation
  * h(v) = v − v³/3 − (v+a)/b + I = 0, with w* = (v*+a)/b.
+ *
+ * Bisection (not Newton) so it converges for every valid input: h is a cubic
+ * with a negative leading term, so h(−M) > 0 and h(+M) < 0 for large enough M —
+ * a sign change always exists. This avoids Newton stalling at a zero derivative
+ * (which happens at v=0 when b=1) and always returns a genuine root.
  */
 export function fixedPoint(
   a: number,
   b: number,
   current: number,
 ): { v: number; w: number; residual: number } {
-  let v = 0;
-  for (let i = 0; i < 100; i++) {
-    const h = v - (v * v * v) / 3 - (v + a) / b + current;
-    const dh = 1 - v * v - 1 / b;
-    if (Math.abs(dh) < 1e-12) break;
-    const next = v - h / dh;
-    if (Math.abs(next - v) < 1e-12) {
-      v = next;
-      break;
-    }
-    v = next;
+  const h = (v: number) => v - (v * v * v) / 3 - (v + a) / b + current;
+  let lo = -10;
+  let hi = 10;
+  // Widen until the bracket straddles a root (guaranteed by the −v³/3 term).
+  for (let i = 0; i < 80 && h(lo) <= 0; i++) lo *= 2;
+  for (let i = 0; i < 80 && h(hi) >= 0; i++) hi *= 2;
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    if (h(mid) > 0) lo = mid;
+    else hi = mid;
   }
-  const w = (v + a) / b;
-  const residual = v - (v * v * v) / 3 - w + current;
-  return { v, w, residual };
+  const v = (lo + hi) / 2;
+  return { v, w: (v + a) / b, residual: h(v) };
 }
 
 function downsampleIndices(len: number, n: number): number[] {

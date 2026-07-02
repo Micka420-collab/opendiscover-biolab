@@ -497,8 +497,9 @@ function downsampleIndices(n: number, maxPoints: number): number[] {
   if (n <= maxPoints) return Array.from({ length: n }, (_, i) => i);
   const seen = new Set<number>();
   const out: number[] = [];
+  const denom = Math.max(maxPoints - 1, 1); // maxPoints === 1 must not divide by zero
   for (let i = 0; i < maxPoints; i++) {
-    const idx = Math.round((i * (n - 1)) / (maxPoints - 1));
+    const idx = Math.round((i * (n - 1)) / denom);
     if (!seen.has(idx)) {
       seen.add(idx);
       out.push(idx);
