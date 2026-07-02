@@ -1,0 +1,16 @@
+{
+  "slug": "paradox-of-enrichment",
+  "title": "The paradox of enrichment",
+  "engine": "rosenzweig-macarthur",
+  "params": {
+    "r": 1,
+    "k": 6,
+    "a": 1,
+    "h": 0.5,
+    "e": 0.5,
+    "m": 0.2
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Enriching a predator-prey system (a high prey carrying capacity K=6, above the Hopf threshold K_H=3) doesn't stabilize it — it tips the calm coexistence equilibrium into wild boom-and-bust cycles. Rosenzweig's counterintuitive 1971 result, live."
+}

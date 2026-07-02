@@ -1,0 +1,14 @@
+{
+  "slug": "neuron-firing-on-repeat",
+  "title": "A neuron firing on repeat",
+  "engine": "fitzhugh-nagumo",
+  "params": {
+    "current": 0.5,
+    "a": 0.7,
+    "b": 0.8,
+    "epsilon": 0.08
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Push a steady current through a FitzHugh-Nagumo neuron and it crosses a Hopf bifurcation into a relaxation-oscillation spike train — firing over and over. Watch the (v, w) phase portrait trace the limit cycle."
+}
