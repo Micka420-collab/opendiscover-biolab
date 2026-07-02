@@ -317,6 +317,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Nicholson–Bailey (R=2): unstable equilibrium (H*=27.7), host outbreak peaks at 1130 (40.8× equilibrium).",
   },
+  "oxygen-transfer": {
+    "metrics": {
+      "criticalKLa": 57.1429,
+      "kLa": 100,
+      "otrAtSteadyState": 400,
+      "oxygenLimited": 0,
+      "percentSaturation": 50,
+      "responseTimeConstant": 0.01,
+      "steadyStateDO": 4,
+    },
+    "summary": "Oxygen transfer: dissolved O₂ settles at 4.00 mg/L (50% saturation) on a 0.6-min time constant.",
+  },
   "pcr": {
     "metrics": {
       "ampliconLength": 100,

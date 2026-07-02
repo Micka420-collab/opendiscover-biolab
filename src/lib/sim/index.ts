@@ -13,6 +13,7 @@
 type AnyEngine = import('./core/types').EngineSpec<any, any>;
 
 import { spec as bioreactor } from './bioprocess/bioreactor';
+import { spec as oxygenTransfer } from './bioprocess/oxygen-transfer';
 import { spec as admet } from './drug/admet';
 import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
@@ -105,6 +106,7 @@ export const engines: AnyEngine[] = [
   levinsMetapopulation,
   replicatorDynamics,
   bioreactor,
+  oxygenTransfer,
   compartmental,
   sis,
   sirEndemic,

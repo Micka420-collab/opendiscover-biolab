@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **49 deterministic simulation engines** across
+The OpenDiscover BioLab ships **50 deterministic simulation engines** across
 10 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -23,7 +23,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
-- **🏭 Bioprocess** — [`bioreactor`](#bioreactor)
+- **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain)
@@ -1616,6 +1616,44 @@ Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors.
 ```
 
 _Run it: `POST /api/lab/run { "engine": "bioreactor", "params": … }` or interactively at `/lab/bioreactor`._
+
+---
+
+### `oxygen-transfer` — Oxygen Transfer & Limitation (kLa)
+
+Gas–liquid oxygen transfer in a stirred bioreactor: dissolved O2 obeys dC/dt = kLa(C*−C) − OUR with the closed-form solution C(t)=C_ss+(C0−C_ss)e^(−kLa·t) relaxing to C_ss=C*−OUR/kLa on a 1/kLa time constant. Reports the steady-state dissolved O2 and % saturation, whether the culture is oxygen-limited, and the critical kLa=OUR/(C*−C_crit) — the minimum transfer needed to keep cells breathing. The mass-transfer side of scale-up, distinct from the bioreactor engine's substrate–biomass kinetics.
+
+**References**
+- Doran, P.M. (2013) Bioprocess Engineering Principles, 2nd ed. Academic Press (ch. 10).
+- Garcia-Ochoa, F. & Gomez, E. (2009) Bioreactor scale-up and oxygen transfer rate in microbial processes. Biotechnology Advances 27:153-176.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `kLa` | number | `100` | ≥ 0, ≤ 100000 |  |
+| `saturationDO` | number | `8` | ≥ 0, ≤ 1000 |  |
+| `our` | number | `400` | ≥ 0, ≤ 1000000 |  |
+| `initialDO` | number | `8` | ≥ 0, ≤ 1000 |  |
+| `criticalDO` | number | `1` | ≥ 0, ≤ 1000 |  |
+| `tEnd` | number | `0.2` | ≥ 0, ≤ 100 |  |
+| `outputPoints` | integer | `200` | ≥ 2, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "kLa": 100,
+  "saturationDO": 8,
+  "our": 400,
+  "initialDO": 8,
+  "criticalDO": 1,
+  "tEnd": 0.2,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "oxygen-transfer", "params": … }` or interactively at `/lab/oxygen-transfer`._
 
 
 ## 🦠 Epidemiology
