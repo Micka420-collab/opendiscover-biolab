@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **53 deterministic simulation engines** across
+The OpenDiscover BioLab ships **54 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -23,7 +23,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
-- **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer)
+- **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
@@ -1655,6 +1655,40 @@ Gas–liquid oxygen transfer in a stirred bioreactor: dissolved O2 obeys dC/dt =
 ```
 
 _Run it: `POST /api/lab/run { "engine": "oxygen-transfer", "params": … }` or interactively at `/lab/oxygen-transfer`._
+
+---
+
+### `substrate-inhibition` — Haldane Substrate-Inhibition Kinetics
+
+Microbial growth on an inhibitory substrate (Haldane/Andrews model): µ(S)=µmax·S/(Ks+S+S²/Ki) rises, peaks, then FALLS as the substrate itself turns toxic — unlike monotone Monod. Reports the closed-form optimum S_opt=√(Ks·Ki), the achievable peak µ_opt=µmax/(1+2√(Ks/Ki)), the peak efficiency µ_opt/µmax, and the half-peak operating window (the two substrate levels whose product is Ks·Ki). Plots the µ-vs-S curve against a Monod reference so the inhibition down-turn is visible. Ki→∞ recovers Monod. Closed-form and deterministic.
+
+**References**
+- Andrews, J.F. (1968) A mathematical model for the continuous culture of microorganisms utilizing inhibitory substrates. Biotechnol. Bioeng. 10:707-723.
+- Haldane, J.B.S. (1930) Enzymes. Longmans, Green & Co.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `muMax` | number | `0.8` | ≥ 0, ≤ 1000 |  |
+| `ks` | number | `1` | ≥ 0, ≤ 1000000 |  |
+| `ki` | number | `100` | ≥ 0, ≤ 1000000000 |  |
+| `substrateMax` | number | `200` | ≥ 0, ≤ 1000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "muMax": 0.8,
+  "ks": 1,
+  "ki": 100,
+  "substrateMax": 200,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "substrate-inhibition", "params": … }` or interactively at `/lab/substrate-inhibition`._
 
 
 ## 🧪 Biochemistry

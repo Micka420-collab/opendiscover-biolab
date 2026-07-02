@@ -67,6 +67,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `izhikevich` | Spiking-neuron model: 4 params → tonic/bursting firing, spike-rate & ISI stats |
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
 | | `oxygen-transfer` | Gas–liquid O₂ transfer: kLa, dissolved-O₂ dynamics, oxygen limitation, critical kLa |
+| | `substrate-inhibition` | Haldane kinetics: growth peaks then falls as substrate turns toxic; S_opt=√(Ks·Ki), operating window |
 | 🧪 Biochemistry | `beer-lambert` | Two-component spectrophotometry: additive Beer–Lambert spectra + least-squares un-mixing |
 | | `acid-base-titration` | Weak-acid titration curve: pH vs volume, equivalence point, pKa buffer plateau |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
@@ -196,7 +197,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 53 engines + the lab layer: **1030+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 54 engines + the lab layer: **1050+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.

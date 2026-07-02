@@ -513,6 +513,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "SIS endemic at R₀=3.00: prevalence settles to i*=0.667.",
   },
+  "substrate-inhibition": {
+    "metrics": {
+      "ki": 100,
+      "maxGrowthRate": 0.666667,
+      "muMax": 0.8,
+      "optimalSubstrate": 10,
+      "peakEfficiency": 0.833333,
+      "windowHigh": 139.282,
+      "windowLow": 0.717968,
+    },
+    "summary": "Haldane substrate inhibition: growth peaks at S_opt=10.00 g/L with µ_opt=0.667 1/h (83% of the µmax ceiling); half-peak window 0.72–139.28 g/L.",
+  },
   "two-state-folding": {
     "metrics": {
       "deltaG25": 11.0124,
