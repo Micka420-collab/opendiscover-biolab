@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { type GalleryEntry, galleryEntries } from '@/content/gallery';
+import { galleryByDomain, galleryEntries } from '@/content/gallery';
+import { domainLabel } from '@/lib/sim/domain-labels';
 import Link from 'next/link';
 
 export const metadata = {
@@ -34,12 +35,7 @@ function Credit({ author, credit }: { author: string; credit: string }) {
 }
 
 export default function GalleryPage() {
-  const groups = new Map<string, GalleryEntry[]>();
-  for (const entry of galleryEntries) {
-    const list = groups.get(entry.engineTitle) ?? [];
-    list.push(entry);
-    groups.set(entry.engineTitle, list);
-  }
+  const groups = galleryByDomain();
 
   return (
     <div className="space-y-10">
@@ -61,9 +57,9 @@ export default function GalleryPage() {
           No entries yet — be the first to contribute one.
         </p>
       ) : (
-        [...groups.entries()].map(([engineTitle, entries]) => (
-          <section key={engineTitle} className="space-y-4">
-            <h2 className="text-lg font-semibold">{engineTitle}</h2>
+        groups.map(({ domain, entries }) => (
+          <section key={domain} className="space-y-4">
+            <h2 className="text-lg font-semibold">{domainLabel(domain)}</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {entries.map((entry) => (
                 <Card key={entry.slug} className="flex flex-col">
@@ -73,7 +69,10 @@ export default function GalleryPage() {
                       <Credit author={entry.author} credit={entry.credit} />
                     </div>
                     <CardTitle className="text-base">{entry.title}</CardTitle>
-                    <CardDescription>{entry.blurb}</CardDescription>
+                    <CardDescription>
+                      <span className="text-foreground/80">{entry.engineTitle}</span> —{' '}
+                      {entry.blurb}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="mt-auto">
                     <Button asChild variant="outline" className="w-full h-8 text-xs">

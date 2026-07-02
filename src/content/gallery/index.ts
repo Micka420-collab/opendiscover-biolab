@@ -12,7 +12,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { experimentSharePath } from '@/lib/lab/share';
-import { getEngine } from '@/lib/sim';
+import { getEngine, listDomains } from '@/lib/sim';
 import { z } from 'zod';
 
 const entrySchema = z.object({
@@ -71,3 +71,26 @@ function load(): GalleryEntry[] {
 }
 
 export const galleryEntries: GalleryEntry[] = load();
+
+/**
+ * Gallery entries grouped by domain, in engine-catalog domain order (domains with
+ * no entries are omitted). Pure over {@link galleryEntries}; a partition — every
+ * entry appears exactly once.
+ */
+export function galleryByDomain(): { domain: string; entries: GalleryEntry[] }[] {
+  const groups = new Map<string, GalleryEntry[]>();
+  for (const entry of galleryEntries) {
+    const list = groups.get(entry.domain) ?? [];
+    list.push(entry);
+    groups.set(entry.domain, list);
+  }
+  const order = listDomains();
+  const known = order
+    .filter((d) => groups.has(d))
+    .map((domain) => ({ domain, entries: groups.get(domain) ?? [] }));
+  // Defensive: any domain not in the registry order (shouldn't happen) still shows.
+  const extra = [...groups.keys()]
+    .filter((d) => !order.includes(d))
+    .map((domain) => ({ domain, entries: groups.get(domain) ?? [] }));
+  return [...known, ...extra];
+}

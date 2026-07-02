@@ -4,22 +4,10 @@ import { SurpriseMe } from '@/components/lab/surprise-me';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listEngines } from '@/lib/sim';
+import { DOMAIN_LABELS } from '@/lib/sim/domain-labels';
 import Link from 'next/link';
 
 export const metadata = { title: 'Lab — OpenDiscover BioLab' };
-
-const DOMAIN_LABELS: Record<string, string> = {
-  'molecular-biology': '🧫 Molecular biology',
-  protein: '🧬 Protein biophysics',
-  'systems-biology': '⚙️ Systems biology',
-  'population-genetics': '🌱 Population genetics',
-  bioprocess: '🏭 Bioprocess',
-  epidemiology: '🦠 Epidemiology',
-  'drug-discovery': '💊 Drug discovery',
-  structural: '🔬 Structural',
-  neuroscience: '🧠 Neuroscience',
-  ecology: '🐺 Ecology',
-};
 
 export default function LabPage() {
   return (

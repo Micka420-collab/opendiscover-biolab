@@ -1,11 +1,22 @@
 import { SHARE_PARAM, decodeExperiment } from '@/lib/lab/share';
 import { runEngine } from '@/lib/sim';
 import { describe, expect, it } from 'vitest';
-import { galleryEntries } from './index';
+import { galleryByDomain, galleryEntries } from './index';
 
 describe('community gallery', () => {
   it('loads at least one validated entry', () => {
     expect(galleryEntries.length).toBeGreaterThan(0);
+  });
+
+  it('galleryByDomain partitions every entry exactly once, grouped by its domain', () => {
+    const groups = galleryByDomain();
+    const flat = groups.flatMap((g) => g.entries);
+    expect(flat.length).toBe(galleryEntries.length); // no drops
+    expect(new Set(flat.map((e) => e.slug)).size).toBe(galleryEntries.length); // no dupes
+    for (const g of groups) {
+      expect(g.entries.length).toBeGreaterThan(0);
+      for (const e of g.entries) expect(e.domain).toBe(g.domain);
+    }
   });
 
   for (const entry of galleryEntries) {
