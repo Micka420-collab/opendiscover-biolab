@@ -1,0 +1,18 @@
+{
+  "slug": "predator-prey-limit-cycle",
+  "title": "Predator-prey limit cycle",
+  "engine": "lotka-volterra",
+  "params": {
+    "alpha": 1.1,
+    "beta": 0.4,
+    "delta": 0.1,
+    "gamma": 0.4,
+    "x0": 10,
+    "y0": 10,
+    "tEnd": 40,
+    "steps": 4000
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "The textbook Lotka-Volterra oscillation: prey and predators chase each other around a closed orbit, with the time-averaged populations landing exactly on the coexistence equilibrium. Watch the phase portrait."
+}

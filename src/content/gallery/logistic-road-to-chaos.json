@@ -1,0 +1,16 @@
+{
+  "slug": "logistic-road-to-chaos",
+  "title": "The road to chaos",
+  "engine": "logistic-map",
+  "params": {
+    "r": 3.9,
+    "x0": 0.4,
+    "rMin": 2.5,
+    "rMax": 4,
+    "rSteps": 300,
+    "bifSamples": 60
+  },
+  "author": "OpenDiscover",
+  "credit": "@opendiscover",
+  "blurb": "Robert May's one-line population model at r=3.9 — fully chaotic, with a positive Lyapunov exponent. The bifurcation diagram shows the whole period-doubling cascade from a stable point into chaos."
+}

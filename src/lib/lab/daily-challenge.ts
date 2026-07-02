@@ -146,6 +146,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 50,
     hint: 'For non-competitive inhibition apparent Vmax = Vmax / (1 + [I]/Ki). Half-max occurs when [I] equals Ki.',
   },
+  {
+    id: 'edge-of-chaos',
+    engine: 'logistic-map',
+    title: 'Balance on the edge of chaos',
+    brief:
+      'Tune the growth parameter r of the logistic map to sit right on the boundary between order and chaos — the razor’s edge where the Lyapunov exponent λ crosses zero.',
+    baseParams: {
+      x0: 0.4,
+      transient: 1000,
+      analysisIterations: 4000,
+      rMin: 2.5,
+      rMax: 4,
+      rSteps: 40,
+      bifSamples: 20,
+    },
+    knob: { param: 'r', label: 'Growth parameter r', min: 3.5, max: 3.6, step: 0.002, default: 3.5 },
+    metricKey: 'lyapunovExponent',
+    metricLabel: 'Lyapunov exponent λ',
+    goal: 'target',
+    target: 0,
+    hint: 'Below the Feigenbaum point (~3.5699) the map is periodic and λ < 0; above it, chaotic with λ > 0. The edge of chaos is exactly where λ = 0.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
