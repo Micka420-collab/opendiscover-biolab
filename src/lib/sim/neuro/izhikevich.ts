@@ -138,12 +138,17 @@ export function run(rawParams: Partial<IzhikevichParams> = {}): SimResult {
   const train = simulate(p);
   const stats = spikeStats(train.spikeTimes, p.tEnd);
 
+  // Need ≥3 spikes (≥2 inter-spike intervals) before the CV can distinguish regular
+  // from irregular firing — with 1–2 spikes cvISI is undefined (forced to 0), not
+  // genuinely periodic, so a near-rheobase cell isn't mislabeled "tonic".
   const regime =
     stats.count === 0
       ? 'quiescent (no spikes)'
-      : stats.cvISI < 0.05
-        ? 'regular (tonic) spiking'
-        : 'irregular / bursting';
+      : stats.count < 3
+        ? 'sparse firing (too few spikes to classify)'
+        : stats.cvISI < 0.05
+          ? 'regular (tonic) spiking'
+          : 'irregular / bursting';
 
   const metrics: Metric[] = [
     { key: 'spikeCount', label: 'Spike count', value: stats.count },
@@ -159,7 +164,7 @@ export function run(rawParams: Partial<IzhikevichParams> = {}): SimResult {
       key: 'cvISI',
       label: 'ISI coefficient of variation',
       value: stats.cvISI,
-      note: 'regularity: 0 = perfectly periodic',
+      note: stats.count < 3 ? 'n/a (< 3 spikes)' : 'regularity: 0 = perfectly periodic',
     },
     {
       key: 'firstSpikeLatency',

@@ -67,6 +67,17 @@ describe('izhikevich', () => {
     }
   });
 
+  it('does not mislabel a 1–2 spike near-rheobase cell as tonic regular spiking (regression)', () => {
+    const r = run({ current: 3.5, tEnd: 120 }); // just above rheobase → a single spike
+    const count = metric(r, 'spikeCount');
+    expect(count).toBeGreaterThan(0);
+    expect(count).toBeLessThan(3);
+    expect(r.summary).toContain('sparse firing');
+    expect(r.summary).not.toContain('tonic');
+    // The CV note must not claim periodicity when the CV is undefined (< 3 spikes).
+    expect(r.metrics.find((m) => m.key === 'cvISI')?.note).toBe('n/a (< 3 spikes)');
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('izhikevich', { current: 12 });
     const b = runEngine('izhikevich', { current: 12 });

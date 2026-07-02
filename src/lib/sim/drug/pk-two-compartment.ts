@@ -35,15 +35,15 @@ import { provenance } from '../core/types';
 export const paramsSchema = z
   .object({
     /** IV bolus dose (mg). */
-    dose: z.number().positive().default(100),
+    dose: z.number().positive().max(1e6).default(100),
     /** Central volume of distribution V1 (L). */
-    v1: z.number().positive().default(10),
+    v1: z.number().positive().max(1e5).default(10),
     /** Clearance CL (L/h) — drug removed from the central compartment. */
-    cl: z.number().positive().default(5),
+    cl: z.number().positive().max(1e5).default(5),
     /** Intercompartmental clearance Q (L/h). Must be > 0 for a real 2-compartment model. */
-    q: z.number().positive().default(10),
+    q: z.number().positive().max(1e5).default(10),
     /** Peripheral volume of distribution V2 (L). */
-    v2: z.number().positive().default(20),
+    v2: z.number().positive().max(1e5).default(20),
     /** Simulated duration (h). */
     tEnd: z.number().positive().max(100_000).default(24),
     /** Points in the plotted concentration curve (>= 2). */
@@ -74,7 +74,10 @@ export function hybridConstants(p: PkTwoCompartmentParams): HybridConstants {
   //   (k10+k12+k21)² − 4·k10·k21 = (k10−k21)² + k12·(k12+2k10+2k21) > 0.
   const disc = Math.sqrt(sum * sum - 4 * k10 * k21);
   const alpha = (sum + disc) / 2;
-  const beta = (sum - disc) / 2;
+  // Get the small root from Vieta (α·β = k10·k21) instead of (sum − disc)/2, which
+  // suffers catastrophic cancellation — and can round β to 0, leaking an Infinite
+  // half-life — when 4·k10·k21 ≪ sum². α ≥ (k10+k12+k21)/2 > 0, so this is safe.
+  const beta = (k10 * k21) / alpha;
   return { k10, k12, k21, alpha, beta };
 }
 

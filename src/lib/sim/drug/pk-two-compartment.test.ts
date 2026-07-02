@@ -75,6 +75,20 @@ describe('pk-two-compartment', () => {
     expect(tmax).toBeLessThan(24);
   });
 
+  it('computes β from Vieta (α·β=k10·k21) — stable, no cancellation, at a stiff ratio (regression)', () => {
+    // Large Q makes 4·k10·k21 ≪ sum²; the old (sum−disc)/2 lost precision / hit 0.
+    const { k10, k21, alpha, beta } = hybridConstants(
+      paramsSchema.parse({ cl: 5, v1: 10, q: 1e5, v2: 1e4 }),
+    );
+    expect(beta).toBeGreaterThan(0);
+    expect(Number.isFinite(beta)).toBe(true);
+    expect(alpha * beta).toBeCloseTo(k10 * k21, 12); // Vieta invariant holds exactly
+    expect(beta).toBeCloseTo((k10 * k21) / alpha, 12);
+    const r = run({ cl: 5, v1: 10, q: 1e5, v2: 1e4 });
+    expect(Number.isFinite(metric(r, 'terminalHalfLife'))).toBe(true);
+    expect(r.summary).not.toContain('Infinity');
+  });
+
   it('is deterministic (same params → identical result)', () => {
     const a = runEngine('pk-two-compartment', { dose: 50, cl: 3 });
     const b = runEngine('pk-two-compartment', { dose: 50, cl: 3 });

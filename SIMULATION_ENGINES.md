@@ -1892,11 +1892,11 @@ The classic two-compartment IV-bolus pharmacokinetic model: a drug distributes f
 
 | Param | Type | Default | Range | Description |
 |---|---|---|---|---|
-| `dose` | number | `100` | ≥ 0 |  |
-| `v1` | number | `10` | ≥ 0 |  |
-| `cl` | number | `5` | ≥ 0 |  |
-| `q` | number | `10` | ≥ 0 |  |
-| `v2` | number | `20` | ≥ 0 |  |
+| `dose` | number | `100` | ≥ 0, ≤ 1000000 |  |
+| `v1` | number | `10` | ≥ 0, ≤ 100000 |  |
+| `cl` | number | `5` | ≥ 0, ≤ 100000 |  |
+| `q` | number | `10` | ≥ 0, ≤ 100000 |  |
+| `v2` | number | `20` | ≥ 0, ≤ 100000 |  |
 | `tEnd` | number | `24` | ≥ 0, ≤ 100000 |  |
 | `outputPoints` | integer | `300` | ≥ 2, ≤ 4000 |  |
 
