@@ -357,6 +357,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.985,
     hint: 'Fraction folded at 25°C peaks when the stability maximum T_maxstab lands on 25°C — near Tm ≈ 55°C for these ΔHm/ΔCp. Both a lower and a higher Tm reduce it.',
   },
+  {
+    id: 'reed-frost-vaccinate',
+    engine: 'reed-frost',
+    title: 'Vaccinate to the tipping point',
+    brief:
+      'An R₀=3 pathogen is about to sweep a town of 100,000. Vaccinate just enough people to hold the final outbreak to 5% of the population — cross the herd-immunity threshold and it collapses entirely, but you want to stop it right at the edge, not waste doses.',
+    baseParams: { population: 100000, r0: 3, initialInfectives: 1, maxGenerations: 200 },
+    knob: {
+      param: 'initialImmune',
+      label: 'People vaccinated',
+      min: 0,
+      max: 80000,
+      step: 100,
+      default: 30000,
+      unit: 'people',
+    },
+    metricKey: 'attackRate',
+    metricLabel: 'Attack rate (fraction infected)',
+    goal: 'target',
+    target: 0.05,
+    hint: 'Herd immunity for R₀=3 needs 1−1/R₀ = 66.7% coverage. The attack rate falls steeply just below that — vaccinate about 64,000 of the 100,000 to hold it at 5%.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

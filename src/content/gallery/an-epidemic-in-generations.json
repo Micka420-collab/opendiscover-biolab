@@ -1,0 +1,9 @@
+{
+  "slug": "an-epidemic-in-generations",
+  "title": "An epidemic, generation by generation",
+  "engine": "reed-frost",
+  "params": { "population": 1000, "r0": 2.5, "initialInfectives": 1 },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Before the SIR differential equations there was Reed and Frost's classroom model (1928): time moves in discrete generations, and each susceptible either escapes every current infective or doesn't. From a single case in a town of 1,000 the chain of infection builds, peaks as the susceptible pool runs dry, then burns out — the classic single-humped epidemic curve. With R₀=2.5 about 89% are eventually infected, matching the large-population final-size law z = 1 − e^(−R₀z). The discrete, coin-flip cousin of the SIR model, and the seed of modern stochastic epidemic theory."
+}
