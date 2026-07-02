@@ -96,10 +96,11 @@ export default async function HomePage() {
             the parameters, beat the target, share your best attempt. Your recurring
             &ldquo;today&apos;s episode&rdquo; hook.
           </Feature>
-          <Feature title="📺 OBS overlay mode" href="/lab/breeding">
+          <Feature title="📺 OBS overlay + Lab TV" href="/tv">
             Add <code className="text-accent">/overlay</code> to any experiment link for a
-            transparent, big-type result card that auto-runs — drop it straight into OBS as a
-            browser source.
+            transparent, big-type card that auto-runs — drop it into OBS as a browser source. Or
+            leave <span className="text-foreground">Lab TV</span> running to auto-cycle live
+            experiments.
           </Feature>
         </div>
       </section>
