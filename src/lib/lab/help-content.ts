@@ -706,6 +706,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'how-aggressive-is-the-tumor': {
+    plainWhat:
+      'You are setting how aggressively a make-believe tumour grows. Starting from a tiny 1% seed, your goal is to make it fill exactly half of its maximum possible size by the deadline.',
+    plainWhy:
+      'Real tumours grow fastest while they are smallest and hardest to spot, then slow as they get large. Understanding that pattern is why early screening saves lives and helps doctors judge how urgently a tumour needs treating.',
+    plainHow:
+      'A more aggressive tumour fills up faster, but with diminishing returns — because growth slows as it gets big. Nudge the aggressiveness up from a crawl until it lands right at the halfway mark by the deadline: not so slow it stays small, not so fast it nearly fills up.',
+    terms: [
+      {
+        term: 'carrying capacity',
+        meaning: 'the largest size the tumour can reach, set by its room and blood supply.',
+      },
+      {
+        term: 'growth aggressiveness',
+        meaning: 'how hard the tumour pushes to grow — higher means it reaches its maximum sooner.',
+      },
+      {
+        term: 'fraction of capacity',
+        meaning:
+          'how full the tumour is compared with its maximum size, from 0 (nothing) to 1 (full).',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

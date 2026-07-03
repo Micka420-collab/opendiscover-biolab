@@ -80,6 +80,7 @@ import { spec as wormLikeChain } from './structural/worm-like-chain';
 import { spec as branchingGrowth } from './systems/branching-growth';
 import { spec as fba } from './systems/fba';
 import { spec as gillespie } from './systems/gillespie';
+import { spec as gompertzTumor } from './systems/gompertz-tumor';
 import { spec as grn } from './systems/grn';
 import { spec as kuramoto } from './systems/kuramoto';
 import { spec as metabolicPathway } from './systems/metabolic-pathway';
@@ -107,6 +108,7 @@ export const engines: AnyEngine[] = [
   enzymeKinetics,
   grn,
   gillespie,
+  gompertzTumor,
   kuramoto,
   branchingGrowth,
   fba,

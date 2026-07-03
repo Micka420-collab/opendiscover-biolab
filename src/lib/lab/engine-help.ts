@@ -1729,6 +1729,30 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'gompertz-tumor': {
+    plainWhat:
+      'This shows how a tumour grows over time. It starts as a tiny cluster of cells and grows, but not steadily: it grows fastest while it is still small, then slows down as it gets bigger and runs short of room and blood supply, levelling off at a maximum size. It draws both the size over time and how fast it is growing at each moment.',
+    plainWhy:
+      'The unsettling lesson is that a tumour grows fastest when it is smallest — exactly when it is hardest to find. By the time it is big enough to notice, its growth is already slowing. That is a big part of why early detection matters so much, and why doctors study these growth curves to plan when to screen and how to time treatment.',
+    plainHow:
+      'Turn up the growth setting and the tumour races to its maximum size sooner; turn it down and it dawdles. Watch the two curves together: the size climbs in a stretched S-shape while the growth-rate curve rises to a peak — around a third of the way to full size — and then falls back toward zero as the tumour fills up.',
+    terms: [
+      {
+        term: 'carrying capacity',
+        meaning: 'the largest size the tumour can reach given its limited room and blood supply.',
+      },
+      {
+        term: 'growth rate',
+        meaning:
+          'how fast the tumour is getting bigger at a given moment — fastest while it is still small.',
+      },
+      {
+        term: 'inflection point',
+        meaning:
+          'the moment of fastest growth, at about a third of the maximum size, after which growth slows.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

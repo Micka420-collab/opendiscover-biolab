@@ -874,6 +874,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 10,
     hint: 'Flow rises as the fourth power of radius (Q ∝ r⁴), so a little widening buys a lot of flow. Reaching 10 mL/s needs a radius near 1.73 mm — a 16-fold flow swing hides inside a 2-fold change in radius.',
   },
+  {
+    id: 'how-aggressive-is-the-tumor',
+    engine: 'gompertz-tumor',
+    title: 'Gauge how aggressive a tumour is',
+    brief:
+      'A tumour grows by the Gompertz law — explosively fast while it is tiny, then slowing as it runs out of room and blood supply. Starting from a 1% seed, tune how aggressively it grows so that after 10 units of time it has filled exactly half of its maximum size.',
+    baseParams: { initialSize: 0.01, carryingCapacity: 1, tEnd: 10 },
+    knob: {
+      param: 'growthRate',
+      label: 'Growth aggressiveness b',
+      min: 0.05,
+      max: 0.6,
+      step: 0.005,
+      default: 0.2,
+      unit: '1/time',
+    },
+    metricKey: 'fractionOfCapacity',
+    metricLabel: 'Fraction of maximum size reached',
+    goal: 'target',
+    target: 0.5,
+    hint: 'Gompertz growth decelerates as the tumour fills up, so the fraction reached climbs with the growth constant b but with diminishing returns. From a 1% seed, hitting half of capacity by t=10 needs b ≈ 0.19.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

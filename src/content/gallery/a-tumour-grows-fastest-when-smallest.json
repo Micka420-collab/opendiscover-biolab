@@ -1,0 +1,15 @@
+{
+  "slug": "a-tumour-grows-fastest-when-smallest",
+  "title": "A tumour grows fastest when it is smallest",
+  "engine": "gompertz-tumor",
+  "params": {
+    "initialSize": 0.01,
+    "carryingCapacity": 1,
+    "growthRate": 0.2,
+    "tEnd": 40,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "We picture cancer as something that accelerates — small and slow at first, then racing away once it is large. The Gompertz curve, the model that fits real tumour data across a century of measurements, says almost the opposite, and it is one of the most important counter-intuitions in oncology. Growth is not symmetric. A tumour expands fastest while it is still tiny — around a third of its eventual size — and then decelerates over a long, slow tail as it exhausts the room and blood supply it needs. Watch the two curves here: the size climbs in a stretched, lop-sided S, while the growth-rate curve below it surges to an early peak and then fades. The unsettling consequence is baked into the geometry. The period of most explosive growth happens when the tumour is smallest, has the fewest cells, and is hardest for any scan to catch — and by the time it is large enough to feel or see, its most dangerous growth phase is already behind it. That single fact is a large part of why early detection is worth so much, why screening programmes exist, and why the same slowing-as-it-fills curve governs not just tumours but bacterial cultures, organ development, and even the way a whole animal grows from embryo to adult. Turn up the growth constant and the whole S steepens and shifts earlier — but the shape, and its lesson, never change."
+}

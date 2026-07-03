@@ -259,6 +259,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "birth–death process: 950 reaction events over t=50.0; mean X ≈ 9.15.",
   },
+  "gompertz-tumor": {
+    "metrics": {
+      "currentGrowthRate": 0.00921034,
+      "finalSize": 0.919113,
+      "fractionOfCapacity": 0.919113,
+      "inflectionSize": 0.367879,
+      "inflectionTime": 7.6359,
+      "peakGrowthRate": 0.0735759,
+    },
+    "summary": "Gompertz growth: from 0.01 the tumour reaches 0.919 by t=20 (91.9% of capacity 1). Growth is fastest at 0.368 (K/e), around t=7.64, then decelerates.",
+  },
   "grn": {
     "metrics": {
       "amplitude": 11.123,

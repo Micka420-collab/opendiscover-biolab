@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **71 deterministic simulation engines** across
+The OpenDiscover BioLab ships **72 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -20,7 +20,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
-- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
+- **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
@@ -727,6 +727,40 @@ Exact stochastic simulation of the chemical master equation via Gillespie’s di
 ```
 
 _Run it: `POST /api/lab/run { "engine": "gillespie", "params": … }` or interactively at `/lab/gillespie`._
+
+---
+
+### `gompertz-tumor` — Tumour Growth (Gompertz)
+
+How a tumour grows by the Gompertz law N(t)=K·exp(ln(N₀/K)·e^(−bt)) — the standard model of tumour growth. Unlike symmetric logistic growth, Gompertz growth is lop-sided: fastest when the tumour is only ~37% (1/e) of its ceiling and small enough to be hard to detect, then decelerating over a long tail toward the maximum size K. Reports the final size, fraction of capacity, current and peak growth rate, and the size (K/e) and time of the steepest-growth (inflection) point, plus the growth curve and its bell-shaped growth-rate curve. Closed-form and deterministic; ratios are evaluated as log differences so output stays finite for any valid input.
+
+**References**
+- Gompertz, B. (1825) Phil. Trans. R. Soc. 115:513-583.
+- Laird, A.K. (1964) Dynamics of tumour growth. Br. J. Cancer 18:490-502.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `initialSize` | number | `0.01` | ≥ 1e-9, ≤ 1000000000000 |  |
+| `carryingCapacity` | number | `1` | ≥ 1e-9, ≤ 1000000000000 |  |
+| `growthRate` | number | `0.2` | ≥ 0.000001, ≤ 10 |  |
+| `tEnd` | number | `20` | ≥ 0.000001, ≤ 1000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "initialSize": 0.01,
+  "carryingCapacity": 1,
+  "growthRate": 0.2,
+  "tEnd": 20,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "gompertz-tumor", "params": … }` or interactively at `/lab/gompertz-tumor`._
 
 ---
 
