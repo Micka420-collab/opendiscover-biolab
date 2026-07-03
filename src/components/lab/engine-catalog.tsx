@@ -44,11 +44,14 @@ export function filterEngines(
 export function EngineCatalog({
   engines,
   domainLabels,
+  initialQuery = '',
 }: {
   engines: EngineCard[];
   domainLabels: Record<string, string>;
+  /** Seed the search box (e.g. a domain key deep-linked from the home page). */
+  initialQuery?: string;
 }) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
   const filtered = useMemo(
     () => filterEngines(engines, query, domainLabels),
     [engines, query, domainLabels],

@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MODELS } from '@/lib/ai/gateway';
 import { recentDiscoveries } from '@/lib/db/queries';
-import { listEngines } from '@/lib/sim';
+import { listDomains, listEngines } from '@/lib/sim';
+import { domainLabel } from '@/lib/sim/domain-labels';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -17,52 +18,56 @@ function pretty(model: string): string {
 
 export default async function HomePage() {
   const seed = await recentDiscoveries(5).catch(() => []);
-  const engineCount = listEngines().length;
+  const engines = listEngines();
+  const engineCount = engines.length;
+  const domains = listDomains().map((key) => ({
+    key,
+    label: domainLabel(key),
+    count: engines.filter((e) => e.domain === key).length,
+  }));
 
   return (
     <div className="space-y-24">
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="grid lg:grid-cols-[1fr_320px] gap-10">
         <div className="space-y-6">
           <div className="inline-block text-xs uppercase tracking-widest text-accent font-mono">
-            In-silico · Deterministic · No account
+            Play it · Watch it · Reproduce it — no account
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-            Invent biology, live.
+          <h1 className="text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+            Biology you can <span className="text-accent">play</span>.
             <br />
             <span className="text-muted-foreground">Every run reproduces byte-for-byte.</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            OpenDiscover BioLab is an open-source virtual biotechnology lab you run in the browser —
-            no login, no database, no secrets. {engineCount} deterministic simulation engines turn
-            each <span className="text-foreground">(engine + parameters)</span> into a stable,
-            content-hashed result that reproduces exactly on any machine. That determinism is the
-            creator superpower: any run is already a shareable, remixable link. Invent something on
-            stream, drop the link in chat, and your viewers land on the <em>exact</em> same
-            experiment.
+            OpenDiscover BioLab is an open-source virtual biotechnology lab that runs entirely in
+            your browser — no login, no database, no secrets. {engineCount} deterministic engines
+            turn each <span className="text-foreground">(engine + parameters)</span> into a stable,
+            content-hashed result that reproduces exactly on any machine. Tune a real model like a
+            game, and every run is already a shareable, remixable link.
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
+
+          <div className="flex flex-wrap gap-3 pt-1">
             <Button asChild size="lg">
-              <Link href="/lab">Run an experiment — no account →</Link>
+              <Link href="/aurora">▶ Play AURORA</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
+              <Link href="/lab">Open the Lab — {engineCount} engines</Link>
+            </Button>
+            <Button asChild variant="ghost" size="lg">
               <Link href="/challenge">Today&apos;s challenge</Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/lab/breeding">Play the Breeding Lab</Link>
-            </Button>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Browse the community&apos;s{' '}
-            <Link href="/gallery" className="text-accent hover:underline">
-              experiment gallery
-            </Link>{' '}
-            or the{' '}
-            <Link href="/discoveries" className="text-accent hover:underline">
-              live discovery feed
-            </Link>
-            .
-          </p>
+
+          {/* Stat strip */}
+          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-px pt-4 rounded-lg overflow-hidden border border-border bg-border">
+            <Stat value={String(engineCount)} label="simulation engines" />
+            <Stat value={String(domains.length)} label="fields of biology" />
+            <Stat value="Plain words" label="help on every dial" />
+            <Stat value="0" label="accounts needed" />
+          </dl>
         </div>
+
         <LiveDiscoveryFeed
           initialEvents={seed.map((d) => ({
             type: 'promoted',
@@ -75,7 +80,103 @@ export default async function HomePage() {
         />
       </section>
 
-      {/* For creators & streamers */}
+      {/* ── AURORA game highlight ────────────────────────────────────────── */}
+      <section>
+        <Card className="border-accent bg-[hsl(142_71%_45%/0.06)]">
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-8 p-2 md:p-4">
+            <div className="space-y-4">
+              <div className="text-xs uppercase tracking-widest text-accent font-mono">
+                🌍 AURORA — the game
+              </div>
+              <h2 className="text-3xl font-bold leading-tight">
+                Find a hidden answer. Light up the Earth.
+              </h2>
+              <p className="text-muted-foreground max-w-xl">
+                A spectator-first citizen-science game built on the real engines. Each round shows a
+                fully-visible fitness landscape — slide one dial to hunt the target band, then{' '}
+                <span className="text-foreground">lock it in</span>. Locking re-runs the actual
+                engine and checks the result, so a win is a genuine, hashable discovery that lights
+                a beacon on a shared globe. As fun to <span className="text-foreground">watch</span>{' '}
+                as to play.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Button asChild>
+                  <Link href="/aurora">▶ Play now</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/aurora/overlay">📺 Watch / stream mode</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-3 content-start">
+              <MiniPoint icon="🎯" title="Daily gauntlet">
+                A 5-round puzzle, date-seeded so it&apos;s identical for everyone on Earth — plus
+                endless and hands-free Watch modes.
+              </MiniPoint>
+              <MiniPoint icon="🔒" title="No fakes">
+                Every lock is a real engine re-run checked against the bar — never an interpolation.
+              </MiniPoint>
+              <MiniPoint icon="♿" title="For everyone">
+                Reduced-motion friendly, keyboard- and screen-reader-accessible, and no account.
+              </MiniPoint>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* ── Domain breadth ───────────────────────────────────────────────── */}
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <div className="text-xs uppercase tracking-widest text-accent font-mono">The breadth</div>
+          <h2 className="text-2xl font-bold">
+            {engineCount} engines across {domains.length} fields of biology
+          </h2>
+          <p className="text-muted-foreground max-w-2xl">
+            From the action potential to predator–prey cycles, PCR to pharmacokinetics — each a
+            pure, tested function you can run, tune, and share. Pick a field to explore its engines.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {domains.map((d) => (
+            <Link
+              key={d.key}
+              href={`/lab?domain=${d.key}`}
+              className="group flex items-center justify-between gap-2 rounded-lg border border-border px-4 py-3 hover:border-accent hover:bg-muted transition-colors"
+            >
+              <span className="text-sm font-medium truncate">{d.label}</span>
+              <span className="shrink-0 font-mono text-xs text-muted-foreground group-hover:text-accent transition-colors">
+                {d.count}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Plain-language help ──────────────────────────────────────────── */}
+      <section>
+        <Card>
+          <div className="grid md:grid-cols-[auto_1fr] gap-6 items-center p-2 md:p-4">
+            <div className="text-6xl md:text-7xl text-center md:px-4" aria-hidden>
+              🫶
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs uppercase tracking-widest text-accent font-mono">
+                Made approachable
+              </div>
+              <h2 className="text-2xl font-bold">A “?” that explains everything, in plain words</h2>
+              <p className="text-muted-foreground max-w-2xl">
+                Citizen science only works if a stranger can understand what they&apos;re doing. So
+                every engine and every challenge carries a plain-language help card — what it is,
+                why it matters for people and the planet, and what to try — written for someone with{' '}
+                <span className="text-foreground">no biology or maths background</span>, with the
+                technical term available on demand and never a bare equation in the friendly copy.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* ── For creators & streamers ─────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="space-y-2">
           <div className="text-xs uppercase tracking-widest text-accent font-mono">
@@ -105,14 +206,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* How the lab works */}
+      {/* ── How the lab works ────────────────────────────────────────────── */}
       <section className="space-y-6">
         <h2 className="text-2xl font-bold">How the lab works</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <Step n="1" title="Pick an engine">
             {engineCount} engines across molecular biology, protein biophysics, systems biology,
-            population genetics, bioprocess, epidemiology and drug discovery. Each is a pure
-            function with a Zod-validated parameter form.
+            population genetics, neuroscience, ecology, bioprocess, biochemistry, epidemiology and
+            drug discovery. Each is a pure function with a Zod-validated parameter form.
           </Step>
           <Step n="2" title="Run it — deterministically">
             No clock, no network, no unseeded randomness. The same parameters always produce the
@@ -126,7 +227,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* The autonomous citizen-science pipeline (original engine, kept) */}
+      {/* ── The autonomous citizen-science pipeline (original engine, kept) ── */}
       <section className="space-y-6">
         <div className="space-y-2">
           <div className="text-xs uppercase tracking-widest text-accent font-mono">
@@ -214,6 +315,37 @@ export default async function HomePage() {
           </CardContent>
         </Card>
       </section>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="bg-background px-4 py-3">
+      <div className="text-xl font-bold leading-none">{value}</div>
+      <div className="text-xs text-muted-foreground mt-1">{label}</div>
+    </div>
+  );
+}
+
+function MiniPoint({
+  icon,
+  title,
+  children,
+}: {
+  icon: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex gap-3">
+      <div className="text-xl leading-none pt-0.5" aria-hidden>
+        {icon}
+      </div>
+      <div>
+        <div className="font-semibold text-sm">{title}</div>
+        <div className="text-sm text-muted-foreground">{children}</div>
+      </div>
     </div>
   );
 }

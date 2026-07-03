@@ -9,7 +9,13 @@ import Link from 'next/link';
 
 export const metadata = { title: 'Lab — OpenDiscover BioLab' };
 
-export default function LabPage() {
+export default async function LabPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const initialQuery = typeof params.domain === 'string' ? params.domain : '';
   return (
     <div className="space-y-10">
       <header className="flex items-start justify-between gap-4 flex-wrap">
@@ -54,6 +60,7 @@ export default function LabPage() {
           tags: e.tags ?? [],
         }))}
         domainLabels={DOMAIN_LABELS}
+        initialQuery={initialQuery}
       />
     </div>
   );
