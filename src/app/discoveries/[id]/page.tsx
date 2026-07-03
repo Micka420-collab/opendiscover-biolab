@@ -1,6 +1,7 @@
 import { PeerReviewPanel } from '@/components/discovery/peer-review-panel';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Markdown } from '@/components/ui/markdown';
 import { getAppSession, isGuestSession } from '@/lib/auth';
 import { db, schema } from '@/lib/db';
 import { desc, eq } from 'drizzle-orm';
@@ -123,11 +124,11 @@ export default async function DiscoveryDetail({ params }: { params: Promise<{ id
         </CardContent>
       </Card>
 
-      <article className="prose prose-invert max-w-none">
-        <pre className="whitespace-pre-wrap font-sans text-base bg-transparent p-0">
-          {d.cardMarkdown}
-        </pre>
-      </article>
+      <Card>
+        <CardContent className="pt-6">
+          <Markdown source={d.cardMarkdown} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
