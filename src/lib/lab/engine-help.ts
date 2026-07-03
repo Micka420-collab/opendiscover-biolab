@@ -3,10 +3,10 @@
  * explains, with no background required, what the simulator models, why it matters, and
  * what to try. Same {@link HelpCard} shape as the challenge cards, keyed by engine slug.
  *
- * Generated (and, where the verify pass ran before an API rate-limit, accuracy-verified)
- * from each engine description by the engine-help-content generate->verify workflow. Every
- * card is grounded in the real engine description; a test enforces that the prose is
- * jargon-free (no equations or Greek symbols) and that every registered engine has a card.
+ * Generated then accuracy- and accessibility-VERIFIED from each engine description by the
+ * engine-help-content generate->verify workflow (every card checked against the real model).
+ * A test enforces that the prose is jargon-free (no equations or Greek symbols) and that
+ * every registered engine has a card.
  */
 
 import type { HelpCard } from './help-content';
@@ -441,214 +441,220 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'metabolic-pathway': {
     plainWhat:
-      'This models a cellular assembly line: a raw ingredient gets passed down a chain of tiny worker molecules (enzymes), each one turning it into the next thing until a final product piles up at the end. It follows how much of each in-between substance builds up over time and how fast the whole line runs.',
+      'Inside every living cell, food gets passed down an assembly line: one worker changes it a little, hands it to the next worker, and so on until you get the finished product. This lab follows that assembly line moment by moment, watching how much of each half-finished piece builds up over time and how fast the whole line ends up running.',
     plainWhy:
-      'Assembly lines like this are how living cells turn food into energy and building blocks for life. Understanding where a line gets stuck helps scientists design better medicines and engineer microbes to brew useful things like fuels, foods, and drugs.',
+      'These cell assembly lines are how living things turn food into energy and the parts they need to grow. Understanding where a line speeds up or clogs helps scientists design better medicines, brew and ferment things, and grow cells that make useful stuff like fuels or drugs.',
     plainHow:
-      "Give each worker a top speed, then watch the line settle down: once it's steady, every step passes stuff along at the same pace. Try lowering one worker's top speed and watch it become the bottleneck that holds back the whole line, while the final product piles up more slowly.",
+      "Give each worker on the line a top speed, then hit run and watch the half-finished pieces fill up until the whole line settles into a steady, unchanging pace. Try lowering just one worker's top speed and see the line's throughput drop to match them — the lab even points out that worker as your bottleneck, the step whose top speed sets the pace for everyone else.",
     terms: [
-      {
-        term: 'enzyme',
-        meaning: 'a tiny molecular worker in a cell that speeds up one specific chemical change',
-      },
       {
         term: 'flux',
         meaning:
-          'how fast stuff flows through the whole line, like items per minute on a conveyor belt',
+          "How much material flows through the line each moment — the line's throughput, or how busy it is.",
       },
-      { term: 'bottleneck', meaning: 'the slowest step, which sets the pace for the entire line' },
+      {
+        term: 'steady state',
+        meaning:
+          'When the line has settled into a smooth, unchanging pace and the amounts stop rising or falling.',
+      },
+      {
+        term: 'bottleneck',
+        meaning:
+          'The step with the lowest top speed, which limits how fast the whole line can go no matter how fast the others are.',
+      },
     ],
   },
   'branching-growth': {
     plainWhat:
-      'This is a game of chance played out by a tiny group of living cells, like the start of a tumor or a patch of stem cells. Every round, each cell rolls its own dice: it either dies, sits still and does nothing, or splits into two new cells. Do that over and over and watch whether the little colony blossoms into a huge crowd or fizzles out to nothing.',
+      'This is a game of chance played out by a tiny group of living cells, like a small clump that could grow into a tumor or a patch of stem cells. Each round, every cell flips its own private coin: it either dies, sits still and does nothing, or splits into two.',
     plainWhy:
-      'The same simple rules decide whether a handful of cancer cells fades away on its own or grows into a real tumor, and whether a few surviving cells can rebuild healthy tissue. Understanding when a tiny cell population takes off versus dies out helps doctors and scientists think about cancer, healing, and how life bounces back from small numbers.',
+      'The same simple rule decides whether a handful of cells fizzles out and disappears, or takes off and keeps growing without stopping, which is exactly the difference between a threat your body clears on its own and one that keeps spreading. Because every cell decides on its own, luck matters most when the group is very small, so understanding it helps make sense of how cancers can start and how living things survive their fragile early days.',
     plainHow:
-      'Try nudging the chance of dividing up (or the chance of dying down) and watch the "extinction probability" — that\'s how likely the whole colony is to vanish completely. Below a tipping point almost every colony dies out; above it, some survive and explode in size. The tool runs the same setup hundreds of times, so you can compare what the math predicts against what actually happened in all those runs.',
+      'Nudge the "divide" chance up a little and watch the population line curve upward and take off, then nudge it down and watch the cells dwindle toward zero. Because chance is involved, the lab runs the whole story many times over and shows you the average, next to the prediction the math makes. The headline number to watch is the chance the whole group dies out completely: it tells you whether this little colony is doomed to vanish or likely to keep growing.',
     terms: [
       {
-        term: 'extinction probability',
-        meaning: 'the chance the whole cell colony eventually dies out completely, leaving nothing',
-      },
-      {
         term: 'generation',
-        meaning: 'one round where every cell takes its turn to die, stay put, or split in two',
+        meaning: 'One round where every cell takes its turn to die, stay, or split.',
       },
       {
-        term: 'mean offspring per cell',
+        term: 'extinction probability',
         meaning:
-          'the average number of cells each cell leaves behind next round; above one and the colony tends to grow, below one and it tends to shrink',
+          'The chance the whole group of cells eventually dies out and disappears completely.',
+      },
+      {
+        term: 'mean offspring',
+        meaning:
+          'The average number of cells each cell leaves behind for the next round; above one tends to grow, below one tends to fade.',
       },
     ],
   },
   'wright-fisher': {
     plainWhat:
-      'This is a make-believe population of living things, where each one carries one of two versions of the same gene. It watches, generation after generation, how common each version becomes as the population has offspring, some versions get a survival edge, and pure luck shuffles who passes their genes on.',
+      'This models how a gene comes in two versions inside a group of living things, and how the mix of those two versions shifts from one generation to the next. Because only a limited number of offspring are born each round, luck alone can slowly make one version more common until it takes over completely or vanishes for good.',
     plainWhy:
-      'It shows how a gene version can slowly take over a whole population or vanish forever, sometimes just by chance and sometimes because it helps survival. This is the basic story of evolution, and it helps explain everything from why some traits spread to how rare diseases stick around or fade in small populations.',
+      'This is how new traits spread through a population, or quietly disappear, over many generations. It helps explain why small groups lose their variety faster, and it underpins how scientists study evolution, protect endangered species, and understand how living things change over time.',
     plainHow:
-      'Try shrinking the population and watch how much more often a gene version gets completely wiped out or takes over purely by luck. The main number to watch is the chance that one gene version ends up "winning" (filling the whole population): with no survival advantage it simply matches how common that version started out, but give it even a small edge and that chance climbs.',
+      'Try shrinking the group size and watch how much faster one gene version wins out purely by chance. Then give one version a survival advantage, or start it out more or less common, and watch the "fixation" number, which is the share of test runs where that version completely took over.',
     terms: [
       {
         term: 'allele',
-        meaning: 'One of the two versions of the same gene that the simulation tracks.',
-      },
-      {
-        term: 'fixation',
-        meaning:
-          'When one gene version has spread to every member of the population, so the other has disappeared.',
+        meaning: 'One of the two versions a gene can come in, like two spellings of the same word.',
       },
       {
         term: 'genetic drift',
         meaning:
           'Random shifts in how common a gene version is, just from the luck of who happens to have offspring.',
       },
+      {
+        term: 'fixation',
+        meaning:
+          'When one gene version becomes the only one left, and the other has completely disappeared.',
+      },
     ],
   },
   fba: {
     plainWhat:
-      'This is a tiny virtual cell. It maps out all the little chemical steps a microbe uses to turn food (like sugar) into the parts it needs to grow, then works out the fastest way it could possibly grow with the food and limits you give it.',
+      'This models the chemistry inside a tiny living cell, like a bacterium. Food comes in, gets passed along a web of little chemical steps, and the cell uses it to grow. The lab works out how fast every step can run at the same time so that nothing piles up and nothing runs dry, then finds the very fastest the cell could grow.',
     plainWhy:
-      'Scientists use this same trick on real bacteria and yeast to guess how fast they grow and which food routes they lean on. That helps in brewing, making medicines, and designing microbes that produce useful things like fuels or drugs.',
+      'This is how scientists predict how fast microbes grow and what they can make. It helps design bacteria and yeast that brew medicines, fuels, and foods, and it helps us understand how living cells feed themselves.',
     plainHow:
-      'Try lowering the glucose (food) limit and watch the growth number drop right alongside it. The main result, the growth flux, tells you the best-case speed the cell can grow, and it also shows you which chemical steps are actually being used to get there.',
+      "Try lowering the food supply (the glucose uptake cap) and watch the growth number drop. In the built-in example, feeding half as much food gives half as much growth. The main result, the growth flux, tells you the fastest the cell could possibly grow with the food and limits you gave it. If you set things up so the cell can't work at all, the growth simply comes back as zero.",
     terms: [
-      {
-        term: 'flux',
-        meaning:
-          'How fast stuff flows through one chemical step, like the flow rate through a pipe.',
-      },
+      { term: 'flux', meaning: 'How fast a single chemical step runs inside the cell.' },
       {
         term: 'steady state',
         meaning:
-          'A balanced setup where everything made inside is used up just as fast, so nothing piles up.',
+          'A balanced setup where every ingredient is made exactly as fast as it is used up, so nothing builds up or runs out.',
       },
       {
-        term: 'biomass / growth flux',
-        meaning: 'The single number for how fast the cell is building new copies of itself.',
+        term: 'objective / biomass',
+        meaning: 'The thing the cell is trying to do most of — here, grow as much as possible.',
+      },
+      {
+        term: 'glucose uptake cap',
+        meaning:
+          'The most food (sugar) the cell is allowed to take in — the main limit you can turn up or down.',
       },
     ],
   },
   kuramoto: {
     plainWhat:
-      'This models how a crowd of things that each keep their own beat — like fireflies blinking, heart pacemaker cells, or a clapping audience — can fall into the same rhythm all on their own. Each one has its own natural pace, and they gently nudge each other every cycle.',
+      'This models how a crowd of things that each keep their own rhythm can suddenly fall into step together, like a field of fireflies ending up flashing all at once, heart-pacemaker cells beating as one, or an audience drifting into synchronized clapping.',
     plainWhy:
-      'Getting in sync (or failing to) shows up everywhere in life: your heartbeat, sleep clocks in your brain, power grids, even people clapping together after a show. Understanding when a group snaps into a shared rhythm helps doctors and scientists spot healthy and unhealthy patterns in the body and beyond.',
+      'Getting in sync (or failing to) shows up everywhere that matters to us: a steady heartbeat, sleep clocks in the brain, power grids staying in time. Understanding when a group locks together helps explain both healthy rhythms and glitches.',
     plainHow:
-      'Try raising the coupling (how strongly each one listens to the others) and watch the coherence line climb. When the nudging is weak, everyone does their own thing and the line stays low and jittery; push past the tipping point and the whole crowd suddenly locks into step and the line shoots up toward 1 — that number tells you how in-sync the group is, where 0 is chaos and 1 is perfect togetherness.',
+      'Turn up the "coupling" slider (how strongly each member pays attention to the others) and watch the coherence line climb from near zero toward one. That line tells you how in-step the crowd is: nudge coupling past the tipping point and a scattered group snaps into a shared beat.',
     terms: [
       {
+        term: 'coherence',
+        meaning:
+          'A score from 0 to 1 for how in-step the group is: 0 means everyone does their own thing, 1 means perfectly together.',
+      },
+      {
         term: 'coupling',
-        meaning:
-          'How strongly each member pays attention to the rest of the group — turn it up and they synchronize more easily.',
+        meaning: 'How strongly each member tunes its rhythm to the rest of the crowd.',
       },
       {
-        term: 'coherence (order parameter r)',
+        term: 'critical coupling',
         meaning:
-          'A single score from 0 to 1 for how in-step the whole group is: 0 is total disorder, 1 is everyone moving as one.',
-      },
-      {
-        term: 'natural frequency',
-        meaning: 'The personal pace each member would keep on its own if nobody else were around.',
+          'The tipping-point strength: below it the crowd stays scattered, above it they start to sync.',
       },
     ],
   },
   phylogenetics: {
     plainWhat:
-      "This builds a family tree for living things by comparing the letter-strings of their DNA (or RNA). You give it a few creatures' matching genetic sequences, and it works out which ones are close cousins and which split apart long ago.",
+      'This tool builds a family tree for living things by comparing their genetic code. You give it the same stretch of code read from a few different species, lined up letter by letter, and it works out who is most closely related to whom.',
     plainWhy:
-      'Family trees like this show how humans, animals, plants, and viruses are all related and how they changed over time. Scientists use them to trace where a new virus came from, track how diseases spread, and understand the story of life on Earth.',
+      'Comparing genetic code is how scientists figure out how life on Earth is connected, trace where a virus came from, and see how creatures changed over millions of years. It turns tiny spelling differences in genes into a picture of the branches of life.',
     plainHow:
-      'Try feeding in a few sequences and watch the tree that comes out: creatures whose DNA matches closely sit on nearby branches, while very different ones sit far apart. Change the counting method or the tree-building style and watch the branch lengths shift, showing how much each creature has changed since they shared an ancestor.',
+      'Paste in a few sequences and watch it draw the tree: species whose code barely differs sit on nearby branches, while big differences push them far apart. Try switching the tree-building method (Neighbor-Joining or UPGMA) and watch the branches rearrange, and check the "tree height" to see how much change has piled up along the longest path from the root out to a tip.',
     terms: [
       {
-        term: 'aligned sequences',
+        term: 'nucleotide sequence',
         meaning:
-          'DNA strings lined up so the same positions can be compared letter by letter, like stacking two words to see which letters differ.',
-      },
-      {
-        term: 'substitution model',
-        meaning:
-          'A recipe for estimating how many real changes happened, since the same spot can change more than once and hide earlier changes.',
+          'A stretch of genetic code, written as a string of letters (A, C, G, and T) that spells out the instructions inside living things. This works for DNA or RNA.',
       },
       {
         term: 'branch length',
         meaning:
-          "How much a creature's DNA has changed along a branch; longer branches mean more changes since the split.",
+          'How much genetic change happened along a branch of the tree; longer means more differences piled up.',
+      },
+      {
+        term: 'Newick',
+        meaning:
+          'A compact text format that writes out the whole tree as one line, so a computer can store or redraw it.',
       },
     ],
   },
   'hardy-weinberg': {
     plainWhat:
-      "This looks at a trait that comes in two versions of a gene across a group of living things — like plants, animals, or people. You tell it how many individuals carry two copies of one version, one of each, or two copies of the other version, and it checks whether the group looks the way you'd expect if partners were pairing up completely at random.",
+      'Living things carry two copies of each gene, and each copy can come in different versions. You tell this tool how many individuals in a group carry each combination of versions. It then works out whether the group looks like one where partners pair up completely at random.',
     plainWhy:
-      'When a real group does NOT match the "random pairing" picture, something interesting is going on — maybe relatives are having offspring together, maybe one version helps survival, or maybe two separate groups got mixed together. Spotting that difference is how scientists notice hidden forces shaping a population.',
+      'When a group drifts away from that "random pairing" pattern, it\'s a clue that something interesting is happening: perhaps relatives are pairing up with relatives, the group is really two separate groups mixed together, or nature is quietly favoring one version over another. Spotting that helps scientists study wildlife, conservation, and human health.',
     plainHow:
-      'Try typing in the counts of each type, then watch the "departs from expected" result. If you make the middle group (the mixed pairs) much smaller than the others, watch the test flip to "departs" — a clue that partners aren\'t pairing at random. The main number tells you whether your group is close enough to the random-pairing prediction or clearly different from it.',
+      'Type in how many individuals you counted with each gene combination, then watch the "departs from random mating" result. Try piling everyone into the two matched-pair groups and leaving hardly any in the mixed group, and you\'ll see the score jump, which means the group no longer looks like random pairing.',
     terms: [
-      {
-        term: 'allele frequency',
-        meaning:
-          'How common each of the two gene versions is in the whole group, as a share of the total.',
-      },
       {
         term: 'heterozygosity',
         meaning:
-          'The share of individuals carrying one of each gene version rather than a matching pair.',
+          'How common it is to carry two different versions of the gene rather than two matching ones.',
       },
       {
         term: 'inbreeding coefficient',
         meaning:
-          'A number that goes up when there are fewer mixed pairs than expected, often a sign relatives are breeding together.',
+          "A number that rises when relatives pair up, leaving fewer individuals with two mismatched gene versions than you'd expect.",
+      },
+      {
+        term: 'chi-square test',
+        meaning:
+          'A standard yes/no math check for whether the real counts stray further from the expected pattern than plain chance would explain.',
       },
     ],
   },
   'moran-process': {
     plainWhat:
-      'This models a small, fixed-size group of living things where a new version of a gene appears in just one or a few members, and then, generation after generation, either spreads to everyone or dies out. Each turn one individual has offspring and one is replaced, so the group stays the same size while the count of the new type wanders up and down.',
+      'Imagine a small crowd of living things that always stays the same size, where one new kind (a mutant) has just appeared among the usual kind. Over and over, one random individual has a baby and one random individual dies, so the head count never changes. This lab follows how the number of the new kind wanders up and down by pure chance, with a gentle push in its favour if it happens to be better at having babies.',
     plainWhy:
-      'This is at the heart of how evolution actually works in real, limited populations: luck (not just fitness) decides whether a brand-new trait takes over or vanishes. Even a helpful new gene often disappears by chance, and even a slightly weak one sometimes wins. Understanding this helps explain how species change, how diseases evolve, and why rare mutations matter.',
+      'This is how a brand-new trait either takes over a whole group or disappears for good. It helps explain why even a helpful change can vanish through bad luck, and why an ordinary one can sometimes spread everywhere. That tug-of-war between luck and advantage sits right at the heart of how living things evolve.',
     plainHow:
-      'Try nudging the "relative fitness" of the new type above 1 to make it stronger, or below 1 to make it weaker, and watch the "fixation probability" — your chance that it eventually spreads to the whole group. Notice that even a strong newcomer starting as a single individual usually still loses, and see the example trajectory climb toward the top (everyone) or fall to zero (gone).',
+      'Try turning up how good the new kind is at having babies and watch the "fixation probability" climb, that is the chance the new kind eventually fills the whole crowd. Then shrink the crowd and see how much more the outcome is left to pure luck. The lab shows both an exact calculated chance and the result of running many random trials, so you can watch the two agree.',
     terms: [
       {
+        term: 'mutant',
+        meaning: 'An individual of the new kind, different from the usual ones in the crowd',
+      },
+      {
         term: 'fixation',
-        meaning: 'when the new type has spread to every single member of the group',
+        meaning: 'When the new kind spreads to every single individual, taking over completely',
       },
       {
         term: 'relative fitness',
         meaning:
-          'how good the new type is at having offspring compared to the original — above 1 is better, below 1 is worse',
-      },
-      {
-        term: 'fixation probability',
-        meaning:
-          'the chance that the new type ends up taking over the whole group instead of dying out',
+          'How good the new kind is at having offspring compared to the usual kind; above 1 means better, below 1 means worse, exactly 1 means no difference',
       },
     ],
   },
   'luria-delbruck': {
     plainWhat:
-      'This recreates a famous 1943 experiment that asked a simple question: do germs "decide" to become resistant when they meet a threat, or were a few of them already resistant by pure chance? It grows many identical little batches of bacteria and counts how many survivors each batch has when hit by a bacteria-killing virus.',
+      'This recreates a famous 1943 experiment with bacteria. You grow lots of separate little dishes of the same germs, then hit each dish with a virus that only a few "resistant" germs can survive, and count how many survivors are in every dish.',
     plainWhy:
-      'It settled how resistance really appears: random copying mistakes happen while the bacteria are growing, long before any threat shows up. That is exactly why antibiotic resistance and drug-resistant infections can be lurking before we ever use the medicine, which shapes how doctors fight them today.',
+      'It answered a huge question: do living things change randomly by luck, or only because their surroundings force them to? The surprising answer here — that the change happens by chance, all on its own, before the danger ever shows up — is a cornerstone of how we understand evolution, and why germs turn resistant to the things meant to kill them.',
     plainHow:
-      'Try raising the mutation rate or the number of batches and watch the "variance-to-mean ratio." If survivors just popped up in a panic when the virus arrived, every batch would look about the same and this number would sit near 1. Instead you get a wild spread — most batches have almost none, while a lucky few hit the "jackpot" with huge numbers — and the ratio climbs far above 1. That big gap is the fingerprint that the resistant cells were already there, quietly passed down as the colony grew.',
+      'Watch the "variance-to-mean ratio." If survivors only popped up at the last second when the virus arrived, every dish would have a similar count and that number would sit near 1. Instead you get a few wild "jackpot" dishes with huge numbers, which pushes the ratio way above 1 — proof the change happened early and by luck. Try raising the number of dishes or the chance of a change, and watch how big the biggest jackpot gets.',
     terms: [
+      {
+        term: 'resistant mutant',
+        meaning: 'A germ that, purely by chance, can survive the thing that kills the others.',
+      },
       {
         term: 'jackpot',
         meaning:
-          'A batch with a huge number of survivors, because a resistant cell appeared early and all its offspring inherited the trait.',
+          'A dish with a giant number of survivors, because one lucky change happened early and all its offspring inherited it.',
       },
       {
         term: 'variance-to-mean ratio',
         meaning:
-          "A measure of how uneven the batches are. Near 1 means they're all similar; much bigger than 1 means a few batches are wildly higher than the rest.",
-      },
-      {
-        term: 'mutation rate',
-        meaning: 'How often a tiny random copying error happens as a cell divides.',
+          'A number showing how uneven the dish-to-dish counts are; far above 1 means the changes were early and driven by chance, near 1 would mean they were forced by the virus.',
       },
     ],
   },
@@ -658,7 +664,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'Understanding these boom-and-bust cycles helps people manage wildlife, fisheries, and pests. It even explains a surprise: spraying to kill a pest and its natural enemy at once can end up leaving you with MORE pests on average, because you also wiped out what was keeping them in check.',
     plainHow:
-      'Try bumping up how fast the prey breed, or how deadly the predator is, then watch the two population lines swing up and down like a chase that never quite ends. The key numbers tell you the balance point each population circles around, and that both settle to that same balance point when you average them over full cycles.',
+      "Try bumping up how fast the prey breed, or how hard the predator hits, then watch the two population lines swing up and down like a chase that never quite ends. Each population has its own balance point that it keeps circling around — and here's the neat part: if you average a population over a full set of ups and downs, that average lands right on its own balance point.",
     terms: [
       {
         term: 'equilibrium',
@@ -674,11 +680,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   gillespie: {
     plainWhat:
-      "This models how tiny groups of things bump into each other and change, one event at a time, when the numbers are small enough that pure luck matters. It comes ready with three stories: things being born and dying, foxes chasing rabbits, and a gene switching on and off to make little bursts of a cell's building blocks.",
+      "This models how tiny groups of things bump into each other and change, one event at a time, when the numbers are so small that pure luck matters. It comes ready with three stories: things being born and dying, foxes chasing rabbits, and a gene flicking on and off to make little bursts of a cell's working parts.",
     plainWhy:
       'Inside a living cell there are often just a handful of copies of something, so chance really shakes the outcome — two identical cells can end up quite different. Seeing that randomness helps scientists understand why life is noisy and how cells cope with it.',
     plainHow:
-      'Pick the foxes-and-rabbits story and watch the two lines swing up and down in wobbly, uneven waves — sometimes a population even crashes to zero and stays there. Try the birth-and-death story instead and change the birth rate: the headline "mean" number tells you roughly how many copies stick around once things settle. Keep the same seed and you get the exact same run every time, so you can compare fairly.',
+      'Pick the foxes-and-rabbits story and watch the two lines swing up and down in wobbly, uneven waves — sometimes a population even crashes to zero and stays there for good. Try the birth-and-death story instead and change the birth rate: the headline "mean" number tells you roughly how many copies stick around once things settle down. Keep the same seed and you get the exact same run every time, so you can compare fairly.',
     terms: [
       {
         term: 'molecule count',
@@ -699,11 +705,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'ewens-sampling': {
     plainWhat:
-      "Imagine scooping up a handful of living things from one population and reading a tiny piece of their DNA. Over time, random copying mistakes create brand-new versions of a gene, and this tool predicts how that handful splits into different versions — how many kinds you'd expect to see, and how common or rare each one is.",
+      "Imagine scooping up a handful of living things from one population and reading a tiny matching piece of their DNA. Over time, random copying mistakes create brand-new versions of a gene, and this tool predicts how that handful splits into different versions — how many kinds you'd expect to see, and how common or rare each one is.",
     plainWhy:
-      "It gives scientists a baseline for what pure chance and plain mutation look like, with no survival advantage helping any version win. When real DNA doesn't match this prediction, that's a clue something interesting is going on — like a trait being favored or a population that recently shrank or boomed.",
+      "It gives scientists a baseline for what pure chance and plain mutation look like, with no survival advantage helping any version win. When real DNA doesn't match this prediction, that's a clue something interesting is going on — like a trait being favored, or a population that recently shrank or boomed.",
     plainHow:
-      'Try turning up the mutation-rate dial and watch the "expected number of alleles" climb — faster mutation means more distinct versions in your sample, and more of them showing up as one-of-a-kind rarities. Turn it down and the handful collapses toward just a few shared versions. The "homozygosity" number tells you the chance that two individuals picked at random carry the very same version.',
+      'Try turning up the mutation-rate dial and watch the "expected number of alleles" climb — faster mutation means more distinct versions in your sample, and more of them showing up as one-of-a-kind rarities. Turn it down and the handful collapses toward just a few shared versions. The "homozygosity" number tells you the chance that two random picks from the sample carry the very same version.',
     terms: [
       {
         term: 'allele',
@@ -713,7 +719,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'homozygosity',
         meaning:
-          'The chance that two randomly picked individuals happen to carry the exact same version of the gene.',
+          'The chance that two random picks from your sample happen to carry the exact same version of the gene.',
       },
       {
         term: 'scaled mutation rate',
@@ -724,14 +730,14 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   coalescent: {
     plainWhat:
-      'Take a small group of living things of the same kind and trace their family trees backwards in time. This tool works out, on average, how those family lines merge together as you go back, until they all meet at one shared great-great-grandparent that every one of them descends from.',
+      'Take a small group of living things of the same kind and trace their family trees backwards in time. This tool works out, on average, how those separate family lines join up as you go further back, until they all meet at a single shared ancestor that every one of them is descended from.',
     plainWhy:
-      'The pattern of shared ancestors is written into DNA. By knowing what a normal family tree should look like, scientists can read the small differences between individuals to estimate how big a population was, how healthy and varied it is, and whether something unusual (like a recent disaster or a helpful trait spreading) has happened to it.',
+      'The pattern of shared ancestors gets written into DNA over time. By knowing what a normal family tree should look like, scientists can read the small differences between individuals to estimate how big a population was, how varied and healthy it is, and whether something unusual (like a recent disaster or a helpful trait spreading quickly) has left its mark on the group.',
     plainHow:
-      'Try raising the sample size (how many individuals you pick) and watch the "time to common ancestor" number: it barely grows past a point, because the very last two family lines take about half the whole wait on their own. Then nudge the variation dial up and see the expected number of DNA differences climb right alongside it.',
+      'Try raising the sample size (how many individuals you pick) and watch the "time to shared ancestor" number: past a point it barely grows, because the very last two family lines to join take about half of the whole wait all on their own, no matter how many you started with. Then nudge the variation dial up and watch the expected number of DNA differences climb right alongside it.',
     terms: [
       {
-        term: 'common ancestor',
+        term: 'shared ancestor',
         meaning:
           'The single individual, far back in time, that every member of your sample is descended from.',
       },
@@ -744,15 +750,20 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         term: 'sample size',
         meaning: 'How many individuals you pick to study the family tree of.',
       },
+      {
+        term: 'variation dial',
+        meaning:
+          'A setting for how much genetic change builds up in the group; turning it up means more DNA differences to find.',
+      },
     ],
   },
   breeding: {
     plainWhat:
-      'This is a virtual pea-and-pet breeding lab. You pick two parents and the traits they carry (like round or wrinkled seeds, coat colour, and so on), then it works out every kind of baby they could have and how likely each one is. It even hands you a batch of made-up offspring to look at.',
+      'This is a virtual breeding lab for plants and animals. You pick two parents and the traits they carry (like round or wrinkled seeds, or coat colour), then it works out every kind of baby they could have and how likely each one is. It even hands you a batch of made-up offspring to look at, one by one.',
     plainWhy:
-      'Guessing which traits get passed on is the heart of gardening, farming, and understanding how families inherit features like eye colour or certain health conditions. This lets anyone see those odds without waiting years for real plants or animals to grow.',
+      'Guessing which traits get passed on is the heart of gardening, farming, and understanding how families inherit features like eye colour or certain health conditions. This lets anyone see those odds in seconds, without waiting years for real plants or animals to grow up.',
     plainHow:
-      'Give each parent their traits, then watch the "most common" result and the mix of babies change. Try making one trait blend in the middle instead of one side winning, and see how the ratio of baby types shifts from a lopsided split to an even three-way spread.',
+      'Give each parent their traits, then watch the "most common" baby and the whole mix of babies change. For a trait where one version simply wins, you get a lopsided split with two kinds of baby. Now switch that trait so the two versions blend in the middle instead: you get three kinds of baby, and the in-between blend actually turns out to be the most common one of all.',
     terms: [
       {
         term: 'allele',
@@ -767,22 +778,22 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'mutation rate',
         meaning:
-          'A small chance that a passed-down trait randomly flips to a different version in the sample babies shown.',
+          'A small chance that a passed-down trait randomly flips to a different version, but only in the sample babies shown, not in the overall odds.',
       },
     ],
   },
   'logistic-map': {
     plainWhat:
-      "This is a super-simple model of an animal population that grows year after year but gets held back by crowding when it gets too big. Each new year's count depends only on last year's, using one short rule repeated over and over.",
+      "This is a super-simple make-believe of an animal population that grows year after year but gets held back by crowding once it gets too big. Each new year's count depends only on last year's, worked out with one short rule used again and again.",
     plainWhy:
-      'It shows a surprising truth: even the simplest rule can produce wildly unpredictable results. This helped scientists understand why some populations settle into a steady number, some bounce between a few values, and others swing about with no pattern at all — a big idea behind the study of chaos.',
+      'It shows a surprising truth: even the simplest rule can produce wildly unpredictable results. This helped scientists understand why some populations settle on a steady number, some bounce between a few values, and others swing about with no pattern at all — a big idea behind the study of chaos.',
     plainHow:
-      'Slowly turn up the growth dial and watch the picture change: at low values the population settles on one steady number, then it starts flipping between two, then four, and past about 3.6 it scatters into a fuzzy, never-repeating mess. The "chaotic" readout flips to yes once tiny changes in the starting point start leading to totally different futures.',
+      'Slowly turn up the growth dial and watch the picture change: at low settings the population settles on one steady number, then it starts flipping between two, then four, and past about 3.57 it scatters into a fuzzy, never-repeating mess. The "chaotic" readout flips to yes once tiny changes in the starting point start leading to totally different futures.',
     terms: [
       {
         term: 'growth dial (r)',
         meaning:
-          'How fast the population tries to grow each year; turning it higher pushes the model from calm to chaotic.',
+          'How hard the population tries to grow each year; turning it higher pushes the model from calm to chaotic.',
       },
       {
         term: 'chaos',
@@ -816,7 +827,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'equilibrium',
         meaning:
-          'a balanced point where all three moves are equally common and nothing pushes the mix to change',
+          'the balanced point where all three moves are equally common, so nothing pulls the mix toward one move or another',
       },
     ],
   },
@@ -826,7 +837,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'Lots of real jobs rely on microbes eating things that turn toxic in big doses, like cleaning pollution out of water or breaking down chemical waste. Knowing the "just right" amount of food keeps the microbes healthy and working at their best instead of poisoning them.',
     plainHow:
-      'Slide the food amount up and down and watch the growth curve: it climbs, reaches a peak, then dips as the food turns harmful. The tool marks the exact best food level and the safe range around it where growth stays strong, and shows a second curve for a microbe that never gets poisoned so you can see the difference.',
+      'Slide the food amount up and down and watch the growth curve: it climbs, reaches a peak, then dips as the food turns harmful. The tool marks the exact best food level and the range around it where growth stays at least half as fast as the peak, and shows a second curve for a microbe that never gets poisoned so you can see the difference.',
     terms: [
       { term: 'substrate', meaning: 'the food or chemical the microbes eat' },
       { term: 'growth rate', meaning: 'how quickly the microbes multiply' },
@@ -835,16 +846,16 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'rosenzweig-macarthur': {
     plainWhat:
-      'This is a model of two animals that need each other: prey (like rabbits) that eat plants, and predators (like foxes) that eat the prey. It follows how both populations rise and fall over time as the foxes hunt and the rabbits breed.',
+      'This is a model of two animals whose lives are tied together: prey (think rabbits) that live off plants, and predators (think foxes) that hunt the prey. It follows how the two populations rise and fall over time as the foxes catch rabbits and the rabbits breed and run out of food.',
     plainWhy:
-      'Real nature works like this, and it holds a famous surprise: giving the prey more food to help them can actually make both animals crash into wild boom-and-bust swings. That warning matters for anyone trying to protect wildlife, manage fisheries, or run a farm without accidentally triggering chaos.',
+      'Real nature really can behave like this, and it hides a famous surprise: giving the prey more food to help them can actually tip both animals into wild boom-and-bust swings instead of calm, steady numbers. That warning matters for anyone trying to protect wildlife, manage fishing, or run a farm without accidentally setting off chaos.',
     plainHow:
-      'Try slowly turning up the "carrying capacity" (how much food and space the prey have) and watch the two population lines. At first they settle to steady, calm numbers, but past a tipping point they suddenly break into huge repeating boom-and-bust waves that never calm down.',
+      'Try slowly turning up the "carrying capacity" (how much food and room the prey have) and watch the two population lines. At first they settle into calm, steady numbers, but once you pass a tipping point they suddenly break into big repeating boom-and-bust waves that never settle down again.',
     terms: [
       {
         term: 'carrying capacity',
         meaning:
-          'the largest prey population the land can feed and hold; turning it up is like giving the prey more food',
+          'the largest prey population the land can feed and hold; turning it up is like giving the prey more food and space',
       },
       {
         term: 'limit cycle',
@@ -862,14 +873,14 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhat:
       'Imagine a tank where two kinds of tiny microbes live, both eating the same single food that trickles in at a steady rate while liquid is drained off just as fast. This shows you which microbe wins when both are hungry for the exact same meal.',
     plainWhy:
-      "In nature, and in real lab and factory tanks, living things constantly compete for limited food. This reveals a famous rule: when two species need the exact same one resource, they can't both keep going forever — the more efficient one takes over and the other fades away.",
+      "In nature, and in real lab and factory tanks, living things constantly compete for limited food. This reveals a famous rule: when two species need the exact same one resource, they can't both keep going forever — the one that gets by on less food takes over and the other fades away.",
     plainHow:
-      'Try making one microbe better at grabbing food when it\'s scarce (lower its "break-even food level") and watch that species climb while the other drops to almost nothing. The "surviving species" readout tells you who wins: the winner is the one that can keep growing on the least food, because it eats the shared food down so low that its rival starves.',
+      'Try making one microbe better at surviving when food is scarce (lower its "break-even food level") and watch that species climb while the other drops to almost nothing. The "surviving species" readout tells you who wins: the winner is the one that can keep growing on the least food, because it eats the shared food down so low that its rival can\'t grow fast enough to replace the microbes being washed out, and starves.',
     terms: [
       {
-        term: 'break-even food level (R*)',
+        term: 'break-even food level',
         meaning:
-          'The lowest amount of food a microbe needs just to hold steady; the microbe that survives on the least food wins.',
+          'The lowest amount of food a microbe needs just to hold steady, without growing or shrinking; the microbe that survives on the least food wins.',
       },
       {
         term: 'dilution rate',
@@ -885,11 +896,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'levins-metapopulation': {
     plainWhat:
-      'Imagine a plant or animal that lives in many separate patches of good habitat, like ponds in a valley or woodlands in farmland. This lab tracks what share of those patches have the species living in them, as it spreads into empty patches and dies out of others, and as some patches get bulldozed away.',
+      'Imagine a plant or animal that lives in many separate patches of good habitat, like ponds dotted across a valley or little woodlands scattered through farmland. This lab tracks what share of those patches have the species living in them, as it spreads into empty patches, dies out of others, and as some patches get bulldozed away for good.',
     plainWhy:
-      'It helps explain how much wild habitat we can lose before a species vanishes for good, and warns that clearing too much land can doom a species even when you still see it around today. That "delayed goodbye" is a real danger for conservation.',
+      'It helps explain how much wild habitat we can lose before a species vanishes for good, and it warns that clearing too much land can doom a species even when you can still spot it around today. That "delayed goodbye" is a real danger in conservation: the species looks fine, but it has already run out of room to keep going.',
     plainHow:
-      'Slide up the amount of habitat destroyed and watch the occupied-patches line. For a while the species hangs on, but push past a tipping point and the line slides all the way to zero, and the species is gone from the whole region, even though it looked fine just before.',
+      'Slide up the amount of habitat destroyed and watch the line showing occupied patches. For a while the species hangs on, holding steady at a lower level. But push past a tipping point and the line slides all the way down to zero, and the species is gone from the whole region, sometimes only after a delay while a few patches still look occupied just before the collapse.',
     terms: [
       {
         term: 'occupancy',
@@ -898,7 +909,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'extinction threshold',
         meaning:
-          'The point where so much habitat is gone that the species can no longer survive anywhere in the region.',
+          'The tipping point where so much habitat is gone that the species can no longer survive anywhere in the region.',
       },
       {
         term: 'extinction debt',
@@ -909,11 +920,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   bioreactor: {
     plainWhat:
-      'This is a virtual tank where tiny living things like yeast or bacteria eat sugar, multiply, and make a useful product (think brewing beer or growing the cells that make medicine). You pick how the tank is run: a sealed batch that you start and let finish, a tank you keep dripping fresh food into, or a tank with food flowing in and mixture flowing out nM steady stream.',
+      'This is a virtual tank where tiny living things like yeast or bacteria eat sugar, multiply, and make a useful product (think brewing beer or growing the cells that make medicine). You pick how the tank is run: a sealed batch that you start once and let finish, a tank you keep dripping fresh food into, or a tank with food flowing in one side and mixture flowing out the other in a steady stream.',
     plainWhy:
       'This is how we actually make beer, wine, yogurt, insulin, vaccines and lots of other things. Getting the settings right means more product from less food, which saves money and cuts waste in real factories.',
     plainHow:
-      'Try lowering the food (substrate) the microbes start with, then watch the biomass line climb and flatten once the food runs out, and see how long it takes to run dry. In the continuous flow mode, try turning up the flow speed: push it too fast and the microbes get washed out of the tank faster than they can breed, so the population crashes to nothing.',
+      'Try lowering the amount of food the microbes start with, then watch the biomass line climb and flatten once the food runs out, and see how long it takes to run dry. In the steady-flow mode, try turning up the flow speed: push it too fast and the microbes get flushed out of the tank faster than they can breed, so the population crashes to nothing.',
     terms: [
       { term: 'biomass', meaning: 'how much living microbe stuff there is in the tank' },
       { term: 'substrate', meaning: 'the food (usually sugar) the microbes eat to grow' },
@@ -930,7 +941,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       "It's a simple way to understand why fighters, sharers, cooperators, and cheats can all survive together in nature, and why sometimes one behavior wins completely while another dies out. The same idea helps explain teamwork, standoffs, and standoffs breaking down in animals and people alike.",
     plainHow:
-      'Change the four "score" numbers that say how well each behavior does against the other, then watch the line for how common the first behavior becomes. It might climb to everyone, drop to no one, settle at a steady mix of both, or tip one way or the other depending on where you start — and the lab tells you which of those four stories you got.',
+      'Change the four "score" numbers that say how well each behavior does against the other, then watch the line for how common the first behavior becomes over time. Depending on those scores and where you start, the crowd can drift to everyone doing it, drop to no one doing it, settle at a steady mix of both, or tip toward one or the other — and if the two behaviors happen to be perfectly matched, the crowd barely budges from where it began. The lab tells you which of these stories you got.',
     terms: [
       {
         term: 'strategy',
@@ -950,11 +961,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'beer-lambert': {
     plainWhat:
-      'This is a color-detective for liquids. Shine light through a clear sample that has two different colored substances mixed together, and the tool works out how much of each one is really there — just from the way the mixture soaks up different colors of light.',
+      'This is a color-detective for liquids. Shine light through a see-through sample that has two different colored substances mixed in it, and the tool figures out how much of each one is really there — just from the way the mix soaks up different colors of light.',
     plainWhy:
-      "This is one of the most common real tests in science and medicine: it's how labs measure things like the amount of a protein, a drug, or a dye in a sample. The clever part here is untangling two mixed substances at once, so you can read each one on its own without having to physically pull them apart.",
+      "This is one of the most common real tests in science and medicine: it's how labs measure things like the amount of a protein, a drug, or a dye in a sample. The clever part here is untangling two mixed substances at once, so you can read each one separately without having to physically pull them apart.",
     plainHow:
-      'Try sliding the two substances\' favorite colors closer together, then watch the \\"Spectra separable\\" readout. When their colors sit far apart, the tool cleanly recovers how much of each you put in. Slide them until they overlap and it warns you the two blur into one and can no longer be told apart — you only see their combined signal. Also watch the peak height climb as you add more of either substance.',
+      'Try moving the two substances\' favorite colors closer together, then watch the "Spectra separable" readout. When their colors are far apart the tool cleanly recovers how much of each you put in; slide them until they overlap and it warns you the two blur into one and can no longer be told apart. Also watch the peak height grow as you add more of either substance.',
     terms: [
       {
         term: 'absorbance',
@@ -975,7 +986,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'acid-base-titration': {
     plainWhat:
-      'This is the classic school science moment where you slowly drip a strong cleaner-like liquid into a sour, weakly-acidic one, drop by drop, and watch how "sour vs. not-sour" changes. It traces that whole journey as a curve, so you can see the acid getting neutralized step by step.',
+      'This is the classic school science moment where you slowly drip a strong cleaner-like liquid into a sour, weakly-acidic one, drop by drop, and watch how "sour vs. not-sour" changes. It traces that whole journey as a curve, so you can see the acid getting used up step by step.',
     plainWhy:
       "Measuring sourness this careful way is how labs figure out exactly how much acid is in something and how to keep a liquid's sourness steady. That steadiness matters for your blood, for medicines, foods, and drinks, which all stop working right if they turn too sour or not sour enough.",
     plainHow:
@@ -1004,7 +1015,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'This slow wandering is how food, oxygen, and signals actually get around inside living cells, with no motor pushing them. It also lets scientists work backwards: by watching how fast something spreads, they can measure how big a molecule is, which is a real trick used to study proteins and design tiny medicines.',
     plainHow:
-      'Try shrinking the particle\'s size, or warming things up, and watch the "diffusion coefficient" climb, meaning it spreads faster. Notice the wandering distance grows with the square root of time, so to go twice as far it needs four times as long, and check how many seconds it takes to drift across a cell.',
+      'Try shrinking the particle\'s size, or warming things up, and watch the "diffusion coefficient" climb, meaning it spreads faster. Notice the wandering distance grows with the square root of time, so to go twice as far it needs four times as long, and check how many seconds it takes to drift across a tiny cell.',
     terms: [
       {
         term: 'diffusion coefficient',
@@ -1014,7 +1025,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'hydrodynamic radius',
         meaning:
-          'The effective size of the particle as the surrounding liquid feels it as it drifts along.',
+          'The effective size of the particle as the surrounding liquid feels it while it drifts along.',
       },
       {
         term: 'viscosity',
@@ -1024,11 +1035,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'oxygen-transfer': {
     plainWhat:
-      'This models how oxygen gets from air bubbles into the liquid where living cells are growing, like in a big tank that brews yeast or grows bacteria. The cells breathe that oxygen, and the tank has to keep resupplying it fast enough.',
+      'This shows how oxygen gets from air bubbles into the liquid where living cells are growing, like in a big tank brewing yeast or growing bacteria. The cells constantly breathe that oxygen, so the tank has to keep resupplying it fast enough by stirring and bubbling air through.',
     plainWhy:
-      "Oxygen barely dissolves in water, so in a crowded tank of cells the oxygen supply often runs out before the food does. If cells can't breathe, they get stressed or die, which can ruin a batch of medicine, food, or fuel, so growers need to know how much stirring and bubbling is enough.",
+      "Oxygen barely dissolves in water, so in a crowded tank of cells the oxygen usually runs short before the food does. If cells can't breathe, they get stressed or die, which can ruin a whole batch of medicine, food, or fuel. Growers need to know how much stirring and bubbling is enough to keep everything alive.",
     plainHow:
-      'Try raising or lowering the oxygen supply strength and watch the "steady-state dissolved oxygen" number and the curve. If the supply is too weak, the tank flips to "oxygen-limited" and the oxygen level crashes below the safe line, telling you the cells can\'t get enough air; boost the supply and watch the level climb back to a healthy, steady value.',
+      'Try raising or lowering the oxygen supply strength and watch the "steady-state dissolved oxygen" number and the curve settle. If the supply is too weak, the tank flips to "oxygen-limited" and the oxygen level crashes below the safe line, telling you the cells can\'t get enough air. Boost the supply and watch the level climb back up and hold steady at a healthy value.',
     terms: [
       {
         term: 'dissolved oxygen',
@@ -1043,6 +1054,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         term: 'oxygen-limited',
         meaning: "when the tank can't deliver oxygen fast enough and the cells start to run short",
       },
+      {
+        term: 'steady-state dissolved oxygen',
+        meaning:
+          "the settled oxygen level the liquid ends up holding once supply and the cells' breathing balance out",
+      },
     ],
   },
   'nicholson-bailey': {
@@ -1051,7 +1067,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       "This is the classic experiment that taught scientists a surprising lesson: when a predator-like attacker depends completely on one prey, their numbers don't settle into a calm balance. Instead they swing wilder and wilder until one side dies out. It's why real pest control and conservation need extra buffers, like hiding spots or crowding limits, to keep both species alive.",
     plainHow:
-      'Press run and watch the two population lines: instead of steadying, they swing higher and lower each cycle, a runaway boom and bust. Try nudging the host\'s breeding rate up or down and watch how fast the swings blow up. The "outbreak vs equilibrium" number tells you how huge the wild swings get compared to the calm point the populations can never actually hold.',
+      'Press run and watch the two population lines: instead of steadying, they swing higher and lower each cycle, a runaway boom and bust that keeps growing no matter what you set. Try nudging the host\'s breeding rate up or down and watch how it changes the size of the swings and where the calm point sits. The "outbreak vs equilibrium" number tells you how huge the wild swings get compared to that calm point the populations can never actually hold.',
     terms: [
       { term: 'host', meaning: 'The bug being attacked, like a caterpillar the wasp targets.' },
       {
@@ -1071,7 +1087,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'This is how labs check the purity of medicines, test food and water, and search for new drugs. Setting the flow speed right means faster results without losing the sharpness that lets you tell one ingredient from another.',
     plainHow:
-      'Slide the flow speed up and down and watch the smudge line: go too slow and the parts spread out while they wait, go too fast and they smear on the way through. There is a "just right" speed in the dip of the curve where signals are sharpest, and the lab points it out for you along with how many clean, well-separated signals you can expect.',
+      'Slide the flow speed up and down and watch the smudge line: go too slow and the parts spread out while they wait, go too fast and they smear on the way through. There is a "just right" speed in the dip of the curve where signals are sharpest, and the lab points it out for you, along with a score for how sharp and well-separated your signals will be at the speed you pick.',
     terms: [
       {
         term: 'plate height',
@@ -1095,7 +1111,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       "It explains why a fresh-water fish can't live in the sea, why salted food doesn't spoil, and why the fluid a hospital drips into your arm has to be mixed just right so your blood cells don't puff up or shrivel.",
     plainHow:
-      'Try raising how much you dissolve, or switch from sugar to salt (salt splits into two particles, so it tugs twice as hard). Watch the pulling strength climb and the readout tell you whether a cell dropped in this water would swell up, stay steady, or shrink.',
+      'Try raising how much you dissolve, or switch from sugar to salt (salt splits into two particles, so at the same amount it tugs twice as hard). Watch the pulling strength climb and the readout tell you whether a cell dropped in this water would swell up, stay steady, or shrink.',
     terms: [
       {
         term: 'osmotic pressure',
@@ -1115,11 +1131,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'oxygen-hemoglobin': {
     plainWhat:
-      'This models how the red stuff in your blood picks up oxygen in your lungs and hands it off to the rest of your body. It shows how full of oxygen your blood gets as the amount of oxygen around it goes up or down.',
+      'This models how the red stuff in your blood picks up oxygen in your lungs and hands it off to the rest of your body. It draws a curve showing how full of oxygen your blood gets as the amount of oxygen around it goes up or down.',
     plainWhy:
-      'Every cell in you needs a steady supply of oxygen, and this hand-off is how it arrives. The clever shape of this curve is exactly what lets your blood grab lots of oxygen in your lungs and then let go of a big chunk of it right where hard-working muscles and organs need it most.',
+      'Every cell in you needs a steady supply of oxygen, and this hand-off is how it arrives. The clever S-shape of this curve is exactly what lets your blood grab lots of oxygen in your lungs and then let go of a big chunk of it right where hard-working muscles and organs need it most.',
     plainHow:
-      'Try nudging the "half-point" pressure higher (like the shift that happens in warm, hard-exercising muscle) and watch the amount of oxygen handed off to tissues jump up. The main readout tells you how full your blood is in the lungs, how full it still is coming back, and what share of its oxygen load it dropped off along the way.',
+      'Try nudging the "half-point" pressure higher (like the shift that happens in warm, hard-exercising muscle) and watch the amount of oxygen handed off to tissues jump up. The readout tells you how full your blood is in the lungs, how full it still is coming back, and what share of its oxygen load it dropped off along the way.',
     terms: [
       {
         term: 'saturation',
@@ -1128,7 +1144,12 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'partial pressure',
         meaning:
-          'A measure of how much oxygen is present in a spot — high in the lungs, low in busy tissues.',
+          'A measure of how much oxygen is present in one spot — high in the lungs, low in busy tissues.',
+      },
+      {
+        term: 'half-point pressure',
+        meaning:
+          'The oxygen level at which the blood is exactly half full; a higher half-point means the blood lets go of oxygen more easily.',
       },
       {
         term: 'Bohr effect',
@@ -1139,20 +1160,20 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'gibbs-equilibrium': {
     plainWhat:
-      'This models which way a chemical reaction naturally wants to go, and how much of it turns into new stuff before it settles into a steady balance. It also shows how heating or cooling can change that answer.',
+      'This works out which way a chemical reaction naturally wants to go, and how much of the starting stuff turns into something new before the mixture settles into a steady balance. It also shows how heating or cooling can change that answer.',
     plainWhy:
-      'Almost everything around you, from batteries and cooking to the reactions inside living cells, depends on whether a reaction runs on its own or needs a push. Knowing the direction and how temperature flips it helps people design medicines, materials, and clean energy.',
+      'Almost everything around you, from batteries and cooking to the reactions inside living cells, depends on whether a reaction runs on its own or needs a push. Knowing which way it goes, and how temperature can flip it, helps people design medicines, materials, and clean energy.',
     plainHow:
-      'Try sliding the temperature up and down and watch the "direction" readout: some reactions that go one way when cold suddenly reverse when hot. The main number tells you which way the reaction runs and what share of the starting material ends up transformed once things settle.',
+      'Slide the temperature up and down and watch the direction readout: some reactions that go one way when cold suddenly reverse when hot. A separate number tells you the share of the starting material that ends up transformed once the mixture settles, and a graph shows how that balance shifts as things get warmer or cooler.',
     terms: [
       {
         term: 'equilibrium',
         meaning:
-          'The steady balance point where a reaction stops changing overall, because it goes both ways at the same speed.',
+          'The steady balance point where a reaction stops changing overall, because it goes forward and backward at the same speed.',
       },
       {
         term: 'spontaneous',
-        meaning: 'A reaction that runs on its own without needing an outside push.',
+        meaning: 'A reaction that runs on its own, without needing an outside push.',
       },
       {
         term: 'product fraction',
@@ -1163,16 +1184,16 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   compartmental: {
     plainWhat:
-      'This models how a disease spreads through a group of people over time. Everyone is sorted into buckets, like still-healthy, currently sick, and recovered, and the tool tracks how people move from one bucket to the next as an outbreak plays out.',
+      "This models how a disease spreads through a group of people over time. Everyone is sorted into buckets — like still-healthy, currently sick, and recovered — and the tool follows how people move from one bucket to the next as an outbreak plays out. Depending on the version you pick, it can also add a bucket for people who have caught it but aren't infectious yet, or a bucket for people who sadly die.",
     plainWhy:
-      'It is the same kind of math public-health teams use to guess how bad an outbreak could get, how many people might get sick at once, and whether enough people being immune can stop it from spreading.',
+      'It is the same kind of math public-health teams use to guess how bad an outbreak could get, how many people might be sick at the same time, and whether having enough people already immune can stop it from spreading.',
     plainHow:
-      'Try turning up how easily the disease passes between people and watch the "peak" climb higher and arrive sooner. The main number to watch tells you whether the outbreak takes off and grows or simply fizzles out, and how big a share of everyone eventually catches it.',
+      'Try turning up how easily the disease passes between people and watch the "peak" — the worst moment, when the most people are sick at once — climb higher and arrive sooner. The main number to watch tells you whether the outbreak takes off and grows or simply fizzles out, and it also shapes how big a share of everyone eventually catches it.',
     terms: [
       {
         term: 'R-zero (R0)',
         meaning:
-          'The average number of people one sick person passes the disease to. Above 1 it spreads, below 1 it dies out.',
+          'The average number of people one sick person passes the disease on to. Above 1 it spreads; below 1 it dies out.',
       },
       {
         term: 'Herd-immunity threshold',
@@ -1184,15 +1205,20 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         meaning:
           'The fraction of the whole group that catches the disease by the time the outbreak is over.',
       },
+      {
+        term: 'Peak',
+        meaning:
+          'The busiest moment of the outbreak, when the largest number of people are sick at the same time.',
+      },
     ],
   },
   'reed-frost': {
     plainWhat:
-      'This models how a contagious illness spreads through a group of people, step by step, in waves called "generations." Each wave, the people who are sick right now can pass the illness to people who haven\'t caught it yet, and you watch how big the outbreak grows.',
+      "This models how a contagious illness spreads through a group of people, step by step, in waves called \"generations.\" In each wave, the people who are sick right now can pass the illness to people who haven't caught it yet. Those newly sick people then get better and can't pass it on again, so it's the next fresh wave that keeps things going. You watch how big the outbreak grows, wave after wave.",
     plainWhy:
-      'Understanding how fast a disease spreads, how many people it eventually reaches, and how many need to be protected to stop it helps doctors, schools, and health workers plan vaccinations and decide when to act.',
+      'Knowing how fast an illness spreads, how many people it eventually reaches, and how many need to be protected to stop it helps doctors, schools, and health workers plan vaccinations and decide when to act.',
     plainHow:
-      'Try nudging the "spread number" up or down and watch the outbreak curve change: below one, it fizzles out fast; above one, it explodes into a big wave. The main result tells you what share of the whole group ends up catching it, and which wave was the worst.',
+      'Try nudging the "spread number" up or down and watch the outbreak curve change: below one, it fizzles out fast; above one, it grows into a big wave. The results tell you what share of the whole group ends up catching it, which wave was the worst, and how many waves it lasted.',
     terms: [
       {
         term: 'Spread number (R0)',
@@ -1201,7 +1227,8 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
       {
         term: 'Generation',
-        meaning: "One round of spreading — today's sick people infecting the next batch.",
+        meaning:
+          "One round of spreading. Today's sick people infect the next batch, then get better; that next batch carries the illness onward.",
       },
       {
         term: 'Attack rate',
@@ -1209,17 +1236,18 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
       {
         term: 'Herd-immunity threshold',
-        meaning: "How much of the group needs to be protected before the outbreak can't take off.",
+        meaning:
+          'How much of the group needs to be protected before the outbreak can no longer take off.',
       },
     ],
   },
   admet: {
     plainWhat:
-      'This is a quick check that tells you whether a molecule could work as a pill you swallow. You type in a molecule (either its recipe-like text code or a few numbers about it), and it scores how likely your body could absorb and use it.',
+      'This is a quick check that tells you whether a molecule could work as a pill you swallow. You give it a molecule — either as its recipe-like text code or as a few numbers describing it — and it scores how easily your body could take it in and use it.',
     plainWhy:
-      "Most would-be medicines fail not because they don't fight the disease, but because the body can't take them in as a pill. Catching that early, before anyone spends years and money making the real thing, saves huge effort and helps good medicines reach people faster.",
+      "Most would-be medicines fail not because they can't fight the disease, but because the body can't take them in when you swallow them. Spotting that early, before anyone spends years and money actually making the molecule, saves huge effort and helps good medicines reach people faster.",
     plainHow:
-      'Paste in a molecule (try aspirin\'s code: CC(=O)Oc1ccccc1C(=O)O) and watch the drug-likeness score, a number from 0 to 1 where higher means more pill-friendly. Then make the molecule bigger or greasier and watch the score drop and warning flags appear, showing you which classic "good medicine" limits it just broke.',
+      'Paste in a molecule (try aspirin\'s code: CC(=O)Oc1ccccc1C(=O)O) and watch the drug-likeness score — a number from 0 to 1 where higher means more pill-friendly. Then make the molecule bigger or greasier and watch the score drop and warning flags appear, showing you which classic "good medicine" limits it just broke.',
     terms: [
       {
         term: 'SMILES',
@@ -1260,6 +1288,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         meaning:
           "When enough people are protected that the disease can't spread, shielding everyone — even the unvaccinated.",
       },
+      {
+        term: 'Final epidemic size',
+        meaning:
+          'The share of the whole group who would catch the disease before the outbreak burns out.',
+      },
     ],
   },
   'pk-two-compartment': {
@@ -1268,7 +1301,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'Doctors need to know how long a medicine stays strong enough to work but not so strong it becomes harmful. This kind of picture helps decide the right dose and how often to give it, so treatments are both safe and effective.',
     plainHow:
-      'Try lowering the clearance (how fast the body cleans the drug out) and watch the blood curve stay higher for longer. The two lines show the drug in the blood and in the tissues: the blood level starts at its peak and drops quickly at first as the drug spreads into tissue, then fades slowly as the body clears it away.',
+      'Try lowering the clearance (how fast the body cleans the drug out) and watch the blood curve stay higher for longer. The two lines show the drug in the blood and in the tissues. The blood line starts at its peak the moment the drug goes in, then drops quickly at first as some of it moves into the tissues, and finally fades away slowly as the body clears it. The tissue line starts at zero, fills up as the drug soaks in, then empties again once the blood level falls.',
     terms: [
       { term: 'clearance', meaning: 'how quickly the body removes the drug from the blood' },
       { term: 'half-life', meaning: 'the time it takes for the drug level to fall by half' },
@@ -1303,7 +1336,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhat:
       'This models a catch-it-again illness — one that never leaves you immune, so once you get better you can catch it right back. Think of the common cold across a whole town, or some ongoing infections that keep circulating. It tracks what share of people are sick as time goes on.',
     plainWhy:
-      "Some diseases don't burn out after one big wave — they settle in and stay for good, quietly infecting a steady slice of people forever. Knowing whether a bug will fade away or stick around helps health workers decide how hard to push things like treatment and prevention to finally stamp it out.",
+      "Some diseases don't burn out after one big wave — they settle in and stay for good, quietly keeping a steady slice of people sick. Knowing whether a bug will fade away or stick around helps health workers decide how hard to push things like treatment and prevention to finally stamp it out.",
     plainHow:
       'Try raising how easily the illness spreads, or lowering how fast people recover, and watch the sickness curve. If each sick person passes it to more than one other on average, the line climbs and then levels off at a steady share that never goes away — the disease is here to stay. Push spreading low enough and the line slides down to zero and the illness dies out. The final level tells you which fate wins.',
     terms: [
@@ -1322,11 +1355,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   docking: {
     plainWhat:
-      "This models how a small molecule (like a possible medicine) settles into a pocket on a much larger protein in your body. You give it a few ways the small piece could be placed and turned, and it works out which fit sits most snugly, the way you'd try a key in a lock.",
+      "This models how a small molecule (like a possible medicine) fits into a pocket on a much larger protein in your body. You hand it a few ways the small piece could be placed and turned inside the pocket, and it works out which fit sits most snugly, the way you'd try a key in a lock.",
     plainWhy:
-      'Finding a molecule that fits a protein snugly is the first step in inventing new drugs. Testing fits on a computer first saves scientists years of lab work and helps them zero in on the shapes worth trying for real.',
+      'Finding a molecule that fits a protein snugly is an early step in inventing new drugs. Trying out fits on a computer first saves scientists years of lab work and helps them zero in on the shapes worth testing for real.',
     plainHow:
-      'Nudge one of the placements a little closer or turned a different way, then watch the "best pose energy" number. A lower (more negative) number means a snugger, more comfortable fit; the tool also tells you which placement won and how close the pieces touch.',
+      'Change one of the placements, moving the small molecule a little closer or turning it a different way, then add it to your list and compare. Watch the "best pose energy" number: a lower (more negative) number means a snugger, more comfortable fit. The tool sorts all your placements, tells you which one won, and shows how closely the two pieces end up touching.',
     terms: [
       {
         term: 'ligand',
@@ -1340,15 +1373,20 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         term: 'pose',
         meaning: 'One way of placing and turning the small molecule inside the pocket.',
       },
+      {
+        term: 'pose energy',
+        meaning:
+          'A score for how comfortable a fit is; a lower (more negative) score means a snugger, steadier fit.',
+      },
     ],
   },
   'dose-response': {
     plainWhat:
-      'This models how much a drug actually does something as you give more or less of it. It draws the classic S-shaped curve where a tiny dose does almost nothing, a middle dose does more, and past a certain point piling on more barely helps.',
+      'This shows how much a drug actually does as you give more or less of it. It draws the classic S-shaped curve: a tiny dose does almost nothing, a middle dose does more, and past a certain point piling on extra barely helps because the effect has hit its ceiling.',
     plainWhy:
-      "It's how scientists figure out the right amount of a medicine: enough to work, not so much it's wasteful or harmful. It also helps them see whether two drugs taken together help each other or just get in the way.",
+      "It's how scientists work out the right amount of a medicine: enough to work, but not so much that it's wasteful or harmful. It also helps them see whether two drugs taken together boost each other, cancel each other out, or just get in the way.",
     plainHow:
-      "Slide the potency (the amount needed to reach the halfway effect) and watch the whole curve shift left or right; a smaller number means the drug works at a lower dose. Change the steepness to see the curve go from a gentle ramp to a sharp on/off switch, and read off the amount that gets you halfway to the drug's full effect.",
+      "Slide the potency (the amount needed to reach the halfway effect) and watch the whole curve shift left or right; a smaller number means the drug works at a lower dose. Change the steepness to see the curve go from a gentle ramp to a sharp on/off switch, and read off the dose that gets you halfway to the drug's full effect. You can also feed in real measurements and let it find the best-fitting curve for you.",
     terms: [
       {
         term: 'EC50',
@@ -1358,7 +1396,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'IC50',
         meaning:
-          'For drugs that shut something down, the dose that cuts the response to half of normal.',
+          'For drugs that shut something down, the dose that cuts the response to half of its normal, untreated level.',
       },
       {
         term: 'Hill slope',
@@ -1393,15 +1431,16 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
   },
   'rna-fold': {
     plainWhat:
-      'RNA is a long thread of chemical "letters" that a cell makes. Left alone, the thread folds back and sticks to itself, forming loops and stems. This lab takes a sequence you type and works out one neat shape it could fold into, guessing the folding that lets the most letters pair up.',
+      'RNA is a long thread of chemical "letters" that a cell makes. Left alone, the thread folds back and sticks to itself, forming loops and stems. This lab takes a sequence you type and works out one neat shape it could fold into, choosing the folding that lets the most letters pair up.',
     plainWhy:
-      'The shape an RNA thread folds into decides what job it can do in a living thing, from switching genes on and off to helping build proteins. Being able to guess that shape from just the letters helps scientists understand life and design things like vaccines and new medicines.',
+      "The shape an RNA thread folds into decides what job it can do in a living thing, from switching genes on and off to helping build proteins. Being able to guess that shape from just the letters helps scientists understand life and design things like vaccines and new medicines. This lab uses one of the oldest, simplest folding methods, so it's great for learning the idea rather than a stand-in for the heavy-duty tools scientists rely on.",
     plainHow:
-      'Type a sequence and watch the dot-bracket picture: matching brackets are two letters holding hands, and dots are letters left loose. Try a sequence with a run of one letter followed by its partners (like GGGG then CCCC) and watch a tidy stem snap together. The "base pairs" number tells you how many letters found a partner, so more pairs means a more tightly folded thread.',
+      'Type a sequence and watch the dot-bracket picture: a matching ( and ) are two letters holding hands, and each dot is a letter left loose. Try the ready-made example, four G letters, then four A letters, then four C letters (GGGGAAAACCCC), and watch a tidy stem snap shut around the A letters in the middle, which stay loose as a little loop. The "base pairs" number tells you how many pairs formed (each pair is two letters), so more pairs means a more tightly folded thread.',
     terms: [
       {
         term: 'base pair',
-        meaning: 'Two RNA letters that fit together and hold hands, like puzzle pieces.',
+        meaning:
+          'Two RNA letters that fit together and hold hands, like puzzle pieces (A with U, G with C, and sometimes G with U).',
       },
       {
         term: 'dot-bracket',
@@ -1413,6 +1452,11 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
         meaning:
           "A small loop where the thread bends back on itself; the loop needs a few loose letters so the bend isn't too sharp.",
       },
+      {
+        term: 'stem',
+        meaning:
+          'A run of stacked base pairs sitting side by side, like a little zip holding two parts of the thread together.',
+      },
     ],
   },
   'dna-melting': {
@@ -1421,7 +1465,7 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
     plainWhy:
       'Splitting DNA apart by heating it is a key step in tests that read genes, spot viruses, or match a sample to a person. Knowing the exact temperature where the strands let go helps scientists design those tests so they work reliably.',
     plainHow:
-      'Set the temperature range and watch the curve slide from fully zipped down to fully apart as things heat up. The melting temperature is the halfway point, where exactly half the strands have come undone. Now try raising the amount of DNA in the mix and notice the melting temperature creep up a little, a giveaway that it takes two strands finding each other to zip up.',
+      'Slide the temperature range and watch the curve slope downward from fully zipped to fully apart. The melting temperature is the halfway point where exactly half the strands have come undone. Try raising the amount of DNA in the mix and notice the melting temperature creep up a little, a giveaway that it takes two strands finding each other to zip up.',
     terms: [
       {
         term: 'Duplex',
@@ -1435,47 +1479,47 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       {
         term: 'Transition width',
         meaning:
-          'How wide a temperature span the melt takes; a narrow span means the strands let go sharply, almost all at once.',
+          'How wide a temperature span the melt takes; a narrow span means the strands let go sharply, all at once.',
       },
     ],
   },
   fret: {
     plainWhat:
-      'This is a molecular tape measure. Scientists attach two tiny glowing tags to a protein or a strand of DNA. When the tags are very close, one hands its light-energy to the other instead of glowing on its own, and how much gets handed over tells you exactly how far apart they are.',
+      'This is a molecular tape measure. Scientists attach two tiny glowing tags to a protein or a strand of DNA. When the tags are very close, one hands its light-energy straight to the other instead of glowing on its own, and how much gets handed over tells you exactly how far apart they are.',
     plainWhy:
-      "It lets people measure distances a million times smaller than a grain of sand, without ever touching or breaking the thing they're looking at. That's how we watch proteins fold, snap shut, or grab their partners in real time, which helps us understand disease and design medicines.",
+      "It lets people measure distances far smaller than anything you could ever see, without touching or breaking the thing they're looking at. That's how we watch proteins fold up, snap shut, or grab their partners as it happens, which helps us understand disease and design medicines.",
     plainHow:
-      'Slide the distance between the two tags and watch the transfer number: bring them close and almost all the energy jumps across (near 100%); pull them apart and the handoff fades fast to nearly nothing. Notice how the sweet spot where it changes sharply is the range where the ruler works best.',
+      "Slide the distance between the two tags and watch the transfer number. Bring them close and almost all the energy jumps across (near 100%); pull them apart and the handoff fades fast to nearly nothing. Between those extremes there's a sweet spot where a small change in distance changes the number a lot — that's the range where this ruler works best, and the lab flags when your tags are inside it.",
     terms: [
       {
         term: 'transfer efficiency',
         meaning:
-          "How much of the glow-energy gets passed from one tag to the other; high when they're close, low when far.",
+          "How much of the glow-energy gets passed from one tag to the other; high when they're close, low when far apart.",
       },
       {
         term: 'Forster radius',
         meaning:
-          "The special distance where exactly half the energy gets handed over — the ruler's middle mark, set by which tags you use.",
+          "The special distance where exactly half the energy gets handed over — the ruler's middle mark, set by which pair of tags you use.",
       },
       {
         term: 'nanometre',
         meaning:
-          'A distance so small that millions would fit across the width of a hair; the scale this ruler measures.',
+          'A distance so tiny that many thousands would fit across the width of a single hair; the scale this ruler measures.',
       },
     ],
   },
   'worm-like-chain': {
     plainWhat:
-      'This mimics what happens when scientists grab a single strand of DNA by its ends and gently pull it straight. Left alone, DNA flops into a loose, tangled coil; this tool shows how hard you have to tug to stretch it out.',
+      'This mimics what happens when scientists grab a single piece of DNA by its two ends and gently pull it straight. Left alone, DNA flops into a loose, tangled coil; this tool shows how hard you have to tug to stretch it out.',
     plainWhy:
-      "DNA doesn't just sit still in your cells — it gets bent, packed, and pulled apart every time a cell copies itself or reads a gene. Knowing exactly how stretchy and springy DNA is helps scientists understand those everyday cell machines and build tiny tools that handle single molecules.",
+      "DNA doesn't just sit still in your cells — it gets bent, packed, and pulled apart every time a cell copies itself or reads a gene. Knowing exactly how stretchy and springy DNA is helps scientists understand those everyday cell machines and build tiny tools that grab and handle one molecule at a time.",
     plainHow:
-      'Try dragging the stretch closer to fully straight and watch the force shoot up fast — at first the DNA gives easily like a soft rubber band, but as it runs out of slack it suddenly fights back hard. The curve you see is the same one real labs measure when they pull on one molecule with a laser or magnet.',
+      'Try dragging the stretch closer to fully straight and watch the pull needed shoot up fast — at first the DNA gives easily like a soft rubber band, but as it runs out of slack it suddenly fights back hard. The curve you see is the same one real labs measure when they pull on one molecule with a beam of light or a magnet.',
     terms: [
       {
         term: 'persistence length',
         meaning:
-          'How floppy or stiff the strand is — a bigger number means it stays straight over a longer stretch before bending.',
+          'How floppy or stiff the strand is — a bigger number means it stays straight over a longer stretch before it bends.',
       },
       {
         term: 'contour length',
