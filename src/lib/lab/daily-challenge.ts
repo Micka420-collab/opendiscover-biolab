@@ -733,6 +733,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'Efficiency = Ksv·[Q]/(1+Ksv·[Q]) hits 50% when Ksv·[Q]=1, i.e. [Q]=1/Ksv. With Ksv=10/mM that is [Q]=0.1 mM.',
   },
+  {
+    id: 'carbon-date-a-bone',
+    engine: 'radioactive-decay',
+    title: 'Carbon-date a bone',
+    brief:
+      'An old bone has a quarter of its carbon-14 left. Since carbon-14 fades at a known, steady pace, that leftover fraction is a clock. Slide the sample’s age until the fraction remaining matches the measured 25% — and you have dated it.',
+    baseParams: { halfLife: 5730, initialAmount: 100 },
+    knob: {
+      param: 'time',
+      label: 'Sample age',
+      min: 0,
+      max: 25000,
+      step: 100,
+      default: 5000,
+      unit: 'years',
+    },
+    metricKey: 'fractionRemaining',
+    metricLabel: 'Fraction of carbon-14 remaining',
+    goal: 'target',
+    target: 0.25,
+    hint: 'Each 5730-year half-life halves the carbon-14 left. A quarter remaining is two halvings, so about 11,460 years.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

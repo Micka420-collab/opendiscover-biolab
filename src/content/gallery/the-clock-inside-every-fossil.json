@@ -1,0 +1,15 @@
+{
+  "slug": "the-clock-inside-every-fossil",
+  "title": "The clock inside every fossil",
+  "engine": "radioactive-decay",
+  "params": {
+    "halfLife": 5730,
+    "time": 5730,
+    "initialAmount": 100,
+    "tMax": 30000,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Every living thing quietly stocks up on a rare, slightly radioactive form of carbon — carbon-14 — while it is alive. The moment it dies, the topping-up stops and the carbon-14 begins to fade, and here is the key: it fades at a perfectly steady pace, halving every 5730 years no matter what. That turns every bone, shell, seed, and scrap of charcoal into a built-in clock. Measure how much carbon-14 is left and you can read the years since death straight off this curve: half remaining is one half-life (about 5730 years), a quarter is two (about 11,460), an eighth is three. The same exponential fade — a fixed fraction lost per unit time, never a fixed amount — is not just for ancient carbon: it is how a drug clears from your blood, how a worn-out protein is recycled inside a cell, and how any radioactive tracer used in medicine ebbs away. One simple halving law, dating a Neanderthal jaw and timing a dose of medicine alike."
+}

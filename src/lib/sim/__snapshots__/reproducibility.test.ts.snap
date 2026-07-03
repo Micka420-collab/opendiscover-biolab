@@ -485,6 +485,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "40-residue protein: 4777.5 Da, pI 10.62, GRAVY -0.16, instability 34.4 (stable).",
   },
+  "radioactive-decay": {
+    "metrics": {
+      "decayConstant": 0.000120968,
+      "fractionRemaining": 0.5,
+      "halfLife": 5730,
+      "halfLivesElapsed": 1,
+      "meanLifetime": 8266.64,
+      "remainingAmount": 50,
+      "timeTo10Pct": 19034.6,
+    },
+    "summary": "First-order decay: t½=5730 → after t=5730 (1.00 half-lives) 50.0% remains (50.00 of 100); mean lifetime 8267.",
+  },
   "reed-frost": {
     "metrics": {
       "analyticFinalSize": 0.892645,

@@ -18,6 +18,7 @@ import { spec as diffusion } from './biochem/diffusion';
 import { spec as gibbsEquilibrium } from './biochem/gibbs-equilibrium';
 import { spec as osmoticPressure } from './biochem/osmotic-pressure';
 import { spec as oxygenHemoglobin } from './biochem/oxygen-hemoglobin';
+import { spec as radioactiveDecay } from './biochem/radioactive-decay';
 import { spec as vanDeemter } from './biochem/van-deemter';
 import { spec as bioreactor } from './bioprocess/bioreactor';
 import { spec as microbialGrowth } from './bioprocess/microbial-growth';
@@ -132,6 +133,7 @@ export const engines: AnyEngine[] = [
   osmoticPressure,
   oxygenHemoglobin,
   gibbsEquilibrium,
+  radioactiveDecay,
   compartmental,
   sis,
   sirEndemic,

@@ -569,6 +569,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'carbon-date-a-bone': {
+    plainWhat:
+      "A bone is buried and slowly loses its carbon-14, which fades away at a steady, known pace. You're given how much is left and asked to work out how long ago the creature died.",
+    plainWhy:
+      'This is how archaeologists and biologists put real dates on ancient bones, tools, and fossils — reading the age straight out of how much of a fading atom remains. It is one of the most powerful clocks in science.',
+    plainHow:
+      'Every 5730 years, half the carbon-14 is gone. So a half left means one stretch of that time; a quarter left means two. Slide the age until the leftover amount matches what was measured.',
+    terms: [
+      {
+        term: 'carbon-14',
+        meaning:
+          'a slowly-fading form of carbon that living things take in, then lose after they die.',
+      },
+      {
+        term: 'half-life',
+        meaning: 'the time for half of it to disappear — about 5730 years for carbon-14.',
+      },
+      {
+        term: 'carbon dating',
+        meaning: 'finding an age from the leftover amount of a fading atom.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

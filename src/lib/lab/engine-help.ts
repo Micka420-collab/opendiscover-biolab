@@ -1592,6 +1592,28 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'radioactive-decay': {
+    plainWhat:
+      "Some things fade away at a steady pace — half of what's there disappears over a set time, then half of the rest, and so on. This follows that fading, whether it's a radioactive atom in an old bone, a medicine leaving your body, or a worn-out protein being recycled inside a cell.",
+    plainWhy:
+      "This same simple fading explains a lot: it's how scientists put an age on ancient bones and fossils by measuring leftover carbon, how doctors work out how often you need a pill, and how cells keep tidy by clearing out old parts.",
+    plainHow:
+      'Set the half-life — the time it takes for half to vanish — and watch the curve drop by half, then half again. Read off how much is left after a chosen time, or flip it around: a known leftover amount tells you how much time has passed, which is exactly how carbon dating works.',
+    terms: [
+      {
+        term: 'half-life',
+        meaning: 'the time it takes for half of the amount to disappear.',
+      },
+      {
+        term: 'decay',
+        meaning: 'fading away at a steady pace, always losing the same share of what is left.',
+      },
+      {
+        term: 'carbon dating',
+        meaning: "working out a sample's age from how much of a slowly-fading atom is still in it.",
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */
