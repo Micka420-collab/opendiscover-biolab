@@ -887,6 +887,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'get-a-million-fold-pcr': {
+    plainWhat:
+      'PCR copies DNA by roughly doubling it each round. A perfect reaction doubles it every single time, but real ones are a bit less efficient. You are tuning that efficiency so that 25 rounds add up to 20 doublings — about a million-fold more DNA, enough to actually detect.',
+    plainWhy:
+      'This is the reaction behind DNA and COVID tests, forensics and gene research. Because the growth is exponential, a small change in efficiency makes a huge difference to the final amount — so knowing how to get a reaction efficient is a real, everyday lab skill.',
+    plainHow:
+      'Each round multiplies the DNA by a bit more than one, and those multiplications compound. Too low an efficiency and 25 rounds fall short of the target; nudge it up and the doublings pile on fast. Find the efficiency where 25 rounds land right on 20 doublings.',
+    terms: [
+      {
+        term: 'efficiency',
+        meaning: 'how reliably each round doubles the DNA — 1 means a perfect doubling every time.',
+      },
+      {
+        term: 'doubling',
+        meaning:
+          'each doubling multiplies the DNA by two; twenty doublings is about a million-fold.',
+      },
+      {
+        term: 'fold amplification',
+        meaning: 'how many times more DNA you end with than you started with.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

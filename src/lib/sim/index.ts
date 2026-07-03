@@ -58,6 +58,7 @@ import { spec as alignment } from './molbio/alignment';
 import { cloningSpec as cloning } from './molbio/cloning';
 import { spec as crispr } from './molbio/crispr';
 import { spec as pcr } from './molbio/pcr';
+import { spec as pcrAmplification } from './molbio/pcr-amplification';
 import { spec as sequence } from './molbio/sequence';
 import { spec as cableLengthConstant } from './neuro/cable-length-constant';
 import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
@@ -99,6 +100,7 @@ import { execute } from './kernel';
 export const engines: AnyEngine[] = [
   sequence,
   pcr,
+  pcrAmplification,
   cloning,
   crispr,
   alignment,

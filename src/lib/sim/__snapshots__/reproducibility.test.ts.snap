@@ -521,6 +521,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "PCR on a 120 nt template yields a 100 bp product (GC 51%); primer Tm 53.8/51.8 °C.",
   },
+  "pcr-amplification": {
+    "metrics": {
+      "effectiveDoublings": 27.78,
+      "finalCopies": 230467000000,
+      "foldAmplification": 230467000,
+      "theoreticalFold": 230467000,
+    },
+    "summary": "PCR: 1000 copies × (1+0.9)^30 → 2.30e+11 copies (2.30e+8-fold, 27.8 effective doublings). Ideal fold would be 2.30e+8.",
+  },
   "photosynthesis-light": {
     "metrics": {
       "canBreakEven": 1,

@@ -1050,6 +1050,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 150,
     hint: 'Breeder’s equation: each generation the mean shifts by h²·S. Over 10 generations you gain 10·0.5·S = 5·S. Lifting 100 → 150 g needs a gain of 50, so S = 10 g.',
   },
+  {
+    id: 'get-a-million-fold-pcr',
+    engine: 'pcr-amplification',
+    title: 'Amplify DNA a million-fold',
+    brief:
+      'A perfect PCR doubles the DNA every cycle, but real reactions are less efficient, so 25 cycles deliver fewer than 25 doublings. Tune the amplification efficiency so that 25 cycles yield 20 effective doublings — a million-fold amplification, enough to detect.',
+    baseParams: { initialCopies: 1000, cycles: 25, plateau: 1e15 },
+    knob: {
+      param: 'efficiency',
+      label: 'Amplification efficiency E',
+      min: 0,
+      max: 1,
+      step: 0.01,
+      default: 0.4,
+    },
+    metricKey: 'effectiveDoublings',
+    metricLabel: 'Effective doublings',
+    goal: 'target',
+    target: 20,
+    hint: 'Each cycle multiplies the DNA by (1+E), so 25 cycles give 25·log₂(1+E) doublings. Twenty doublings (≈ a million-fold) needs 25·log₂(1+E) = 20, i.e. E ≈ 0.74 — a realistic, efficient reaction.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

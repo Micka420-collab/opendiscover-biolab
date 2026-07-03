@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **79 deterministic simulation engines** across
+The OpenDiscover BioLab ships **80 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -17,7 +17,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 ## Catalog
 
-- **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
+- **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`pcr-amplification`](#pcr-amplification) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`protein-charge`](#protein-charge) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential) · [`cable-length-constant`](#cable-length-constant)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
@@ -103,6 +103,38 @@ Deterministic in-silico PCR on a known linear template. Locates forward/reverse 
 ```
 
 _Run it: `POST /api/lab/run { "engine": "pcr", "params": … }` or interactively at `/lab/pcr`._
+
+---
+
+### `pcr-amplification` — PCR Amplification
+
+How a polymerase chain reaction amplifies DNA: each cycle multiplies the amount by (1+E) for efficiency E, so after c cycles the copy number is N₀·(1+E)^c — exponential growth — until it levels off at a plateau when reagents run low, N(c)=min(N₀·(1+E)^c, plateau). Reports the final copy number, the fold amplification, the ideal (plateau-free) fold, and the effective number of doublings, plus the copies-versus-cycle curve. Explains why a few extra cycles multiply the product enormously, why a small drop in efficiency costs a lot of yield, and why every reaction eventually stops amplifying. Closed-form and deterministic; bounded so every value stays finite.
+
+**References**
+- Mullis, K.B. et al. (1986) Cold Spring Harb. Symp. Quant. Biol. 51:263-273.
+- Kubista, M. et al. (2006) The real-time polymerase chain reaction. Mol. Aspects Med. 27:95-125.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `initialCopies` | number | `1000` | ≥ 1, ≤ 1000000000000 |  |
+| `efficiency` | number | `0.9` | ≥ 0, ≤ 1 |  |
+| `cycles` | integer | `30` | ≥ 1, ≤ 60 |  |
+| `plateau` | number | `1000000000000` | ≥ 1, ≤ 1000000000000000 |  |
+
+**Example**
+
+```json
+{
+  "initialCopies": 1000,
+  "efficiency": 0.9,
+  "cycles": 30,
+  "plateau": 1000000000000
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "pcr-amplification", "params": … }` or interactively at `/lab/pcr-amplification`._
 
 ---
 

@@ -1916,6 +1916,30 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'pcr-amplification': {
+    plainWhat:
+      'This shows how the lab technique called PCR turns a tiny amount of DNA into billions of copies. Each round of the reaction roughly doubles the DNA, so it piles up incredibly fast — until the ingredients run low and it levels off. It draws that runaway rise and the plateau.',
+    plainWhy:
+      'PCR is one of the most important tools in all of biology and medicine — it is how a COVID or DNA test finds a needle-in-a-haystack scrap of genetic material, how crime scenes are matched, and how genes are studied. Because the growth is exponential, tiny differences in how well each round works make a huge difference to the final amount, which is why getting the reaction efficient matters so much.',
+    plainHow:
+      'Turn up the efficiency (how reliably each round doubles the DNA) or add more rounds, and the final amount explodes — because doubling again and again compounds fast. Watch the curve rocket upward and then flatten as the reaction exhausts its supplies. Notice how just a few more rounds, or a slightly better efficiency, multiplies the yield enormously.',
+    terms: [
+      {
+        term: 'PCR',
+        meaning:
+          'a lab method that copies a chosen piece of DNA over and over until there is plenty to work with.',
+      },
+      {
+        term: 'efficiency',
+        meaning: 'how reliably each round doubles the DNA; a perfect round doubles it exactly.',
+      },
+      {
+        term: 'plateau',
+        meaning:
+          'the point where the reaction runs out of ingredients and stops making more copies.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

@@ -1,0 +1,14 @@
+{
+  "slug": "a-million-copies-from-one",
+  "title": "A billion copies from a handful",
+  "engine": "pcr-amplification",
+  "params": {
+    "initialCopies": 1000,
+    "efficiency": 0.9,
+    "cycles": 35,
+    "plateau": 1e12
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "When Kary Mullis dreamed up the polymerase chain reaction on a California highway in 1983, he was chasing one idea: what if you could double a piece of DNA, then double the doublings, over and over? This curve is that idea made real, and it is why PCR won a Nobel Prize and now underpins DNA tests, forensics, and the swab that told you whether you had COVID. Each thermal cycle copies every eligible strand, so the amount of DNA is multiplied by roughly (1 + efficiency) every round — and because that happens again and again, the growth is exponential. Start with a thousand copies at 90% efficiency and after 35 cycles you are looking at hundreds of billions: a scrap of genetic material too faint to detect becomes an unmistakable signal. Two features of the curve carry the whole lesson. First, exponential growth is merciless about efficiency: a reaction running at 90% instead of 100% loses more than half its final yield over 35 cycles, which is why molecular biologists obsess over clean reagents and good primers. Second, no reaction runs forever — as primers and nucleotides deplete, the exponential rise bends over into the flat plateau you see here, which is exactly why quantitative PCR measures the early cycles, before the plateau erases the differences. Slide the efficiency or the cycle count and watch a few copies become a billion — the quiet exponential engine inside modern biology."
+}
