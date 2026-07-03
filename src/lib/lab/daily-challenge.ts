@@ -941,6 +941,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'The signal survives as e^(−x/λ) with λ=√(d·R_m/(4·R_i)), so a fatter fibre (bigger λ) delivers more. Half surviving at 500 µm needs λ ≈ 721 µm — a diameter of about 2.1 µm.',
   },
+  {
+    id: 'when-a-positive-test-is-trustworthy',
+    engine: 'diagnostic-accuracy',
+    title: 'When is a positive test trustworthy?',
+    brief:
+      'A very good test (99% sensitive, 95% specific) still fools you when a disease is rare: most positives are false alarms. Raise how common the disease is until a positive result is a coin-flip — a 50% chance it is real. Below that prevalence, trust a positive test less than a coin.',
+    baseParams: { sensitivity: 0.99, specificity: 0.95, populationSize: 100000 },
+    knob: {
+      param: 'prevalence',
+      label: 'Disease prevalence',
+      min: 0,
+      max: 0.2,
+      step: 0.001,
+      default: 0.02,
+      unit: 'fraction',
+    },
+    metricKey: 'ppv',
+    metricLabel: 'Chance a positive is real (PPV)',
+    goal: 'target',
+    target: 0.5,
+    hint: 'By Bayes, PPV = sens·p / (sens·p + (1−spec)(1−p)). It climbs with prevalence and hits 50% when the true cases just balance the false positives — near a prevalence of 4.8% for this test.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

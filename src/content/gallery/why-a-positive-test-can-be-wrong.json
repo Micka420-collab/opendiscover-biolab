@@ -1,0 +1,15 @@
+{
+  "slug": "why-a-positive-test-can-be-wrong",
+  "title": "Why a positive test can still be wrong",
+  "engine": "diagnostic-accuracy",
+  "params": {
+    "prevalence": 0.01,
+    "sensitivity": 0.95,
+    "specificity": 0.9,
+    "populationSize": 100000,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Here is a result that surprises almost everyone the first time they see it. Take a genuinely good test — 95% sensitive, 90% specific — and use it to screen for a disease that one person in a hundred actually has. Your test comes back positive. How worried should you be? The intuition says 'very' — the test is 95% accurate, after all. The maths says otherwise: the chance you truly have the disease is under 9%. More than nine out of ten positives are false alarms. The reason is pure arithmetic, and this curve makes it visible. In a town of 100,000 with 1% prevalence, only about a thousand people are actually sick, and the test catches most of them — but the 99,000 healthy people generate nearly ten thousand false positives, simply because there are so many of them. The false alarms swamp the true catches. This is the base-rate fallacy, and it is not an academic curiosity: it shapes how we should read a surprising cancer screen, a rare-disease panel, or a mass COVID screen, and it is why doctors re-test before acting and why screening rare conditions demands almost impossibly high specificity. Slide the prevalence and watch the 'chance a positive is real' curve climb — shockingly low when the disease is rare, trustworthy only once it becomes common. The test never changed. Only how common the disease is did."
+}

@@ -1799,6 +1799,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'diagnostic-accuracy': {
+    plainWhat:
+      'This works out what a medical test result actually tells you. A test has two quality scores — how often it catches real cases, and how often it correctly clears healthy people — but the number you really want is different: if your result comes back positive, what are the real odds you have the disease? It shows exactly that, and how it changes with how common the disease is.',
+    plainWhy:
+      'There is a famous, deeply counter-intuitive trap here. When a disease is rare, even a very good test raises far more false alarms than real catches, so a positive result is more likely to be wrong than right. Misreading this leads to needless panic, extra procedures and wasted money — so understanding it matters to every patient and doctor, and to how we run screening for things like cancer.',
+    plainHow:
+      'Slide how common the disease is and watch the "chance a positive is real" climb. When the disease is rare it stays shockingly low; as it becomes more common the same test suddenly becomes trustworthy. A better test — especially one that rarely cries wolf on healthy people — lifts the whole curve.',
+    terms: [
+      {
+        term: 'prevalence',
+        meaning: 'how common the disease is — the share of tested people who really have it.',
+      },
+      {
+        term: 'false positive',
+        meaning: 'a healthy person the test wrongly flags as having the disease.',
+      },
+      {
+        term: 'predictive value',
+        meaning:
+          'the real chance a result is right — that a positive means disease, or a negative means health.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

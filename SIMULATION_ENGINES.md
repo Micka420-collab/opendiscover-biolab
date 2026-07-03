@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **74 deterministic simulation engines** across
+The OpenDiscover BioLab ships **75 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -25,7 +25,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling) · [`photosynthesis-light`](#photosynthesis-light)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
-- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
+- **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`diagnostic-accuracy`](#diagnostic-accuracy) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
 
@@ -2414,6 +2414,39 @@ Deterministic SIR / SEIR / SIRD transmission models with standard (frequency-dep
 ```
 
 _Run it: `POST /api/lab/run { "engine": "compartmental", "params": … }` or interactively at `/lab/compartmental`._
+
+---
+
+### `diagnostic-accuracy` — Diagnostic Test Predictive Value
+
+What a positive or negative medical test really means, from Bayes' theorem. A test's sensitivity and specificity are fixed, but the chance a POSITIVE result is real — the positive predictive value PPV=sens·p/(sens·p+(1−spec)(1−p)) — depends heavily on how common the disease is. The base-rate fallacy: when a disease is rare, even an excellent test produces more false positives than true ones, so a positive is more likely wrong than right. Reports PPV, NPV, false-discovery rate, overall accuracy, and the true/false-positive counts in a population, plus the PPV/NPV-vs-prevalence curves. Predictive values are guarded so the no-positives / no-negatives cases stay finite. Closed-form and deterministic.
+
+**References**
+- Altman, D.G. & Bland, J.M. (1994) Diagnostic tests 2: predictive values. BMJ 309:102.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `prevalence` | number | `0.01` | ≥ 0, ≤ 1 |  |
+| `sensitivity` | number | `0.95` | ≥ 0, ≤ 1 |  |
+| `specificity` | number | `0.9` | ≥ 0, ≤ 1 |  |
+| `populationSize` | integer | `100000` | ≥ 1, ≤ 1000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "prevalence": 0.01,
+  "sensitivity": 0.95,
+  "specificity": 0.9,
+  "populationSize": 100000,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "diagnostic-accuracy", "params": … }` or interactively at `/lab/diagnostic-accuracy`._
 
 ---
 

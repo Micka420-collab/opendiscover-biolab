@@ -148,6 +148,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "5 SpCas9 guide(s); best on-target 0.72, best specificity 1.00.",
   },
+  "diagnostic-accuracy": {
+    "metrics": {
+      "falseDiscoveryRate": 0.912442,
+      "falsePositives": 9900,
+      "npv": 0.999439,
+      "overallAccuracy": 0.9005,
+      "ppv": 0.0875576,
+      "truePositives": 950,
+    },
+    "summary": "At 1.00% prevalence, a 95.0%-sensitive / 90.0%-specific test has PPV 8.76% — of every 10,850 positives in 100,000 people, 9,900 are false alarms. NPV 99.94%.",
+  },
   "diffusion": {
     "metrics": {
       "diffusionCoefficient": 42.944,

@@ -774,6 +774,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'when-a-positive-test-is-trustworthy': {
+    plainWhat:
+      'You are setting how common a disease is, and watching what a positive test result is really worth. Your goal is to find the point where a positive test is a true coin-flip — a 50/50 chance the person actually has the disease.',
+    plainWhy:
+      'This is one of the most important and most misunderstood ideas in medicine. For a rare disease, even a great test raises far more false alarms than real catches, so a positive result is usually wrong. Knowing this prevents panic and needless treatment, and it is why doctors re-test surprising results.',
+    plainHow:
+      'When the disease is rare, almost every positive is a false alarm, so a positive result is barely worth anything. As you make the disease more common, real cases start to outnumber the false alarms. Raise it until the two exactly balance — that is the 50/50 point.',
+    terms: [
+      {
+        term: 'prevalence',
+        meaning: 'how common the disease is — the share of tested people who really have it.',
+      },
+      {
+        term: 'false alarm',
+        meaning: 'a positive test in someone who is actually healthy.',
+      },
+      {
+        term: 'trustworthiness of a positive',
+        meaning: 'the real chance that a positive result means the person truly has the disease.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */
