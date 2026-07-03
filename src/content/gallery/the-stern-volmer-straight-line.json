@@ -1,0 +1,15 @@
+{
+  "slug": "the-stern-volmer-straight-line",
+  "title": "The Stern–Volmer straight line",
+  "engine": "stern-volmer",
+  "params": {
+    "ksv": 10,
+    "quencher": 0.1,
+    "f0": 100,
+    "quencherMax": 0.5,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Shine light on the right molecule and it glows — until you add a quencher that collides with it and steals the energy before it can shine. Plot how much the glow is knocked down (the ratio of full brightness to dimmed brightness) against how much quencher you add, and you get one of the tidiest straight lines in all of biochemistry, first written down by Otto Stern and Max Volmer in 1919. Its slope is a single number that says how effective the quenching is: steeper means the quencher reaches the glowing molecule more easily. That is the whole point — a fluorescent tag sitting out in the open on the surface of a protein gets dimmed easily and gives a steep line, while one buried deep inside is shielded and barely dims at all. So this simple line is a ruler for accessibility, letting scientists tell whether part of a protein is exposed to the watery world or tucked safely inside, and watch it move as the protein folds, binds a partner, or changes shape. Here a quencher of moderate strength cuts the glow in half at just a tenth of a millimole."
+}

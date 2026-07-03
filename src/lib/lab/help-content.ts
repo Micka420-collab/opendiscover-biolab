@@ -546,6 +546,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'dim-the-glow': {
+    plainWhat:
+      'A molecule is glowing, and you add a quencher that dims it by bumping into it. Tune how much quencher you add so the glow drops to exactly half its brightness.',
+    plainWhy:
+      'Dimming a glow by a known amount is how scientists measure how exposed a glowing tag is — a clever, everyday trick for studying the shapes of proteins and other molecules.',
+    plainHow:
+      'Add too little quencher and the glow barely dims; add too much and it fades well below half. There is a just-right amount that lands it exactly halfway.',
+    terms: [
+      {
+        term: 'quencher',
+        meaning:
+          'a molecule that dims a glow by bumping into the glowing one and draining its energy.',
+      },
+      {
+        term: 'fluorescence',
+        meaning: 'the glow a molecule gives off shortly after it soaks up light.',
+      },
+      {
+        term: 'half-quenched',
+        meaning: 'the point where the glow has dropped to 50% of its full brightness.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

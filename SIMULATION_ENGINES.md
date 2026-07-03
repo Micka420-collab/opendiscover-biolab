@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **64 deterministic simulation engines** across
+The OpenDiscover BioLab ships **65 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -27,7 +27,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
-- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
+- **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
 
 ---
 
@@ -2681,6 +2681,40 @@ The molecular ruler of fluorescence microscopy: the energy-transfer efficiency b
 ```
 
 _Run it: `POST /api/lab/run { "engine": "fret", "params": … }` or interactively at `/lab/fret`._
+
+---
+
+### `stern-volmer` — Stern–Volmer Fluorescence Quenching
+
+Dynamic (collisional) fluorescence quenching by the Stern–Volmer law F₀/F=1+K_SV·[Q]: a quencher colliding with an excited fluorophore drains its energy, so brightness falls linearly with quencher concentration. The Stern–Volmer constant K_SV=k_q·τ₀ (collision rate × excited-state lifetime) is the slope of the F₀/F-vs-[Q] straight line. Reports the quenched fluorescence F, the fraction of glow remaining F/F₀=1/(1+K_SV·[Q]), the quenching efficiency, the Stern–Volmer ratio, and the quencher needed for 50% quenching (1/K_SV), plus the Stern–Volmer and fluorescence curves. The standard readout for how accessible a fluorophore — like a protein's tryptophan — is to the solvent. Closed-form and deterministic.
+
+**References**
+- Stern, O. & Volmer, M. (1919) Über die Abklingzeit der Fluoreszenz. Phys. Z. 20:183-188.
+- Lakowicz, J.R. (2006) Principles of Fluorescence Spectroscopy, 3rd ed. Springer.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `ksv` | number | `10` | ≥ 0.000001, ≤ 1000000 |  |
+| `quencher` | number | `0.1` | ≥ 0, ≤ 1000000 |  |
+| `f0` | number | `100` | ≥ 0.000001, ≤ 1000000000 |  |
+| `quencherMax` | number | `0.5` | ≥ 0.000001, ≤ 1000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "ksv": 10,
+  "quencher": 0.1,
+  "f0": 100,
+  "quencherMax": 0.5,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "stern-volmer", "params": … }` or interactively at `/lab/stern-volmer`._
 
 
 ## Authoring an engine

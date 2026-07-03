@@ -1525,6 +1525,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'stern-volmer': {
+    plainWhat:
+      'Some molecules glow when you shine light on them. This shows how adding a "quencher" — a molecule that bumps into the glowing one and steals its energy — makes the glow dimmer. You set how strong the quencher is and how much you add.',
+    plainWhy:
+      "Measuring how easily a glow gets dimmed tells scientists how exposed the glowing part is — for example, whether a glowing tag on a protein is out in the open or tucked away inside. It's a simple, powerful way to peek at a molecule's shape and surroundings.",
+    plainHow:
+      'Add more quencher and watch the glow fade; it plots as a straight line that climbs steeper the stronger the quencher. Try a stronger quencher and see how much less of it is needed to cut the glow in half.',
+    terms: [
+      {
+        term: 'quencher',
+        meaning:
+          'a molecule that dims a glow by bumping into the glowing one and draining its energy.',
+      },
+      {
+        term: 'fluorescence',
+        meaning: 'the glow a molecule gives off shortly after it soaks up light.',
+      },
+      {
+        term: 'Stern–Volmer constant',
+        meaning: 'how strongly a quencher dims the glow; a bigger number means a steeper fade.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

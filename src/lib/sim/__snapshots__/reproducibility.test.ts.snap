@@ -602,6 +602,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "SIS endemic at R₀=3.00: prevalence settles to i*=0.667.",
   },
+  "stern-volmer": {
+    "metrics": {
+      "fluorescence": 50,
+      "fractionRemaining": 0.5,
+      "ksv": 10,
+      "quencherForHalf": 0.1,
+      "quenchingEfficiency": 0.5,
+      "sternVolmerRatio": 2,
+    },
+    "summary": "Stern–Volmer: K_SV=10/mM → at [Q]=0.1 mM the glow drops to 50.0% (F₀/F=2.00, 50% quenched); half-quenched at [Q]=1/K_SV=0.100 mM.",
+  },
   "substrate-inhibition": {
     "metrics": {
       "ki": 100,

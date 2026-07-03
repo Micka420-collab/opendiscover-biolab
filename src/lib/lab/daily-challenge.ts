@@ -711,6 +711,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 24,
     hint: 'Time to 90% = ln(9·(K−P₀)/P₀) / r, so a faster growth rate reaches the plateau sooner. With this seed and capacity, hitting 90% at 24 h needs r ≈ 0.31 /h.',
   },
+  {
+    id: 'dim-the-glow',
+    engine: 'stern-volmer',
+    title: 'Dim the glow by half',
+    brief:
+      'A fluorescent molecule is glowing, and a quencher dims it by colliding with it. Dial in how much quencher you add so the glow drops to exactly half its brightness — the half-quenched point that reads out how accessible the fluorophore is.',
+    baseParams: { ksv: 10, f0: 100 },
+    knob: {
+      param: 'quencher',
+      label: 'Quencher [Q]',
+      min: 0.01,
+      max: 0.5,
+      step: 0.005,
+      default: 0.3,
+      unit: 'mM',
+    },
+    metricKey: 'quenchingEfficiency',
+    metricLabel: 'Quenching efficiency',
+    goal: 'target',
+    target: 0.5,
+    hint: 'Efficiency = Ksv·[Q]/(1+Ksv·[Q]) hits 50% when Ksv·[Q]=1, i.e. [Q]=1/Ksv. With Ksv=10/mM that is [Q]=0.1 mM.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
