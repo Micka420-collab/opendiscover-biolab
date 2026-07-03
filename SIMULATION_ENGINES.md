@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **67 deterministic simulation engines** across
+The OpenDiscover BioLab ships **68 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -21,7 +21,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay)
@@ -1165,6 +1165,38 @@ The Kingman coalescent — evolution run backwards — for a neutral sample of n
 ```
 
 _Run it: `POST /api/lab/run { "engine": "coalescent", "params": … }` or interactively at `/lab/coalescent`._
+
+---
+
+### `recombination-map` — Genetic Recombination & Linkage Mapping
+
+How genetic distance turns into recombination frequency — the basis of every genetic map. Two genes recombine when a crossover falls between them, so the recombination frequency r measures distance (1% ≈ 1 centimorgan), but for distant genes double crossovers cancel and r saturates toward ½, under-reporting the true distance. Reports r under the Morgan (naive r=d), Haldane (r=½(1−e^(−2d))) and Kosambi (r=½·tanh(2d)) mapping functions, the naive-vs-corrected gap, whether the genes are still linked, and the r-versus-distance curve that flattens at ½. Closed-form and deterministic; r stays in [0, ½].
+
+**References**
+- Sturtevant, A.H. (1913) The linear arrangement of six sex-linked factors in Drosophila. J. Exp. Zool. 14:43-59.
+- Kosambi, D.D. (1943) The estimation of map distances from recombination values. Ann. Eugen. 12:172-175.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `mapDistanceCm` | number | `20` | ≥ 0, ≤ 1000 |  |
+| `mapFunction` | enum(morgan \| haldane \| kosambi) | `haldane` |  |  |
+| `distanceMaxCm` | number | `100` | ≥ 0.000001, ≤ 1000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "mapDistanceCm": 20,
+  "mapFunction": "haldane",
+  "distanceMaxCm": 100,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "recombination-map", "params": … }` or interactively at `/lab/recombination-map`._
 
 ---
 

@@ -1636,6 +1636,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'recombination-map': {
+    plainWhat:
+      'Genes sit in a row along a chromosome, and this works out how far apart two of them are. It uses a simple clue: the further apart two genes lie, the more often they get shuffled onto different copies when eggs and sperm are made.',
+    plainWhy:
+      'This is how the very first gene maps were drawn, and it is still how scientists hunt down the gene behind an inherited disease — narrowing the search to a stretch of chromosome by seeing which genes travel together through families.',
+    plainHow:
+      'Set how far apart the two genes are and watch how often they get separated. For nearby genes the separation rate rises straight in step with distance — but for far-apart genes it flattens out near a half, because the shuffling can happen twice and cancel itself. Switch the mapping method to see how each one corrects for that.',
+    terms: [
+      {
+        term: 'recombination',
+        meaning:
+          'the shuffling that puts two genes onto different chromosome copies when reproductive cells form.',
+      },
+      {
+        term: 'centimorgan',
+        meaning: 'the unit of genetic distance; roughly the distance that gives 1% shuffling.',
+      },
+      {
+        term: 'crossover',
+        meaning: 'a swap between the two chromosome copies that reshuffles the genes along them.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

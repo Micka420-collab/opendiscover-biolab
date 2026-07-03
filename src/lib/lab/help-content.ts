@@ -614,6 +614,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'uncover-gene-distance': {
+    plainWhat:
+      'In a breeding cross, two genes end up shuffled apart 40% of the time. You need to turn that number into the true distance between them along the chromosome.',
+    plainWhy:
+      'Finding the real distance between genes is how researchers zero in on the gene behind an inherited trait or disease — a cornerstone of genetics, from the very first fruit-fly maps to modern medicine.',
+    plainHow:
+      "For far-apart genes the shuffling can happen twice and undo itself, so the observed 40% actually hides a bigger true distance. Slide the true distance up until the model's shuffling rate matches the measured 40%.",
+    terms: [
+      {
+        term: 'recombination',
+        meaning: 'the shuffling that separates two genes onto different chromosome copies.',
+      },
+      {
+        term: 'centimorgan',
+        meaning: 'the unit of genetic distance; roughly the distance that gives 1% shuffling.',
+      },
+      {
+        term: 'double crossover',
+        meaning:
+          'two swaps between the same two genes, which cancel out and make far genes look closer.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

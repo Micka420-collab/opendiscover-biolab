@@ -1,0 +1,14 @@
+{
+  "slug": "the-map-hidden-by-crossovers",
+  "title": "The map hidden by crossovers",
+  "engine": "recombination-map",
+  "params": {
+    "mapDistanceCm": 50,
+    "mapFunction": "haldane",
+    "distanceMaxCm": 150,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "In 1913 a twenty-year-old student named Alfred Sturtevant sat up all night and drew the first map of genes on a chromosome, using nothing but one brilliant idea: the further apart two genes are, the more often a crossover falls between them and shuffles them apart. Count how often two traits come un-stuck in the offspring and you have a ruler — 1% recombination is defined as one centimorgan of distance. This curve shows the beautiful catch that makes real gene mapping subtle. For nearby genes the recombination rate climbs in lockstep with distance, a clean straight line. But for genes far apart, a SECOND crossover can undo the first and leave them looking un-shuffled, so the measured rate bends over and flattens toward one half — the same 50:50 you'd get from genes on entirely different chromosomes. Left uncorrected, that makes distant genes look far closer than they truly are. The Haldane and Kosambi mapping functions shown here straighten the ruler back out, turning a saturating recombination rate into an honest, additive genetic distance — the quiet maths behind every gene hunt from fruit flies to the search for human disease genes."
+}

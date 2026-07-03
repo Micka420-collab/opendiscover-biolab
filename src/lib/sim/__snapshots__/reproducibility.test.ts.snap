@@ -507,6 +507,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "First-order decay: t½=5730 → after t=5730 (1.00 half-lives) 50.0% remains (50.00 of 100); mean lifetime 8267.",
   },
+  "recombination-map": {
+    "metrics": {
+      "geneticDistanceMorgans": 0.2,
+      "linked": 1,
+      "mapDistanceCm": 20,
+      "naiveRecombination": 0.2,
+      "recombinationFrequency": 0.16484,
+      "underReport": 0.03516,
+    },
+    "summary": "Recombination (haldane): 20 cM apart → r=0.1648 (16.5% recombinant); the naive 20.0% over-reads by 3.5 points as crossovers cancel. Still linked.",
+  },
   "reed-frost": {
     "metrics": {
       "analyticFinalSize": 0.892645,

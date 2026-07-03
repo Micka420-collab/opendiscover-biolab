@@ -62,6 +62,7 @@ import { spec as hardyWeinberg } from './popgen/hardy-weinberg';
 import { spec as luriaDelbruck } from './popgen/luria-delbruck';
 import { spec as moranProcess } from './popgen/moran-process';
 import { spec as phylogenetics } from './popgen/phylogenetics';
+import { spec as recombinationMap } from './popgen/recombination-map';
 import { spec as wrightFisher } from './popgen/wright-fisher';
 import { spec as hpFolding } from './protein/hp-folding';
 import { spec as massSpec } from './protein/mass-spec';
@@ -114,6 +115,7 @@ export const engines: AnyEngine[] = [
   luriaDelbruck,
   ewensSampling,
   coalescent,
+  recombinationMap,
   breeding,
   lotkaVolterra,
   logisticMap,

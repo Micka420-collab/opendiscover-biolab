@@ -777,6 +777,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.98,
     hint: 'Relative activity at 60°C peaks when the enzyme’s optimum lands on 60°C. Too low a melting temperature and it is already unfolding at 60°C; too high and 60°C sits below its best. Raise Tm until the optimum reaches 60°C.',
   },
+  {
+    id: 'uncover-gene-distance',
+    engine: 'recombination-map',
+    title: 'Uncover the true gene distance',
+    brief:
+      'A breeding cross shows two genes shuffled apart 40% of the time. But crossovers between distant genes can cancel out, hiding the real distance. Slide the true map distance up until the model’s recombination rate matches the measured 40% — and you’ve mapped the gene.',
+    baseParams: { mapFunction: 'haldane' },
+    knob: {
+      param: 'mapDistanceCm',
+      label: 'True map distance',
+      min: 0,
+      max: 200,
+      step: 1,
+      default: 30,
+      unit: 'cM',
+    },
+    metricKey: 'recombinationFrequency',
+    metricLabel: 'Recombination frequency',
+    goal: 'target',
+    target: 0.4,
+    hint: 'Crossovers between distant genes cancel, so observed recombination saturates below the true distance. Under Haldane r=½(1−e^(−2d)); r=40% means the true distance is about 80 cM — double the naive 40.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */
