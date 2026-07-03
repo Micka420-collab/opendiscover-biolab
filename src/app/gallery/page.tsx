@@ -40,11 +40,18 @@ export default function GalleryPage() {
   return (
     <div className="space-y-10">
       <header className="space-y-2">
+        <div className="text-xs uppercase tracking-widest text-accent font-mono">
+          Curated · reproducible · one-file PRs
+        </div>
         <h1 className="text-3xl font-bold">Community gallery</h1>
         <p className="text-muted-foreground max-w-2xl">
-          Interesting runs contributed by the community. Every card opens the exact experiment in
-          the Lab — reproduce it, then tweak a parameter to make it your own. Want yours here?
-          It&apos;s a{' '}
+          {galleryEntries.length > 0 && (
+            <span className="text-foreground">
+              {galleryEntries.length} hand-picked runs across {groups.length} fields.{' '}
+            </span>
+          )}
+          Every card opens the <em>exact</em> experiment in the Lab — reproduce it, then tweak a
+          parameter to make it your own. Want yours here? It&apos;s a{' '}
           <Link href="/lab" className="text-accent hover:underline">
             one-file pull request
           </Link>{' '}
@@ -59,17 +66,30 @@ export default function GalleryPage() {
       ) : (
         groups.map(({ domain, entries }) => (
           <section key={domain} className="space-y-4">
-            <h2 className="text-lg font-semibold">{domainLabel(domain)}</h2>
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-lg font-semibold">{domainLabel(domain)}</h2>
+              <span className="font-mono text-xs text-muted-foreground">{entries.length}</span>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {entries.map((entry) => (
-                <Card key={entry.slug} className="flex flex-col">
+                <Card
+                  key={entry.slug}
+                  className="group flex flex-col hover:border-accent transition-colors"
+                >
                   <CardHeader>
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="muted">{entry.engine}</Badge>
                       <Credit author={entry.author} credit={entry.credit} />
                     </div>
-                    <CardTitle className="text-base">{entry.title}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-base">
+                      <Link
+                        href={entry.sharePath}
+                        className="group-hover:text-accent transition-colors"
+                      >
+                        {entry.title}
+                      </Link>
+                    </CardTitle>
+                    <CardDescription className="line-clamp-4">
                       <span className="text-foreground/80">{entry.engineTitle}</span> —{' '}
                       {entry.blurb}
                     </CardDescription>
