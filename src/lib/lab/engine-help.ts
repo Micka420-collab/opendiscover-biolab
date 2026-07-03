@@ -1659,6 +1659,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'allometric-scaling': {
+    plainWhat:
+      "This shows a deep pattern in biology: how an animal's size sets the pace of its life. Bigger animals burn energy faster in total but slower for their size, and it draws how the energy-burn rate climbs as animals get heavier — from a mouse to a whale.",
+    plainWhy:
+      "This one rule ties together heart rate, lifespan, and how much food an animal needs, across almost every creature on Earth. It's why a mouse's heart races and it lives a couple of years while an elephant's heart plods and it lives for decades — yet both get roughly the same billion heartbeats in a lifetime.",
+    plainHow:
+      'Slide the body mass and watch the energy-burn rate climb — but not in a straight line: it rises as a special three-quarters power of mass, so doubling the size less than doubles the burn. Notice the per-kilogram rate falling, the lifespan stretching, and the heartbeats-per-life staying almost fixed.',
+    terms: [
+      {
+        term: 'metabolic rate',
+        meaning: 'how fast an animal burns energy just to stay alive.',
+      },
+      {
+        term: 'allometry',
+        meaning: 'how a body feature changes with overall size, usually not in simple proportion.',
+      },
+      {
+        term: "Kleiber's law",
+        meaning:
+          'the finding that whole-body energy burn scales as about the three-quarters power of mass.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

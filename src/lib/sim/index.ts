@@ -32,6 +32,7 @@ import { spec as pkOralAbsorption } from './drug/pk-oral-absorption';
 import { spec as pkTwoCompartment } from './drug/pk-two-compartment';
 import { spec as saturationBinding } from './drug/saturation-binding';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
+import { spec as allometricScaling } from './ecology/allometric-scaling';
 import { spec as chemostatCompetition } from './ecology/chemostat-competition';
 import { spec as levinsMetapopulation } from './ecology/levins-metapopulation';
 import { spec as logisticMap } from './ecology/logistic-map';
@@ -125,6 +126,7 @@ export const engines: AnyEngine[] = [
   chemostatCompetition,
   levinsMetapopulation,
   replicatorDynamics,
+  allometricScaling,
   bioreactor,
   microbialGrowth,
   oxygenTransfer,

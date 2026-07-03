@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **68 deterministic simulation engines** across
+The OpenDiscover BioLab ships **69 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
-- **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
+- **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
@@ -1630,6 +1630,42 @@ The replicator equation for a symmetric 2×2 game: dx/dt = x(1−x)(f_A − f_B)
 ```
 
 _Run it: `POST /api/lab/run { "engine": "replicator-dynamics", "params": … }` or interactively at `/lab/replicator-dynamics`._
+
+---
+
+### `allometric-scaling` — Allometric Scaling (Kleiber's Law)
+
+How body size sets the pace of life. An animal's whole-body metabolic rate scales as a power of its mass, B=B₀·M^b, with Kleiber's exponent b≈3/4 — a straight line of slope b on a log-log plot across the whole tree of life. The metabolic rate PER kilogram falls as M^(b−1) (bigger animals burn slower), heart rate scales the same way, and lifespan stretches as M^(1−b), so heartbeats per lifetime are nearly constant (~a billion) from a shrew to an elephant. Reports the metabolic rate, the mass-specific rate, the heart-rate and lifespan scalings relative to a 1 kg animal, and the heartbeats-per-lifetime invariant, plus the metabolic-rate-vs-mass curve. Closed-form and deterministic.
+
+**References**
+- Kleiber, M. (1932) Body size and metabolism. Hilgardia 6:315-353.
+- West, G.B., Brown, J.H. & Enquist, B.J. (1997) A general model for the origin of allometric scaling laws in biology. Science 276:122-126.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `bodyMass` | number | `1` | ≥ 1e-9, ≤ 1000000 |  |
+| `scalingExponent` | number | `0.75` | ≥ 0.1, ≤ 2 |  |
+| `normalization` | number | `3.4` | ≥ 0.000001, ≤ 1000000 |  |
+| `massMin` | number | `0.001` | ≥ 1e-9, ≤ 1000000 |  |
+| `massMax` | number | `10000` | ≥ 1e-9, ≤ 1000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "bodyMass": 1,
+  "scalingExponent": 0.75,
+  "normalization": 3.4,
+  "massMin": 0.001,
+  "massMax": 10000,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "allometric-scaling", "params": … }` or interactively at `/lab/allometric-scaling`._
 
 
 ## 🏭 Bioprocess

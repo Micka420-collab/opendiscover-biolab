@@ -1,0 +1,16 @@
+{
+  "slug": "the-three-quarter-power-law-of-life",
+  "title": "The 3/4-power law of life",
+  "engine": "allometric-scaling",
+  "params": {
+    "bodyMass": 1,
+    "scalingExponent": 0.75,
+    "normalization": 3.4,
+    "massMin": 0.001,
+    "massMax": 100000,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Plot the energy every animal burns against how much it weighs — a shrew, a mouse, a dog, a human, a horse, an elephant, a whale — and something almost eerie happens: they fall on one straight line, spanning more than twenty doublings of body mass. This is Kleiber's law, and its slope is not 1 (which would mean twice the mass burns twice the energy) but about three-quarters: a bigger body is more energy-efficient per kilogram than a smaller one. The same three-quarters exponent quietly sets the tempo of a whole life. Because each gram of a big animal burns slower, its heart beats slower and it lives longer — heart rate falling and lifespan stretching by opposite powers of mass that almost exactly cancel. The startling consequence, visible in the numbers here, is that a mouse and an elephant get about the same total number of heartbeats in a lifetime — roughly a billion — even though the mouse packs them into two years and the elephant spreads them across sixty. One clean line, drawn from the smallest mammal to the largest, hiding the arithmetic that ties body size to heartbeat, hunger, and how long you get to live."
+}

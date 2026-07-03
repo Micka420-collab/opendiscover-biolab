@@ -799,6 +799,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.4,
     hint: 'Crossovers between distant genes cancel, so observed recombination saturates below the true distance. Under Haldane r=½(1−e^(−2d)); r=40% means the true distance is about 80 cM — double the naive 40.',
   },
+  {
+    id: 'live-long-grow-big',
+    engine: 'allometric-scaling',
+    title: 'Live long by growing big',
+    brief:
+      'Across the animal kingdom, bigger bodies buy longer lives — but only slowly. Grow the body mass until the expected lifespan reaches three times that of a 1 kg creature.',
+    baseParams: { scalingExponent: 0.75, normalization: 3.4 },
+    knob: {
+      param: 'bodyMass',
+      label: 'Body mass',
+      min: 1,
+      max: 500,
+      step: 1,
+      default: 10,
+      unit: 'kg',
+    },
+    metricKey: 'lifespanRelative',
+    metricLabel: 'Lifespan vs a 1 kg animal',
+    goal: 'target',
+    target: 3,
+    hint: 'Lifespan scales as mass^(1−b). With Kleiber’s b=0.75 that is mass^0.25 (the fourth root), so tripling lifespan needs 3⁴ = 81× the mass — about 81 kg.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

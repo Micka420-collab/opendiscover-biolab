@@ -36,6 +36,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Global (Needleman–Wunsch) alignment: score 11, 70.0% identity over 10 columns (7 matches, 0 gaps).",
   },
+  "allometric-scaling": {
+    "metrics": {
+      "heartRateRelative": 1,
+      "heartbeatsPerLifeRelative": 1,
+      "lifespanRelative": 1,
+      "massSpecificRate": 3.4,
+      "metabolicRate": 3.4,
+      "scalingExponent": 0.75,
+    },
+    "summary": "Allometric scaling (b=0.75): a 1 kg animal burns 3.400 W (3.400 W/kg); vs a 1 kg animal its heart runs 1.00× as fast and it lives 1.00× as long — so 1.00× the heartbeats per lifetime.",
+  },
   "beer-lambert": {
     "metrics": {
       "absorbanceAtReadout": 0.376546,

@@ -637,6 +637,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'live-long-grow-big': {
+    plainWhat:
+      'Bigger animals live longer, in a very regular way. Grow the body mass of an animal until its expected lifespan is three times that of a 1-kilogram creature.',
+    plainWhy:
+      'This surprising rule — size buys time — holds across mammals from mice to whales, and it is one of the clues to why lifespans differ so much. Understanding it helps biologists compare ageing across species.',
+    plainHow:
+      'Lifespan grows only slowly with size — as roughly the fourth root of mass — so you need a LOT more mass for a little more life. Nudge the mass up until the lifespan lands at three times the reference.',
+    terms: [
+      {
+        term: 'metabolic rate',
+        meaning: 'how fast an animal burns energy just to stay alive.',
+      },
+      {
+        term: 'body mass',
+        meaning: 'how heavy the animal is — the single number that sets the pace of its life.',
+      },
+      {
+        term: 'lifespan scaling',
+        meaning:
+          'the rule that bigger animals live longer, in proportion to mass raised to a small power.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */
