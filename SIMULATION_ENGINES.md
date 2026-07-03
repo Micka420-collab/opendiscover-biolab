@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **63 deterministic simulation engines** across
+The OpenDiscover BioLab ships **64 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -23,7 +23,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
-- **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
+- **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
@@ -1663,6 +1663,40 @@ Monod-based microbial growth in batch, fed-batch, and chemostat (CSTR) reactors.
 ```
 
 _Run it: `POST /api/lab/run { "engine": "bioreactor", "params": … }` or interactively at `/lab/bioreactor`._
+
+---
+
+### `microbial-growth` — Microbial Growth Curve (logistic)
+
+The classic S-shaped microbial growth curve from logistic (Verhulst) dynamics dP/dt=r·P·(1−P/K): a population grows at per-capita rate r while small and levels off at the carrying capacity K as space and nutrients run out. The closed-form solution P(t)=K/(1+A·e^(−rt)) with A=(K−P₀)/P₀ gives an exponential-looking early phase, a steepest point at half capacity, and a stationary plateau. Reports the carrying capacity, the early doubling time ln2/r, the inflection time, the time to reach 90% of capacity, the maximum absolute growth rate r·K/4, and the final population, plus the growth curve. Closed-form and deterministic; distinct from the substrate-limited Monod bioreactor engine.
+
+**References**
+- Verhulst, P.-F. (1838) Notice sur la loi que la population suit dans son accroissement. Corresp. Math. Phys. 10:113-121.
+- Zwietering, M.H. et al. (1990) Modeling of the bacterial growth curve. Appl. Environ. Microbiol. 56:1875-1881.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `carryingCapacity` | number | `2` | ≥ 0.000001, ≤ 1000000 |  |
+| `growthRate` | number | `0.4` | ≥ 0.000001, ≤ 100 |  |
+| `initialPop` | number | `0.01` | ≥ 1e-9, ≤ 1000000 |  |
+| `tEnd` | number | `48` | ≥ 0.000001, ≤ 1000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "carryingCapacity": 2,
+  "growthRate": 0.4,
+  "initialPop": 0.01,
+  "tEnd": 48,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "microbial-growth", "params": … }` or interactively at `/lab/microbial-growth`._
 
 ---
 

@@ -524,6 +524,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       { term: 'occupancy', meaning: 'the share of targets currently filled, from none to all.' },
     ],
   },
+  'time-a-fermentation': {
+    plainWhat:
+      'You are growing a batch of microbes to make something useful, and it needs to be ready on schedule. Tune how fast they multiply so the batch reaches 90% full in exactly 24 hours.',
+    plainWhy:
+      'In real fermentation — brewing, medicine, food — timing is everything. Too slow and you miss the deadline; too fast and you can sail past the best moment to harvest. Hitting the target time keeps a production line running smoothly.',
+    plainHow:
+      'A faster growth rate means the flask fills up and levels off sooner. Dial the growth speed up to reach the 90%-full mark earlier, or down to reach it later, until it lands right on 24 hours.',
+    terms: [
+      {
+        term: 'carrying capacity',
+        meaning: 'the most microbes the flask can hold, where growth finally stops.',
+      },
+      {
+        term: 'growth rate',
+        meaning: 'how fast the population multiplies while there is still room to grow.',
+      },
+      {
+        term: '90% full',
+        meaning: 'nearly at the plateau — a common point to harvest a culture.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

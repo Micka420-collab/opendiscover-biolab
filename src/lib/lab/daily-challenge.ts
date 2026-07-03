@@ -688,6 +688,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.9,
     hint: 'Occupancy = [L]/(Kd+[L]). At [L]=10 nM, reaching 90% filled needs a small Kd — about 1.1 nM. Smaller Kd = tighter binding = more filled at the same dose.',
   },
+  {
+    id: 'time-a-fermentation',
+    engine: 'microbial-growth',
+    title: 'Time a fermentation',
+    brief:
+      'Your batch of microbes has to be ready on schedule. Tune how fast they multiply so the culture reaches 90% of its carrying capacity in exactly 24 hours — not so slow it misses the deadline, not so fast it overshoots the best harvest window.',
+    baseParams: { carryingCapacity: 2, initialPop: 0.01, tEnd: 48 },
+    knob: {
+      param: 'growthRate',
+      label: 'Growth rate r',
+      min: 0.1,
+      max: 2,
+      step: 0.01,
+      default: 0.4,
+      unit: '1/h',
+    },
+    metricKey: 'timeTo90Pct',
+    metricLabel: 'Time to 90% of capacity',
+    unit: 'h',
+    goal: 'target',
+    target: 24,
+    hint: 'Time to 90% = ln(9·(K−P₀)/P₀) / r, so a faster growth rate reaches the plateau sooner. With this seed and capacity, hitting 90% at 24 h needs r ≈ 0.31 /h.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

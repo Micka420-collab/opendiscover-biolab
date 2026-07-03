@@ -1503,6 +1503,28 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       { term: 'occupancy', meaning: 'the share of targets currently filled, from none to all.' },
     ],
   },
+  'microbial-growth': {
+    plainWhat:
+      'This grows a population of microbes — like bacteria or yeast in a flask — and draws the famous S-shaped growth curve: a slow start, a fast-rising middle, then a level-off as the flask fills up and runs low on food and room.',
+    plainWhy:
+      'This curve shows up everywhere microbes matter: brewing, making medicine, food going off, or an infection taking hold. Knowing how fast a culture grows and when it will plateau lets people time a harvest, a dose, or a clean-up.',
+    plainHow:
+      'Turn up the growth rate and watch the curve rise and level off sooner; the population never climbs past the carrying capacity — the most the flask can hold. Try changing the starting amount or the capacity and watch when the culture hits its steepest, fastest-growing moment.',
+    terms: [
+      {
+        term: 'carrying capacity',
+        meaning: 'the biggest population the flask can support, where growth finally stops.',
+      },
+      {
+        term: 'growth rate',
+        meaning: 'how fast the population multiplies while there is still plenty of room.',
+      },
+      {
+        term: 'inflection',
+        meaning: 'the steepest, fastest-growing moment, which happens at half the capacity.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

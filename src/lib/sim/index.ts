@@ -20,6 +20,7 @@ import { spec as osmoticPressure } from './biochem/osmotic-pressure';
 import { spec as oxygenHemoglobin } from './biochem/oxygen-hemoglobin';
 import { spec as vanDeemter } from './biochem/van-deemter';
 import { spec as bioreactor } from './bioprocess/bioreactor';
+import { spec as microbialGrowth } from './bioprocess/microbial-growth';
 import { spec as oxygenTransfer } from './bioprocess/oxygen-transfer';
 import { spec as substrateInhibition } from './bioprocess/substrate-inhibition';
 import { spec as admet } from './drug/admet';
@@ -120,6 +121,7 @@ export const engines: AnyEngine[] = [
   levinsMetapopulation,
   replicatorDynamics,
   bioreactor,
+  microbialGrowth,
   oxygenTransfer,
   substrateInhibition,
   beerLambert,

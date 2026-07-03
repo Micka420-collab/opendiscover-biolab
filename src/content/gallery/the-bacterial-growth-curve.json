@@ -1,0 +1,15 @@
+{
+  "slug": "the-bacterial-growth-curve",
+  "title": "The bacterial growth curve",
+  "engine": "microbial-growth",
+  "params": {
+    "carryingCapacity": 2,
+    "growthRate": 0.4,
+    "initialPop": 0.01,
+    "tEnd": 48,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Drop a few microbes into a flask of broth and this is the shape their numbers trace — the single most recognisable curve in microbiology. It starts almost flat while the cells settle in, then rounds into a steep, near-exponential climb as they double and double again, and finally bends over and flattens into a plateau as food and room run out. That ceiling is the carrying capacity, the most the flask can hold; the steepest point in the middle sits at exactly half of it. The whole S is captured by one tug-of-war equation — grow fast when there is room, slow to a stop when there is not — first written down by Pierre-François Verhulst in 1838. The same curve times a batch of yeast in a brewery, warns when food left out will spoil, predicts when an infection peaks, and sets when to harvest a vat of engineered cells making insulin or a vaccine. Read off the doubling time near the start, the moment of fastest growth, and when the culture reaches 90% of capacity — the usual cue to harvest."
+}

@@ -362,6 +362,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "3-step pathway: steady-state flux ≈ 4.1667, bottleneck at step 1 (Vmax=5), final product S3 = 824.885.",
   },
+  "microbial-growth": {
+    "metrics": {
+      "carryingCapacity": 2,
+      "doublingTime": 1.73287,
+      "finalPop": 2,
+      "inflectionTime": 13.2333,
+      "maxAbsGrowthRate": 0.2,
+      "timeTo90Pct": 18.7263,
+    },
+    "summary": "Logistic growth: r=0.4/h, K=2, seed 0.01 → reaches half capacity at 13.2 h and 90% at 18.7 h; population at 48 h is 2.000 (100% of K).",
+  },
   "moran-process": {
     "metrics": {
       "analyticFixationProbability": 0.5,
