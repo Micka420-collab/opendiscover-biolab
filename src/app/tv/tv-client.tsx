@@ -98,17 +98,20 @@ export function TvClient({ playlist, dwellMs }: { playlist: PlaylistItem[]; dwel
           <span className="text-xs text-muted-foreground">{item.engineTitle}</span>
           <span className="text-xs text-muted-foreground">· by {item.author}</span>
         </div>
-        <h1 className="text-2xl font-bold">{item.title}</h1>
-        <p className="text-sm text-muted-foreground max-w-3xl">{item.blurb}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{item.title}</h1>
+        <p className="text-sm text-muted-foreground max-w-3xl line-clamp-2">{item.blurb}</p>
         <Link href={item.sharePath} className="text-xs text-accent hover:underline">
           Open this run in the Lab →
         </Link>
       </header>
 
       {phase.kind === 'loading' && (
-        <p className="text-sm text-muted-foreground" aria-busy="true">
+        <div
+          className="rounded-lg border border-border bg-muted/20 p-6 text-sm text-muted-foreground animate-pulse"
+          aria-busy="true"
+        >
           Running {item.engineTitle}…
-        </p>
+        </div>
       )}
       {phase.kind === 'error' && (
         <p className="text-sm text-red-400" role="alert">
