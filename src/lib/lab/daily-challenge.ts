@@ -1005,6 +1005,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0,
     hint: 'Net charge falls steadily as pH rises and crosses zero at the isoelectric point. For this acidic protein (more Asp/Glu than Lys/Arg) the pI sits low — around pH 4.9.',
   },
+  {
+    id: 'the-q10-rule-of-thumb',
+    engine: 'arrhenius-rate',
+    title: 'Explain the “rates double per 10°C” rule',
+    brief:
+      'Biologists have a rule of thumb: warm a reaction by 10°C and it runs about twice as fast (a Q₁₀ of 2). That factor is set by the reaction’s energy barrier. Tune the activation energy until the Q₁₀ at room temperature comes out to exactly 2 — and you’ve found the barrier behind the rule.',
+    baseParams: { preExponential: 1e13, temperatureC: 25, tMinC: -10, tMaxC: 100 },
+    knob: {
+      param: 'activationEnergy',
+      label: 'Activation energy Eₐ',
+      min: 10,
+      max: 150,
+      step: 1,
+      default: 30,
+      unit: 'kJ/mol',
+    },
+    metricKey: 'q10',
+    metricLabel: 'Q₁₀ at 25°C',
+    goal: 'target',
+    target: 2,
+    hint: 'Q₁₀ rises steadily with the barrier height. By Arrhenius, a Q₁₀ of 2 at 25°C corresponds to an activation energy of about 53 kJ/mol — the value behind the classic biological rule of thumb.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

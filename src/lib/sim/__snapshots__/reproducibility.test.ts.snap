@@ -47,6 +47,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Allometric scaling (b=0.75): a 1 kg animal burns 3.400 W (3.400 W/kg); vs a 1 kg animal its heart runs 1.00× as fast and it lives 1.00× as long — so 1.00× the heartbeats per lifetime.",
   },
+  "arrhenius-rate": {
+    "metrics": {
+      "arrheniusSlope": -6013.95,
+      "foldChangeOverRange": 843.019,
+      "q10": 1.92433,
+      "rateConstant": 17373.7,
+    },
+    "summary": "Arrhenius: k=1.74e+4 /s at 25 °C for a 50 kJ/mol barrier. Q₁₀=1.92 (rate ×1.92 per 10 °C); across -10→100 °C the rate changes 843×. ln k vs 1/T is a straight line of slope -6014 K.",
+  },
   "beer-lambert": {
     "metrics": {
       "absorbanceAtReadout": 0.376546,

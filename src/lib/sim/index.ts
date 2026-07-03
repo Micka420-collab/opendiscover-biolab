@@ -13,6 +13,7 @@
 type AnyEngine = import('./core/types').EngineSpec<any, any>;
 
 import { spec as acidBaseTitration } from './biochem/acid-base-titration';
+import { spec as arrheniusRate } from './biochem/arrhenius-rate';
 import { spec as beerLambert } from './biochem/beer-lambert';
 import { spec as diffusion } from './biochem/diffusion';
 import { spec as enzymeThermal } from './biochem/enzyme-thermal';
@@ -145,6 +146,7 @@ export const engines: AnyEngine[] = [
   substrateInhibition,
   beerLambert,
   acidBaseTitration,
+  arrheniusRate,
   diffusion,
   enzymeThermal,
   vanDeemter,

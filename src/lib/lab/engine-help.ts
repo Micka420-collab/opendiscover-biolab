@@ -1869,6 +1869,30 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'arrhenius-rate': {
+    plainWhat:
+      'This shows how much faster a chemical reaction goes as you heat it up. Almost every reaction speeds up with warmth, and this works out by exactly how much — the rate at a given temperature, how much it jumps for each 10 degrees, and how many times faster it runs across a whole temperature range.',
+    plainWhy:
+      'This one relationship is why your fridge keeps food fresh (cold slows the spoilage reactions) and why a fever makes your body race, why bread rises faster in a warm kitchen, and why the enzyme that powers COVID and DNA tests was borrowed from microbes in boiling hot springs. Understanding it lets people control reactions — speeding up the useful ones and slowing the harmful ones — just with temperature.',
+    plainHow:
+      'Turn up the temperature and watch the rate climb — but not gently: it rises faster and faster, because heat helps more molecules get over the energy "hill" a reaction must climb. A taller hill (a bigger energy barrier) makes the reaction far more sensitive to temperature. The second chart straightens that curve into a line whose steepness reveals exactly how tall the hill is.',
+    terms: [
+      {
+        term: 'reaction rate',
+        meaning: 'how fast a chemical reaction runs — how quickly reactants turn into products.',
+      },
+      {
+        term: 'activation energy',
+        meaning:
+          'the energy "hill" molecules must climb to react; a taller hill means a slower, more temperature-sensitive reaction.',
+      },
+      {
+        term: 'Q10',
+        meaning:
+          'how many times faster the reaction runs when you warm it by 10 degrees — often about 2 for living things.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

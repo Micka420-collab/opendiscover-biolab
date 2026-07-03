@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **77 deterministic simulation engines** across
+The OpenDiscover BioLab ships **78 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling) · [`photosynthesis-light`](#photosynthesis-light)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`arrhenius-rate`](#arrhenius-rate) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`diagnostic-accuracy`](#diagnostic-accuracy) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding) · [`therapeutic-window`](#therapeutic-window)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
@@ -2065,6 +2065,42 @@ The titration curve of a weak monoprotic acid with strong base: pH versus titran
 ```
 
 _Run it: `POST /api/lab/run { "engine": "acid-base-titration", "params": … }` or interactively at `/lab/acid-base-titration`._
+
+---
+
+### `arrhenius-rate` — Arrhenius Reaction Rate
+
+How fast a reaction runs versus temperature, from the Arrhenius law k=A·exp(−E_a/RT). Heating speeds a reaction because more molecules clear the activation barrier E_a; taking logs linearises it, so a plot of ln k against 1/T is a straight line whose slope −E_a/R reveals the barrier. Reports the rate constant at a chosen temperature, the Q₁₀ (rate factor per 10 °C — near 2 for a ~50 kJ/mol barrier), the fold-change in rate across the plotted range, and the Arrhenius slope, plus the rate-vs-temperature curve and the classic straight-line Arrhenius plot. Explains why the fridge slows spoilage, why a fever speeds the body's chemistry, and why hot-spring enzymes power PCR. Closed-form and deterministic; temperatures are bounded so T>0 and every value stays finite.
+
+**References**
+- Arrhenius, S. (1889) Z. Phys. Chem. 4:226-248.
+- Laidler, K.J. (1984) The development of the Arrhenius equation. J. Chem. Educ. 61:494.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `preExponential` | number | `10000000000000` | ≥ 1, ≤ 1000000000000000000 |  |
+| `activationEnergy` | number | `50` | ≥ 1, ≤ 500 |  |
+| `temperatureC` | number | `25` | ≥ -50, ≤ 300 |  |
+| `tMinC` | number | `-10` | ≥ -50, ≤ 300 |  |
+| `tMaxC` | number | `100` | ≥ -50, ≤ 300 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "preExponential": 10000000000000,
+  "activationEnergy": 50,
+  "temperatureC": 25,
+  "tMinC": -10,
+  "tMaxC": 100,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "arrhenius-rate", "params": … }` or interactively at `/lab/arrhenius-rate`._
 
 ---
 

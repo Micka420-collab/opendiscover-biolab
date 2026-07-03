@@ -841,6 +841,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'the-q10-rule-of-thumb': {
+    plainWhat:
+      'Warm a reaction by 10 degrees and it runs roughly twice as fast — biologists call that a Q₁₀ of 2. How big that jump is depends on the reaction’s energy "hill". You are tuning the height of that hill until the 10-degree speed-up comes out to exactly double.',
+    plainWhy:
+      'This rule of thumb quietly runs the living world: it is why cold-blooded animals slow down in the cold, why the fridge preserves food, and why a small change in body temperature has such a big effect on your chemistry. Pinning it to a specific energy barrier is a neat piece of everyday science.',
+    plainHow:
+      'A taller energy hill makes a reaction much more sensitive to temperature, so the 10-degree speed-up grows as you raise the barrier. Nudge the barrier up from low until the speed-up factor lands exactly on 2 — that height is the answer behind the famous rule.',
+    terms: [
+      {
+        term: 'Q₁₀',
+        meaning: 'how many times faster a reaction runs when you warm it by 10 degrees.',
+      },
+      {
+        term: 'activation energy',
+        meaning: 'the size of the energy "hill" a reaction must climb — the dial you are tuning.',
+      },
+      {
+        term: 'rule of thumb',
+        meaning:
+          'a rough guide (here, "rates double per 10°C") that holds well for many living reactions.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

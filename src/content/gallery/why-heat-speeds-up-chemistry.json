@@ -1,0 +1,16 @@
+{
+  "slug": "why-heat-speeds-up-chemistry",
+  "title": "Why heat speeds up chemistry",
+  "engine": "arrhenius-rate",
+  "params": {
+    "preExponential": 1e13,
+    "activationEnergy": 50,
+    "temperatureC": 25,
+    "tMinC": -10,
+    "tMaxC": 100,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "In 1889 Svante Arrhenius wrote down one of the most quietly universal equations in all of science, and this chart is it in action. A reaction needs its molecules to climb an energy hill before they can react, and only the fastest-moving ones make it over. Heat the mix and you shift far more molecules above that threshold — so the rate does not just rise, it rises exponentially, curving upward ever more steeply as the top curve here shows. The size of the hill, the activation energy, sets how dramatic that climb is: a taller barrier means a reaction that is sluggish when cool but explosively temperature-sensitive when warmed. The lower chart performs the classic trick that made the law so useful: take the logarithm and the exponential curve straightens into a perfect line, whose slope reads the barrier height straight off. This is not abstract. It is why your refrigerator works — a mere 30°C drop can slow the spoilage reactions inside food by a factor of ten or more. It is why a fever of a few degrees noticeably speeds your body's chemistry, why bread proofs faster on a warm counter, and why the heat-loving enzyme that copies DNA in every PCR test was harvested from a microbe living in a near-boiling hot spring. The biologist's rule of thumb — that rates roughly double for every 10°C — falls straight out of this same curve. Slide the temperature or the barrier and watch the rate leap or crawl: one equation, governing the pace of the chemical world."
+}
