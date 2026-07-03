@@ -2,9 +2,9 @@
 
 # 🧬 OpenDiscover BioLab
 
-### An autonomous in-silico biotechnology laboratory
+### An autonomous in-silico biotechnology laboratory — that anyone can play
 
-**Deterministic simulation engines + AI scientist agents + a citizen-science discovery pipeline — in one reproducible, open platform.**
+**77 deterministic simulation engines + AI scientist agents + a watchable citizen-science game + plain-language help on every dial — in one reproducible, open platform.**
 
 [![CI](https://github.com/Micka420-collab/opendiscover-biolab/actions/workflows/ci.yml/badge.svg)](https://github.com/Micka420-collab/opendiscover-biolab/actions)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
@@ -18,15 +18,53 @@
 
 ## What this is
 
-OpenDiscover BioLab is a **virtual biotechnology laboratory** you can run in a browser and drive with AI. It has three layers that build on each other:
+OpenDiscover BioLab is a **virtual biotechnology laboratory** you can run in a browser, play like a game, and drive with AI. It has four layers that build on each other:
 
-1. **A library of deterministic simulation engines** covering the breadth of computational biology — molecular biology, protein biophysics, systems biology, population genetics, bioprocess engineering, epidemiology, and drug discovery. Every engine is a *pure function*: no clock, no network, no unseeded randomness. Same inputs → same outputs → same content hash, on every machine.
+1. **A library of 77 deterministic simulation engines** covering the breadth of computational biology — molecular biology, protein biophysics, systems biology, population genetics, neuroscience, ecology, bioprocess engineering, biochemistry, epidemiology, drug discovery, and structural biology. Every engine is a *pure function*: no clock, no network, no unseeded randomness. Same inputs → same outputs → same content hash, on every machine.
 
-2. **Autonomous AI scientist agents** that use those engines as instruments. Given a research goal, an agent forms a falsifiable hypothesis, designs and runs parameter-swept experiments, reads the numbers, iterates, and writes up an honest report — journalling every step in a transparent lab notebook.
+2. **A game anyone can play — and watch.** [**AURORA**](./src/app/aurora) turns the deterministic lab into a spectator-friendly discovery game: tune one dial to find a hidden answer on a fully-visible fitness landscape, lock it in with a real re-run of the engine, and light a beacon on a shared globe. Every engine also has a one-a-day [challenge](#play-share--stream), and every complex dial has a **plain-language "?" card** that explains — with no biology or maths background — what it is, why it matters, and what to try. Science made approachable, so *anyone* can take part.
 
-3. **A citizen-science discovery pipeline** (the original OpenDiscover engine) that screens, scores, and vulgarizes promising results into shareable Discovery Cards, with peer review, canary replication, and open archival.
+3. **Autonomous AI scientist agents** that use those engines as instruments. Given a research goal, an agent forms a falsifiable hypothesis, designs and runs parameter-swept experiments, reads the numbers, iterates, and writes up an honest report — journalling every step in a transparent lab notebook.
+
+4. **A citizen-science discovery pipeline** (the original OpenDiscover engine) that screens, scores, and vulgarizes promising results into shareable Discovery Cards, with peer review, canary replication, and open archival.
 
 > **The core idea:** because every experiment is deterministic and hashed, an AI-run experiment is exactly as reproducible and trustworthy as a human-run one. That is what lets a *swarm* of autonomous agents systematically explore biology at a throughput no wet lab can match — without giving up rigor.
+
+---
+
+## 🌍 AURORA — the game
+
+**Route: [`/aurora`](./src/app/aurora)** · in the nav as **“Play”**
+
+AURORA is the front door for everyone who *isn't* here to read Zod schemas. It's a spectator-first
+citizen-science game built entirely on the deterministic engines — as fun to **watch** as to **play**.
+
+- **One dial, one hidden answer.** Each round shows a fully-visible *fitness landscape* on a live
+  canvas (the SignalScope). You slide a single control to hunt the target band — no hidden
+  information, pure skill and intuition.
+- **Locking in is a real experiment.** When you lock, AURORA re-runs the actual engine and checks
+  the result against the bar — never an interpolation, never a fake. A win is a genuine, hashable
+  discovery.
+- **Light up the Earth.** Every solved challenge lights a beacon on a 2D dot-globe; the planet's
+  progress is the honest fraction of the challenge pool that's been cracked. An `?lit=` permalink
+  can pre-light the globe cosmetically for a stream, but it can never fake a score.
+- **Three ways to play.** A **daily 5-round gauntlet** (date-seeded, identical for everyone on
+  Earth), an endless mode, and a hands-free **Watch mode** that auto-solves the whole pool forever —
+  perfect for a background stream.
+- **Built for streamers.** A chrome-less [`/aurora/overlay`](./src/app/aurora/overlay) route is a
+  ready-made OBS/Twitch browser source.
+
+100% client-deterministic, reduced-motion-friendly, keyboard- and screen-reader-accessible. No R3F,
+no game engine — just canvas, SVG and CSS.
+
+## 🫶 Plain-language help, everywhere
+
+Citizen science only works if a stranger can understand what they're doing. So **every engine and
+every challenge carries a “?” card** written for someone with *no* biology or maths background: what
+this is, why it matters for people and the planet, and what to try — with the technical term available
+on demand and never a bare equation in the friendly copy. A test enforces that the plain-language copy
+stays jargon-free, and another enforces that **every** engine and challenge has a card, so approachability
+can't silently rot.
 
 ---
 
@@ -46,6 +84,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `hp-folding` | HP lattice-model folding via seeded Monte-Carlo energy minimization |
 | | `mass-spec` | Peptide MS/MS b/y fragment-ion prediction; residue masses derived from CODATA atomic masses |
 | | `two-state-folding` | Thermodynamic folding stability curve: ΔG(T), Tm, fraction folded, heat & cold denaturation |
+| | `protein-charge` | Net charge vs pH from ionizable groups (Henderson–Hasselbalch); isoelectric point (pI), titration curve |
 | ⚙️ Systems biology | `enzyme-kinetics` | Michaelis–Menten, competitive/non-competitive inhibition, Hill cooperativity |
 | | `grn` | Gene regulatory networks: repressilator, toggle switch, feed-forward loops |
 | | `gillespie` | Exact stochastic simulation (SSA) of the chemical master equation |
@@ -53,6 +92,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `branching-growth` | Galton-Watson branching process: cell-population growth & extinction probability |
 | | `metabolic-pathway` | Kinetic linear pathway (Michaelis-Menten steps, ODE) — flux uniformity & bottlenecks |
 | | `kuramoto` | Kuramoto synchronization: coupled phase oscillators, order parameter, critical coupling |
+| | `gompertz-tumor` | Gompertz tumour growth: lop-sided sigmoid, fastest at K/e, inflection size & time |
 | 🌱 Population genetics | `wright-fisher` | Genetic drift, selection, mutation, fixation probability |
 | | `phylogenetics` | Distance models (JC/K2P), Neighbor-Joining & UPGMA trees, Newick output |
 | | `breeding` | Mendelian crossing: Punnett distributions, 3:1 / 9:3:3:1, dominance modes (loci always unlinked; `recombinantGametes` is a standalone helper, not wired into the cross) |
@@ -61,12 +101,15 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `luria-delbruck` | The 1943 fluctuation test: variance ≫ mean "jackpots", p0 mutation-rate estimate m = −ln(p0) |
 | | `ewens-sampling` | Ewens sampling formula: E[K]=Σθ/(θ+i), homozygosity 1/(1+θ), allele-frequency spectrum |
 | | `coalescent` | Kingman coalescent tree: E[T_MRCA]=2(1−1/n), tree length, Watterson's θ̂_W, E[S]=θ·aₙ |
+| | `recombination-map` | Linkage mapping: Haldane/Kosambi map functions, recombination-fraction saturation to ½ |
 | 🧠 Neuroscience | `hodgkin-huxley` | The 1952 action-potential model (Nobel Prize, 1963): spike threshold, repetitive firing |
 | | `fitzhugh-nagumo` | 2-variable excitable neuron: rest/limit-cycle, Hopf bifurcation, (v,w) phase portrait |
 | | `wilson-cowan` | Excitatory/inhibitory neural populations: fixed points vs limit-cycle brain rhythms |
 | | `izhikevich` | Spiking-neuron model: 4 params → tonic/bursting firing, spike-rate & ISI stats |
 | | `resting-potential` | Nernst & Goldman–Hodgkin–Katz: resting V_m from ion gradients + permeabilities, [K]o depolarization |
+| | `cable-length-constant` | Passive cable equation: length constant λ=√(d·Rm/4Ri), exponential voltage decay, effective reach |
 | 🏭 Bioprocess | `bioreactor` | Monod growth: batch, fed-batch, and chemostat/CSTR dynamics |
+| | `microbial-growth` | Logistic batch growth: lag/exponential/stationary, time-to-90%, doubling time |
 | | `oxygen-transfer` | Gas–liquid O₂ transfer: kLa, dissolved-O₂ dynamics, oxygen limitation, critical kLa |
 | | `substrate-inhibition` | Haldane kinetics: growth peaks then falls as substrate turns toxic; S_opt=√(Ks·Ki), operating window |
 | 🧪 Biochemistry | `beer-lambert` | Two-component spectrophotometry: additive Beer–Lambert spectra + least-squares un-mixing |
@@ -74,20 +117,30 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `diffusion` | Brownian motion & Stokes–Einstein D=kB·T/6πηr: RMS displacement, cell-crossing time, hydrodynamic radius |
 | | `van-deemter` | Chromatography efficiency H=A+B/u+C·u: optimal velocity √(B/C), min plate height, theoretical plates |
 | | `osmotic-pressure` | van't Hoff colligative properties: Π=iMRT, osmolarity, tonicity (hypo/iso/hyper), ΔTf, osmometry MW |
+| | `enzyme-thermal` | Enzyme temperature optimum: Arrhenius speed-up × thermal denaturation → activity bell curve, Q10 |
+| | `oxygen-hemoglobin` | Hill O₂–haemoglobin binding: sigmoidal saturation, P₅₀, Bohr shift, O₂ delivered to tissue |
+| | `gibbs-equilibrium` | Gibbs free energy: ΔG=ΔH−TΔS, ΔG=ΔG°+RT·lnQ, equilibrium constant, spontaneity |
+| | `radioactive-decay` | First-order decay: N=N₀e^(−λt), half-life, mean lifetime, carbon-dating age |
+| | `membrane-permeation` | Fick two-compartment crossing: permeability P=D·K/L, flux, half-equilibration time |
+| | `poiseuille-flow` | Hagen–Poiseuille laminar flow: Q∝r⁴, resistance, wall shear, Reynolds, parabolic profile |
 | 🦠 Epidemiology | `compartmental` | SIR / SEIR / SIRD, R₀, herd-immunity threshold, final epidemic size |
 | | `sis` | SIS (no immunity): endemic prevalence i* = 1 − 1/R₀, disease-free threshold |
 | | `sir-endemic` | SIR with demography: damped recurrent epidemics to S* = 1/R₀, I* = μ(R₀−1)/β |
 | | `reed-frost` | Discrete chain-binomial epidemic: I_{t+1}=S_t(1−(1−p)^{I_t}), attack rate, final size z=1−e^(−R₀z) |
 | | `vaccination` | Herd-immunity threshold v_c=(1−1/R₀)/ε, effective R, post-vaccination final size, coverage-response curve |
+| | `diagnostic-accuracy` | Bayes test predictive value: PPV/NPV vs prevalence, the base-rate fallacy, false-discovery rate |
 | 💊 Drug discovery | `admet` | Lipinski/Veber/Ghose rules, QED drug-likeness, SMILES property parsing |
 | | `docking` | Geometric rigid-body docking — Lennard-Jones pose scoring & ranking |
 | | `dose-response` | Hill dose–response, IC₅₀/EC₅₀ fitting, drug-combination indices |
 | | `pk-two-compartment` | IV-bolus pharmacokinetics: bi-exponential plasma curve, α/β half-lives, AUC=Dose/CL |
 | | `pk-oral-absorption` | Oral 1-compartment PK: Bateman curve, Cmax/Tmax, flip-flop kinetics, ka=ke limit |
+| | `saturation-binding` | Receptor binding: fractional occupancy [L]/(Kd+[L]), Bmax, tight vs loose binders |
+| | `therapeutic-window` | Efficacy vs toxicity dose–response: therapeutic index TD50/ED50, net benefit, the safe dose |
 | 🔬 Structural | `rna-fold` | RNA secondary structure via the Nussinov DP algorithm |
 | | `worm-like-chain` | DNA force–extension (Marko–Siggia): entropic elasticity, low-force stiffness, tweezers curve |
 | | `dna-melting` | DNA duplex melting (two-state van't Hoff): sigmoidal curve, concentration-dependent Tm, transition width |
 | | `fret` | Förster resonance energy transfer: E=1/(1+(r/R0)⁶) molecular ruler, 90/10% range, distance sensitivity |
+| | `stern-volmer` | Fluorescence quenching: F₀/F=1+Ksv·[Q], quencher accessibility, half-quench point |
 | 🐺 Ecology | `lotka-volterra` | Predator–prey oscillations: conserved quantity, coexistence equilibrium, phase portrait |
 | | `logistic-map` | Robert May's map: fixed point → period-doubling → chaos, Lyapunov exponent, bifurcation diagram |
 | | `rosenzweig-macarthur` | Realistic predator–prey (logistic prey, Holling II): coexistence equilibrium, paradox of enrichment |
@@ -96,17 +149,19 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `chemostat-competition` | Two species, one substrate: the R* rule & competitive exclusion (lower R* wins) |
 | | `levins-metapopulation` | Patch occupancy p* = h − e/c and the habitat-destruction extinction threshold |
 | | `replicator-dynamics` | Evolutionary game theory: classifies any 2×2 game (Hawk–Dove, Stag Hunt, PD) and finds the ESS |
+| | `allometric-scaling` | Kleiber's law: metabolic rate ∝ mass^¾, lifespan & heart-rate scaling, ~billion heartbeats |
+| | `photosynthesis-light` | Leaf light response: gross/net photosynthesis, light compensation point, net primary productivity |
 
-> Full catalog with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
+> Full catalog (all 77 engines) with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
 > Run any engine interactively — a param form generated from its Zod schema, Vega-Lite result
 > charts, no account needed — at `/lab`.
 
 ---
 
-## Streamers & creators
+## Play, share & stream
 
 Because every run is deterministic, **any experiment is already a shareable link** — the whole
-lab is built to be streamed, shared, and remixed with no account and no infrastructure.
+lab is built to be played, streamed, shared, and remixed with no account and no infrastructure.
 
 - **🔗 Share & remix permalinks.** Every engine playground has a **Share / Remix** button that packs
   the exact engine + parameters into a `?x=` link. Whoever opens it reproduces your run
@@ -203,7 +258,7 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 60 engines + the lab layer: **1120+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job).
+- All 77 engines + the lab + AURORA game layer: **1300+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job). Every engine is guarded by a reproducibility snapshot (pins each example's metric values), a schema-robustness sweep (no NaN/Infinity for any valid extreme input), and a determinism guard (no `Math.random`/`Date`/locale-dependent formatting in engine source). The AURORA pure libs are tested against the *real* engines — the auto-tuner clears the bar for every pooled challenge, so the game is provably winnable.
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.
