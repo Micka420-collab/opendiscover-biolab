@@ -1027,6 +1027,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 2,
     hint: 'Q₁₀ rises steadily with the barrier height. By Arrhenius, a Q₁₀ of 2 at 25°C corresponds to an activation energy of about 53 kJ/mol — the value behind the classic biological rule of thumb.',
   },
+  {
+    id: 'breed-a-bigger-crop',
+    engine: 'breeders-equation',
+    title: 'Breed a bigger crop',
+    brief:
+      'Selective breeding works by keeping the best individuals as parents each generation. Only the heritable part of your choice carries over, so progress is steady, not instant. Choose how far above average your selected parents are (the selection differential) to lift the average fruit size from 100 to 150 g over 10 generations.',
+    baseParams: { initialMean: 100, heritability: 0.5, generations: 10, outputPoints: 100 },
+    knob: {
+      param: 'selectionDifferential',
+      label: 'Selection differential S',
+      min: 0,
+      max: 30,
+      step: 0.5,
+      default: 4,
+      unit: 'g',
+    },
+    metricKey: 'finalMean',
+    metricLabel: 'Final average size',
+    unit: 'g',
+    goal: 'target',
+    target: 150,
+    hint: 'Breeder’s equation: each generation the mean shifts by h²·S. Over 10 generations you gain 10·0.5·S = 5·S. Lifting 100 → 150 g needs a gain of 50, so S = 10 g.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

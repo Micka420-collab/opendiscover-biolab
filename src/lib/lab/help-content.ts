@@ -864,6 +864,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'breed-a-bigger-crop': {
+    plainWhat:
+      'You are selectively breeding a crop for bigger fruit. Each generation you keep the biggest plants as parents, and the whole crop drifts a little bigger. You set how picky you are — how far above average your chosen parents are — to reach a target average size over ten generations.',
+    plainWhy:
+      'This is exactly how humans turned wild plants into today’s food crops and wild animals into farm breeds, over many generations. Understanding it shows both the power and the patience of breeding — and why heritable traits change while luck-driven ones do not.',
+    plainHow:
+      'Only the inherited part of your choice carries over, so each generation the average shifts by a fixed step. Pick parents further above average (a bigger selection differential) and each step is bigger. Turn it up until ten generations of steady gains add up to the target size.',
+    terms: [
+      {
+        term: 'selection differential',
+        meaning: 'how far above the average your chosen parents are — how picky you are being.',
+      },
+      {
+        term: 'heritability',
+        meaning:
+          'the share of a trait that is passed down, which sets how much of your choice carries over.',
+      },
+      {
+        term: 'generations',
+        meaning: 'rounds of breeding — the gains add up one generation at a time.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

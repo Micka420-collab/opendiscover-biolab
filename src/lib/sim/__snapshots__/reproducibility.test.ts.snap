@@ -89,6 +89,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "supercritical branching process (mean offspring m=1.200): theoretical extinction probability 0.500, observed 0.000 across 300 replicates.",
   },
+  "breeders-equation": {
+    "metrics": {
+      "finalMean": 110,
+      "realizedHeritability": 0.5,
+      "responsePerGeneration": 1,
+      "totalResponse": 10,
+    },
+    "summary": "Breeder's equation: with h²=0.5 and a selection differential of 2, the mean shifts 1.00 per generation. Over 10 generations it climbs from 100 to 110.0 (total response 10.0).",
+  },
   "breeding": {
     "metrics": {
       "genotypeClasses": 9,

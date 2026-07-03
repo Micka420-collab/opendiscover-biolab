@@ -1,0 +1,15 @@
+{
+  "slug": "how-we-bred-the-modern-crop",
+  "title": "How we bred the modern crop",
+  "engine": "breeders-equation",
+  "params": {
+    "initialMean": 100,
+    "heritability": 0.5,
+    "selectionDifferential": 5,
+    "generations": 30,
+    "outputPoints": 100
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Every ear of corn, every dairy cow, every fat orchard peach is the end of a line like this one — a straight, patient climb drawn by a single equation the breeders call R = h²·S. The recipe never changes: each generation, keep as parents the individuals that sit furthest above the average (that gap is S, the selection differential), and the population's average shifts in that direction by R. The catch, and the whole reason breeding takes generations rather than an afternoon, is the h² term: only the genuinely inherited fraction of a trait passes to the offspring. Choose parents that are twice as good and, if half the variation is heritable, you bank half the gain — every generation, compounding into the steady upward line you see here. It is why a highly heritable trait like body size or seed weight yields quickly to selection while a barely-heritable one like disease resistance or lifetime fertility crawls, no matter how carefully you choose. Ten thousand years of this quiet arithmetic turned a scrappy Mexican grass into maize and a wary wolf into a spaniel. And the same equation runs in reverse in the wild: it sets the speed limit on how fast a species can adapt to a warming climate or a new predator — often, worryingly, slower than the world is changing. Raise the heritability or pick bolder parents and watch the line steepen; the destination is never in doubt, only how many generations it takes to arrive."
+}

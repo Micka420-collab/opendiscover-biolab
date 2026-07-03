@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **78 deterministic simulation engines** across
+The OpenDiscover BioLab ships **79 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -21,7 +21,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`protein-charge`](#protein-charge) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential) · [`cable-length-constant`](#cable-length-constant)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
-- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
+- **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeders-equation`](#breeders-equation) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling) · [`photosynthesis-light`](#photosynthesis-light)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`arrhenius-rate`](#arrhenius-rate) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
@@ -1304,6 +1304,40 @@ How genetic distance turns into recombination frequency — the basis of every g
 ```
 
 _Run it: `POST /api/lab/run { "engine": "recombination-map", "params": … }` or interactively at `/lab/recombination-map`._
+
+---
+
+### `breeders-equation` — Breeder's Equation (Response to Selection)
+
+How fast a trait shifts under selective breeding, from the breeder's equation R=h²·S. Each generation the selected parents exceed the population mean by the selection differential S, and the mean responds by R=h²·S, where the narrow-sense heritability h² is the additively-heritable fraction that actually carries over (so R≤S). With constant selection the mean climbs linearly, M(t)=M₀+t·h²·S. Reports the response per generation, the total response, the final mean and the realized heritability, plus the trait-mean trajectory. Shows why highly heritable traits respond fast to selection while barely-heritable ones crawl. Closed-form, linear and deterministic.
+
+**References**
+- Lush, J.L. (1937) Animal Breeding Plans.
+- Falconer, D.S. & Mackay, T.F.C. (1996) Introduction to Quantitative Genetics, 4th ed.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `initialMean` | number | `100` | ≥ -1000000000, ≤ 1000000000 |  |
+| `heritability` | number | `0.5` | ≥ 0, ≤ 1 |  |
+| `selectionDifferential` | number | `2` | ≥ 0, ≤ 1000000 |  |
+| `generations` | integer | `10` | ≥ 1, ≤ 1000000 |  |
+| `outputPoints` | integer | `100` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "initialMean": 100,
+  "heritability": 0.5,
+  "selectionDifferential": 2,
+  "generations": 10,
+  "outputPoints": 100
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "breeders-equation", "params": … }` or interactively at `/lab/breeders-equation`._
 
 ---
 

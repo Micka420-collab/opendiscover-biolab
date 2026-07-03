@@ -1893,6 +1893,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'breeders-equation': {
+    plainWhat:
+      'This shows how selective breeding gradually changes a living thing — bigger tomatoes, faster horses, friendlier dogs. Each generation you keep the best individuals as parents, and the whole population shifts a little in that direction. It works out how much it shifts each generation and where it ends up.',
+    plainWhy:
+      'Almost every crop and farm animal you know was shaped this way, over many generations. The key insight is that only the part of a trait that is genuinely inherited carries over to the offspring — so progress is steady rather than instant, and choosing more extreme parents speeds it up. It is the same maths behind how quickly wildlife can adapt to a changing world.',
+    plainHow:
+      'Two dials matter: how strongly a trait is inherited, and how extreme the parents you pick are. Turn either up and the trait shifts faster each generation. Watch the average climb in a straight line over the generations — steeper when the trait is more heritable or your selection is bolder.',
+    terms: [
+      {
+        term: 'heritability',
+        meaning:
+          'how much of a trait is passed from parent to child, versus set by luck or surroundings.',
+      },
+      {
+        term: 'selection differential',
+        meaning: 'how far above the average your chosen parents are — how picky you are.',
+      },
+      {
+        term: 'response to selection',
+        meaning: 'how much the population’s average actually shifts in the next generation.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */
