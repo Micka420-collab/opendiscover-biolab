@@ -1,4 +1,6 @@
 import { Badge } from '@/components/ui/badge';
+import { HelpCardBody, HelpTip } from '@/components/ui/help-tip';
+import { helpForEngine } from '@/lib/lab/engine-help';
 import { SHARE_PARAM, decodeExperiment } from '@/lib/lab/share';
 import { describeEngine, getEngine } from '@/lib/sim';
 import { notFound } from 'next/navigation';
@@ -43,6 +45,7 @@ export default async function EnginePage({
   if (!spec) notFound();
 
   const engine = describeEngine(spec);
+  const help = helpForEngine(slug);
 
   // A shared/remixed experiment permalink (`?x=<token>`) seeds the form with the
   // exact params someone else ran — but only if the token targets this engine.
@@ -63,8 +66,23 @@ export default async function EnginePage({
             </Badge>
           ))}
         </div>
-        <h1 className="text-3xl font-bold">{engine.title}</h1>
-        <p className="text-muted-foreground max-w-3xl whitespace-pre-line">{engine.description}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-3xl font-bold">{engine.title}</h1>
+          {help && (
+            <HelpTip title={engine.title}>
+              <HelpCardBody card={help} />
+            </HelpTip>
+          )}
+        </div>
+        {help && (
+          <p className="max-w-3xl text-foreground">
+            <span className="text-muted-foreground">In plain words — </span>
+            {help.plainWhat}
+          </p>
+        )}
+        <p className="text-muted-foreground max-w-3xl whitespace-pre-line text-sm">
+          {engine.description}
+        </p>
         {engine.references.length > 0 && (
           <ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
             {engine.references.map((r) => (
