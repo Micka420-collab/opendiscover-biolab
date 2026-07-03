@@ -73,7 +73,7 @@ export function run(rawParams: Partial<AllometricScalingParams> = {}): SimResult
       label: 'Metabolic rate per kg',
       value: massSpecific,
       unit: 'W/kg',
-      note: '∝ M^(b−1): bigger burns slower',
+      note: `∝ M^(b−1): bigger burns ${b < 1 ? 'slower' : b > 1 ? 'faster' : 'the same'}`,
     },
     {
       key: 'heartRateRelative',
@@ -85,7 +85,7 @@ export function run(rawParams: Partial<AllometricScalingParams> = {}): SimResult
       key: 'lifespanRelative',
       label: 'Lifespan (vs 1 kg)',
       value: lifespanRel,
-      note: '∝ M^(1−b): bigger lives longer',
+      note: `∝ M^(1−b): bigger lives ${b < 1 ? 'longer' : b > 1 ? 'shorter' : 'the same'}`,
     },
     {
       key: 'heartbeatsPerLifeRelative',

@@ -40,6 +40,14 @@ describe('recombination-map (linkage mapping)', () => {
     expect(metric(run({ mapDistanceCm: 100, mapFunction: 'morgan' }), 'linked')).toBe(0);
   });
 
+  it('under-report stays consistent (≤ ½) past 50 cM: capped naive − under-report = observed r', () => {
+    const r = run({ mapDistanceCm: 100, mapFunction: 'haldane' });
+    const cappedNaive = Math.min(0.5, 100 / 100); // display caps the naive r at ½
+    const under = metric(r, 'underReport');
+    expect(under).toBeLessThanOrEqual(0.5 + 1e-9);
+    expect(cappedNaive - under).toBeCloseTo(metric(r, 'recombinationFrequency'), 9);
+  });
+
   it('rejects denormal inputs and stays finite at the schema bounds', () => {
     expect(() => run({ distanceMaxCm: 5e-324 })).toThrow();
     const r = run({ mapDistanceCm: 1000, mapFunction: 'kosambi', distanceMaxCm: 1000 });

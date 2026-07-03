@@ -9,8 +9,9 @@
  *     activity(T) = e^(−Ea/RT) · fFolded(T),   fFolded(T) = 1 / (1 + e^(−ΔG(T)/RT)),
  *
  * with the two-state stability ΔG(T) = ΔHd·(1 − T/Tm). Activity climbs on the Arrhenius side,
- * peaks at the optimum temperature T_opt (which sits BELOW the melting temperature Tm, because
- * unfolding starts eating into activity before half the protein has melted), then collapses.
+ * peaks at the optimum temperature T_opt — which in the usual biological regime (unfolding
+ * enthalpy ΔHd ≳ 2·Ea) sits below the melting temperature Tm, because unfolding starts eating
+ * into activity before half the protein has melted — then collapses.
  * Reports T_opt, the melting temperature, the relative activity at a chosen temperature, and
  * the Q10 (how many times faster the underlying chemistry runs per 10 °C), plus the activity
  * curve normalised to its peak.
@@ -71,23 +72,33 @@ export function run(rawParams: Partial<EnzymeThermalParams> = {}): SimResult {
   const p = paramsSchema.parse(rawParams);
   const { activationEnergy: ea, denaturationEnthalpy: dHd, meltingTemp: tm } = p;
 
-  // Optimum temperature: argmax of activity over a fine internal grid (independent of the
-  // plot resolution). Range is the plotted window, ordered so lo <= hi.
   const lo = Math.min(p.tMinC, p.tMaxC);
   const hi = Math.max(p.tMinC, p.tMaxC);
+  // Optimum temperature: argmax of activity over a fine internal grid (independent of the
+  // plot resolution), searched over the plot window WIDENED to include the reporting
+  // temperature — so `peak` is a true upper bound and the relative activity never exceeds 1.
+  const searchLo = Math.min(lo, p.temperatureC);
+  const searchHi = Math.max(hi, p.temperatureC);
   const gridN = 721;
-  let optT = lo;
+  let optT = searchLo;
   let optA = Number.NEGATIVE_INFINITY;
   for (let i = 0; i < gridN; i++) {
-    const t = lo + ((hi - lo) * i) / (gridN - 1);
+    const t = searchLo + ((searchHi - searchLo) * i) / (gridN - 1);
     const a = activity(t, ea, dHd, tm);
     if (a > optA) {
       optA = a;
       optT = t;
     }
   }
+  // Cover the reporting temperature exactly (the grid may straddle it), so relativeAtT ≤ 1.
+  const aAtReport = activity(p.temperatureC, ea, dHd, tm);
+  if (aAtReport > optA) {
+    optA = aAtReport;
+    optT = p.temperatureC;
+  }
   const peak = optA > 0 ? optA : 1;
-  const relativeAtT = activity(p.temperatureC, ea, dHd, tm) / peak;
+  const relativeAtT = aAtReport / peak;
+  const margin = tm - optT; // Tm − T_opt; positive in the usual regime, can be ≤ 0 if ΔHd is low
 
   const metrics: Metric[] = [
     {
@@ -95,7 +106,7 @@ export function run(rawParams: Partial<EnzymeThermalParams> = {}): SimResult {
       label: 'Optimal temperature T_opt',
       value: optT,
       unit: '°C',
-      note: 'where activity peaks (below Tm)',
+      note: 'where activity peaks',
     },
     {
       key: 'meltingTemp',
@@ -119,9 +130,9 @@ export function run(rawParams: Partial<EnzymeThermalParams> = {}): SimResult {
     {
       key: 'thermalMargin',
       label: 'Tm − T_opt',
-      value: tm - optT,
+      value: margin,
       unit: '°C',
-      note: 'unfolding bites before Tm',
+      note: 'positive when unfolding bites before Tm (ΔHd > 2·Ea)',
     },
   ];
 
@@ -138,7 +149,7 @@ export function run(rawParams: Partial<EnzymeThermalParams> = {}): SimResult {
 
   return {
     engine: 'enzyme-thermal',
-    summary: `Enzyme activity peaks at T_opt=${optT.toFixed(1)}°C (Tm=${tm}°C, so ${(tm - optT).toFixed(1)}°C below melting); at ${p.temperatureC}°C it runs at ${(100 * relativeAtT).toFixed(0)}% of peak, with Q10≈${q10(p.temperatureC, ea).toFixed(2)}.`,
+    summary: `Enzyme activity peaks at T_opt=${optT.toFixed(1)}°C (Tm=${tm}°C, so ${Math.abs(margin).toFixed(1)}°C ${margin >= 0 ? 'below' : 'above'} melting); at ${p.temperatureC}°C it runs at ${(100 * relativeAtT).toFixed(0)}% of peak, with Q10≈${q10(p.temperatureC, ea).toFixed(2)}.`,
     metrics,
     series,
     detail: { optimalTemp: optT, meltingTemp: tm, relativeActivityAtT: relativeAtT },
@@ -152,7 +163,7 @@ export const spec: EngineSpec<EnzymeThermalParams> = {
   domain: 'biochemistry',
   version: '1.0.0',
   description:
-    "An enzyme's bell-shaped activity-versus-temperature curve, from two opposing effects: chemistry speeds up with heat (Arrhenius, e^(−Ea/RT)) while the enzyme unfolds and dies once it gets too hot (two-state denaturation with folded fraction 1/(1+e^(−ΔG/RT)), ΔG=ΔHd(1−T/Tm)). Their product peaks at the optimal temperature T_opt, which sits BELOW the melting temperature Tm because unfolding erodes activity before half the protein has melted. Reports T_opt, Tm, the relative activity at a chosen temperature, the Q10 (fold rate increase per 10°C), and the margin Tm−T_opt, plus the peak-normalised activity curve. Closed-form and deterministic.",
+    "An enzyme's bell-shaped activity-versus-temperature curve, from two opposing effects: chemistry speeds up with heat (Arrhenius, e^(−Ea/RT)) while the enzyme unfolds and dies once it gets too hot (two-state denaturation with folded fraction 1/(1+e^(−ΔG/RT)), ΔG=ΔHd(1−T/Tm)). Their product peaks at the optimal temperature T_opt, which in the usual regime (ΔHd ≳ 2·Ea) sits below the melting temperature Tm because unfolding erodes activity before half the protein has melted. Reports T_opt, Tm, the relative activity at a chosen temperature, the Q10 (fold rate increase per 10°C), and the margin Tm−T_opt, plus the peak-normalised activity curve. Closed-form and deterministic.",
   references: [
     'Arrhenius, S. (1889) Über die Reaktionsgeschwindigkeit bei der Inversion von Rohrzucker durch Säuren. Z. Phys. Chem. 4:226-248.',
     'Daniel, R.M. & Danson, M.J. (2010) A new understanding of how temperature affects enzyme activity. Trends Biochem. Sci. 35:584-591.',

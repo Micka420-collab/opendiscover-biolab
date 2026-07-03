@@ -63,7 +63,9 @@ export function run(rawParams: Partial<RecombinationMapParams> = {}): SimResult 
   const naiveR = p.mapDistanceCm / 100; // Morgan/additive expectation
   const geneticDistanceMorgans = p.mapDistanceCm / 100;
   const linked = r < 0.5 - 1e-9; // r → ½ means effectively unlinked (independent assortment)
-  const underReport = Math.max(0, naiveR - r); // how much r hides the true distance
+  // How much the observed r hides the true distance — using the SAME capped naive value the
+  // metric/summary display, so naiveShown − underReport reconstructs the observed r (bounded ½).
+  const underReport = Math.max(0, Math.min(0.5, naiveR) - r);
 
   const metrics: Metric[] = [
     {

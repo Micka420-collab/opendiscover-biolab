@@ -34,6 +34,17 @@ describe('enzyme-thermal (temperature optimum)', () => {
     expect(metric(r, 'q10')).toBeGreaterThan(1); // heat speeds chemistry up
   });
 
+  it('relative activity never exceeds 1, even when the reporting temperature is outside the plot window', () => {
+    const r = run({ tMinC: 0, tMaxC: 40, temperatureC: 50, denaturationEnthalpy: 400 });
+    expect(metric(r, 'relativeActivityAtT')).toBeGreaterThan(0);
+    expect(metric(r, 'relativeActivityAtT')).toBeLessThanOrEqual(1 + 1e-9);
+  });
+
+  it('the optimum can rise to/above Tm (margin ≤ 0) when denaturation is shallow (ΔHd < 2·Ea)', () => {
+    const r = run({ activationEnergy: 200, denaturationEnthalpy: 300, meltingTemp: 55 });
+    expect(metric(r, 'thermalMargin')).toBeLessThanOrEqual(0); // Tm − T_opt ≤ 0
+  });
+
   it('rejects denormal inputs and stays finite at the schema bounds', () => {
     expect(() => run({ activationEnergy: 5e-324 })).toThrow();
     expect(() => run({ denaturationEnthalpy: 1e-160 })).toThrow();
