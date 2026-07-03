@@ -851,6 +851,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'The two sides close half their gap every ln2/(2·P) seconds, and with these settings the permeability P equals K. A half-time of 0.5 s needs 2·K = ln2/0.5, i.e. K ≈ 0.69 — a moderately lipophilic drug.',
   },
+  {
+    id: 'reopen-a-narrowed-artery',
+    engine: 'poiseuille-flow',
+    title: 'Reopen a narrowed artery',
+    brief:
+      'A cholesterol plaque has narrowed an artery, and blood flow falls with the FOURTH power of the radius — so even a small narrowing chokes it dramatically. Widen the vessel (as a stent would) until the flow is restored to a healthy 10 mL/s.',
+    baseParams: { length: 5, pressureDrop: 500, viscosity: 3.5e-3, density: 1060 },
+    knob: {
+      param: 'radius',
+      label: 'Vessel radius',
+      min: 0.5,
+      max: 3,
+      step: 0.01,
+      default: 1,
+      unit: 'mm',
+    },
+    metricKey: 'flowRate',
+    metricLabel: 'Blood flow rate',
+    unit: 'mL/s',
+    goal: 'target',
+    target: 10,
+    hint: 'Flow rises as the fourth power of radius (Q ∝ r⁴), so a little widening buys a lot of flow. Reaching 10 mL/s needs a radius near 1.73 mm — a 16-fold flow swing hides inside a 2-fold change in radius.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

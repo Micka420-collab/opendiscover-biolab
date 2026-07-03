@@ -20,6 +20,7 @@ import { spec as gibbsEquilibrium } from './biochem/gibbs-equilibrium';
 import { spec as membranePermeation } from './biochem/membrane-permeation';
 import { spec as osmoticPressure } from './biochem/osmotic-pressure';
 import { spec as oxygenHemoglobin } from './biochem/oxygen-hemoglobin';
+import { spec as poiseuilleFlow } from './biochem/poiseuille-flow';
 import { spec as radioactiveDecay } from './biochem/radioactive-decay';
 import { spec as vanDeemter } from './biochem/van-deemter';
 import { spec as bioreactor } from './bioprocess/bioreactor';
@@ -142,6 +143,7 @@ export const engines: AnyEngine[] = [
   gibbsEquilibrium,
   radioactiveDecay,
   membranePermeation,
+  poiseuilleFlow,
   compartmental,
   sis,
   sirEndemic,

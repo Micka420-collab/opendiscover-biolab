@@ -1706,6 +1706,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'poiseuille-flow': {
+    plainWhat:
+      'This shows how fast a fluid flows through a tube — like blood through a vessel or water through a pipe — for a given push. It works out the flow, how fast the fluid moves across the tube, and the drag on the tube wall, and draws the flow as a smooth bullet-shaped profile: fastest in the middle, still at the edges.',
+    plainWhy:
+      'The surprising part is how strongly the tube width matters: the flow depends on the width raised to the FOURTH power, so a vessel that narrows even a little loses a huge amount of flow. That is exactly what happens when fatty deposits narrow an artery, and it is why widening it a touch — with a stent — can restore so much blood flow. The same rule governs pipes, drips and tiny lab channels.',
+    plainHow:
+      'The width of the tube is by far the biggest lever — nudge it up a little and the flow leaps, because of that fourth-power rule. A stronger push or a shorter, less sticky fluid also helps. Keep an eye on the smoothness check: push too hard and the flow stops being smooth and orderly, and the simple rule no longer applies.',
+    terms: [
+      {
+        term: 'flow rate',
+        meaning: 'how much fluid passes through the tube each second.',
+      },
+      {
+        term: 'wall shear stress',
+        meaning: 'the drag the moving fluid exerts on the tube wall as it slides past.',
+      },
+      {
+        term: 'laminar vs turbulent',
+        meaning:
+          'laminar flow is smooth and layered (the simple rule holds); turbulent flow is churning and messy (it does not).',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

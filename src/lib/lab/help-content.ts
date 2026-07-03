@@ -682,6 +682,30 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'reopen-a-narrowed-artery': {
+    plainWhat:
+      'A fatty deposit has narrowed a blood vessel, throttling the flow. You are widening the vessel — the way a stent does — until the blood flow climbs back to a healthy level.',
+    plainWhy:
+      'This is the heart of what a stent or an angioplasty does. Because flow depends so steeply on how wide the vessel is, even a small narrowing can starve tissue of blood, and even a small widening can bring it dramatically back. It is one of the most common life-saving procedures in medicine.',
+    plainHow:
+      'Widening the vessel helps far more than you would expect: the flow grows with the fourth power of the width, so doubling the width multiplies the flow sixteen-fold. Nudge the width up gently — you will reach the target flow well before the vessel is back to full size.',
+    terms: [
+      {
+        term: 'vessel radius',
+        meaning:
+          'half the width of the blood vessel — the single biggest thing that sets the flow.',
+      },
+      {
+        term: 'flow rate',
+        meaning: 'how much blood passes through the vessel each second.',
+      },
+      {
+        term: 'fourth-power law',
+        meaning:
+          'flow grows with width multiplied by itself four times, so small width changes have huge effects.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

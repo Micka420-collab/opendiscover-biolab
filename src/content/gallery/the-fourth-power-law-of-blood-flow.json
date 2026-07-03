@@ -1,0 +1,16 @@
+{
+  "slug": "the-fourth-power-law-of-blood-flow",
+  "title": "The fourth-power law of blood flow",
+  "engine": "poiseuille-flow",
+  "params": {
+    "radius": 2,
+    "length": 5,
+    "pressureDrop": 500,
+    "viscosity": 3.5e-3,
+    "density": 1060,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Push a fluid gently through a tube and it does not slide along in a single block — it flows fastest down the middle and grinds to a standstill against the walls, tracing the smooth bullet-shaped profile you see here. That much is intuitive. What is not intuitive, and what makes this one of the most consequential little equations in medicine, is how the total flow depends on the tube's width: not in proportion, not even squared, but to the FOURTH power of the radius. Halve the radius and the flow does not halve — it drops to a sixteenth. This is why a partly-blocked artery is so dangerous: a plaque that narrows a vessel by a modest fraction can throttle the blood supply to a trickle, starving the tissue beyond it. It is also why the fix works so well — a stent that reopens the vessel by even a little restores flow out of all proportion to the change in width. The same law sets how hard your heart must pump, why capillaries need that pressure behind them, how a drip delivers fluid, and how engineers size the hair-thin channels of a lab-on-a-chip. Change the radius here and watch the flow rate leap or collapse — the fourth power is a steep, unforgiving curve, and your circulation lives on it every second."
+}

@@ -506,6 +506,18 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Two-compartment IV bolus: Cmax=10.00 mg/L, distributes with t½α=0.37 h then clears with terminal t½β=5.17 h; AUC=20.0 mg·h/L.",
   },
+  "poiseuille-flow": {
+    "metrics": {
+      "flowRate": 17.952,
+      "laminar": 1,
+      "maxVelocity": 285.714,
+      "meanVelocity": 142.857,
+      "resistance": 27852100,
+      "reynoldsNumber": 1730.61,
+      "wallShearStress": 10,
+    },
+    "summary": "Poiseuille flow: Q=18.0 mL/s through a 2 mm × 5 cm tube (Q ∝ r⁴). Peak velocity 286 cm/s at the centre; Reynolds 1.73e+3 → laminar.",
+  },
   "properties": {
     "metrics": {
       "extinction280": 6990,
