@@ -12,6 +12,12 @@
 ![License](https://img.shields.io/badge/code-MIT-green)
 ![Data](https://img.shields.io/badge/data-CC--BY%204.0-orange)
 
+### [🚀 Open the app →](https://opendiscover-biolab.vercel.app)
+
+**[▶ Play AURORA](https://opendiscover-biolab.vercel.app/aurora)** &nbsp;·&nbsp; **[🧪 Open the Lab](https://opendiscover-biolab.vercel.app/lab)** &nbsp;·&nbsp; **[🎯 Daily challenge](https://opendiscover-biolab.vercel.app/challenge)**
+
+*No install, no account — it runs right in your browser.*
+
 </div>
 
 ---
@@ -234,6 +240,12 @@ Deeper dive: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 **Stack:** Next.js 15 (App Router) · React 19 · TypeScript · Drizzle ORM + Postgres/pgvector · Inngest · Vercel AI SDK v6 + AI Gateway · Vercel Sandbox · Better Auth · Upstash Redis (SSE) · Mol* · Vega-Lite · Biome · Vitest · Playwright.
 
 ---
+
+## Get the app
+
+- **Use it now, in your browser — [opendiscover-biolab.vercel.app](https://opendiscover-biolab.vercel.app).** Nothing to install or download: the whole lab, the AURORA game, and the daily challenge run client-side. Any run is a shareable link.
+- **Run it yourself** with the quick start below (clone + `pnpm dev`) — the engines and lab work with zero secrets.
+- **Native desktop app (Windows / macOS):** on the roadmap (a Tauri shell around the same app) — not yet released.
 
 ## Quick start
 
