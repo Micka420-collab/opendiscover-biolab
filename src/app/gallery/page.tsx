@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { galleryByDomain, galleryEntries } from '@/content/gallery';
 import { domainLabel } from '@/lib/sim/domain-labels';
 import Link from 'next/link';
@@ -39,25 +40,25 @@ export default function GalleryPage() {
 
   return (
     <div className="space-y-10">
-      <header className="space-y-2">
-        <div className="text-xs uppercase tracking-widest text-accent font-mono">
-          Curated · reproducible · one-file PRs
-        </div>
-        <h1 className="text-3xl font-bold">Community gallery</h1>
-        <p className="text-muted-foreground max-w-2xl">
-          {galleryEntries.length > 0 && (
-            <span className="text-foreground">
-              {galleryEntries.length} hand-picked runs across {groups.length} fields.{' '}
-            </span>
-          )}
-          Every card opens the <em>exact</em> experiment in the Lab — reproduce it, then tweak a
-          parameter to make it your own. Want yours here? It&apos;s a{' '}
-          <Link href="/lab" className="text-accent hover:underline">
-            one-file pull request
-          </Link>{' '}
-          — see CONTRIBUTING.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Curated · reproducible · one-file PRs"
+        title="Community gallery"
+        intro={
+          <>
+            {galleryEntries.length > 0 && (
+              <span className="text-foreground">
+                {galleryEntries.length} hand-picked runs across {groups.length} fields.{' '}
+              </span>
+            )}
+            Every card opens the <em>exact</em> experiment in the Lab — reproduce it, then tweak a
+            parameter to make it your own. Want yours here? It&apos;s a{' '}
+            <Link href="/lab" className="text-accent hover:underline">
+              one-file pull request
+            </Link>{' '}
+            — see CONTRIBUTING.
+          </>
+        }
+      />
 
       {galleryEntries.length === 0 ? (
         <p className="text-sm text-muted-foreground">

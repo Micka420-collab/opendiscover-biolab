@@ -3,6 +3,7 @@ import { ExplorationProgress } from '@/components/lab/exploration-progress';
 import { SurpriseMe } from '@/components/lab/surprise-me';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { listEngines } from '@/lib/sim';
 import { DOMAIN_LABELS } from '@/lib/sim/domain-labels';
 import Link from 'next/link';
@@ -18,17 +19,17 @@ export default async function LabPage({
   const initialQuery = typeof params.domain === 'string' ? params.domain : '';
   return (
     <div className="space-y-10">
-      <header className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Lab</h1>
-          <p className="text-muted-foreground max-w-2xl">
+      <PageHeader
+        title="Lab"
+        intro={
+          <>
             {listEngines().length} deterministic simulation engines. Pick one to set parameters and
             run it — no account, no database, no secrets. Every run is content-hashed and
             reproducible.
-          </p>
-        </div>
-        <SurpriseMe slugs={listEngines().map((e) => e.slug)} />
-      </header>
+          </>
+        }
+        actions={<SurpriseMe slugs={listEngines().map((e) => e.slug)} />}
+      />
 
       <ExplorationProgress
         catalog={listEngines().map((e) => ({ slug: e.slug, title: e.title, domain: e.domain }))}
