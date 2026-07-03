@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { db, schema } from '@/lib/db';
 import { desc, eq, sql } from 'drizzle-orm';
 import Link from 'next/link';
@@ -53,14 +54,17 @@ export default async function ExperimentsPage() {
 
   return (
     <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold">Experiments</h1>
-        <p className="text-muted-foreground max-w-2xl">
-          Pick a protocol. Each one runs in your browser (or in Vercel Sandbox) on a public dataset
-          slice. Results are deterministic — same input, same output, same hash, verified
-          server-side.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Run a protocol"
+        title="Experiments"
+        intro={
+          <>
+            Pick a protocol. Each one runs in your browser (or in Vercel Sandbox) on a public
+            dataset slice. Results are deterministic — same input, same output, same hash, verified
+            server-side.
+          </>
+        }
+      />
 
       {protocols.length === 0 && (
         <div className="border border-dashed border-border rounded-lg p-8 text-center text-muted-foreground">

@@ -2,6 +2,7 @@ import { DiscoveryFilters } from '@/components/discovery/discovery-filters';
 import { LiveDiscoveryFeed } from '@/components/discovery/live-feed';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { db, schema } from '@/lib/db';
 import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import Link from 'next/link';
@@ -137,13 +138,16 @@ export default async function DiscoveriesPage({
   return (
     <div className="grid lg:grid-cols-[1fr_320px] gap-8">
       <div className="space-y-8">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold">Discoveries</h1>
-          <p className="text-muted-foreground">
-            Auto-generated Discovery Cards from signals the community surfaced and the engine
-            corroborated. Each is provisional until peer review confirms.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Community discovery pipeline"
+          title="Discoveries"
+          intro={
+            <>
+              Auto-generated Discovery Cards from signals the community surfaced and the engine
+              corroborated. Each is provisional until peer review confirms.
+            </>
+          }
+        />
 
         <Suspense>
           <DiscoveryFilters domains={domains} />
@@ -171,7 +175,7 @@ export default async function DiscoveriesPage({
                   <CardTitle className="group-hover:text-accent transition-colors">
                     {d.title}
                   </CardTitle>
-                  <CardDescription>{d.summary}</CardDescription>
+                  <CardDescription className="line-clamp-2">{d.summary}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-4 text-xs text-muted-foreground">
