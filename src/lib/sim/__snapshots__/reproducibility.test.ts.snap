@@ -540,6 +540,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Rosenzweig–MacArthur: limit cycle (K=6 > K_H=3.00).",
   },
+  "saturation-binding": {
+    "metrics": {
+      "boundSpecific": 66.6667,
+      "kd": 5,
+      "ligandForHalf": 5,
+      "nonspecificBound": 0,
+      "occupancy": 0.666667,
+      "totalBound": 66.6667,
+    },
+    "summary": "Saturation binding: Kd=5 nM, Bmax=100 → at [L]=10 nM, 66.7% of sites filled (B=66.67); half-occupancy at [L]=Kd=5 nM.",
+  },
   "secondary-structure": {
     "metrics": {
       "coilFraction": 0,

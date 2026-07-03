@@ -666,6 +666,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: -20,
     hint: 'ΔG° = ΔH° − T·ΔS°. With ΔH° = −40 kJ/mol at 310 K, ΔG° = −20 needs T·ΔS° = −20 kJ/mol, i.e. ΔS° ≈ −64 J/mol/K.',
   },
+  {
+    id: 'design-high-affinity-binder',
+    engine: 'saturation-binding',
+    title: 'Design a high-affinity binder',
+    brief:
+      'A tighter-gripping drug works at a lower, safer dose. Tune the dissociation constant Kd of your candidate so that at a fixed 10 nM dose it fills 90% of its target receptors — grippy enough to work, without going overboard.',
+    baseParams: { bmax: 100, ligand: 10 },
+    knob: {
+      param: 'kd',
+      label: 'Dissociation constant Kd',
+      min: 0.1,
+      max: 20,
+      step: 0.1,
+      default: 5,
+      unit: 'nM',
+    },
+    metricKey: 'occupancy',
+    metricLabel: 'Fractional occupancy',
+    goal: 'target',
+    target: 0.9,
+    hint: 'Occupancy = [L]/(Kd+[L]). At [L]=10 nM, reaching 90% filled needs a small Kd — about 1.1 nM. Smaller Kd = tighter binding = more filled at the same dose.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

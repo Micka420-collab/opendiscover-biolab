@@ -27,6 +27,7 @@ import { spec as docking } from './drug/docking';
 import { spec as doseResponse } from './drug/dose-response';
 import { spec as pkOralAbsorption } from './drug/pk-oral-absorption';
 import { spec as pkTwoCompartment } from './drug/pk-two-compartment';
+import { spec as saturationBinding } from './drug/saturation-binding';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as chemostatCompetition } from './ecology/chemostat-competition';
 import { spec as levinsMetapopulation } from './ecology/levins-metapopulation';
@@ -138,6 +139,7 @@ export const engines: AnyEngine[] = [
   doseResponse,
   pkTwoCompartment,
   pkOralAbsorption,
+  saturationBinding,
   rnaFold,
   wormLikeChain,
   dnaMelting,

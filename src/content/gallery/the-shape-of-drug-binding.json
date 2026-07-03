@@ -1,0 +1,16 @@
+{
+  "slug": "the-shape-of-drug-binding",
+  "title": "The shape of drug binding",
+  "engine": "saturation-binding",
+  "params": {
+    "kd": 5,
+    "bmax": 100,
+    "ligand": 10,
+    "nonspecific": 0.3,
+    "ligandMax": 60,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Almost every drug works by latching onto a target — a receptor — and the curve of how much is bound versus how much is around is one of the most-measured shapes in all of pharmacology. It is a rectangular hyperbola that climbs steeply at first, then bends over and flattens as the last empty sites fill up: once every receptor is taken, adding more drug does nothing. The single number that defines it is the dissociation constant Kd — the concentration that fills exactly half the sites — and a smaller Kd means a tighter grip, so fewer molecules are needed to occupy the target. Here Kd = 5 nM against a site capacity of 100, so at 10 nM the receptors are already two-thirds full. The faint straight line riding on top is non-specific binding — drug stuck to everything else in the tube — which never saturates and must be subtracted to see the real signal. Read backwards through the classic Scatchard straight line, whose slope is −1/Kd, this same curve is how a lab measures how tightly any new drug candidate holds its target."
+}

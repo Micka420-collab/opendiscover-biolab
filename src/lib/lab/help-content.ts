@@ -504,6 +504,26 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'design-high-affinity-binder': {
+    plainWhat:
+      'You are designing a drug and choosing how tightly it grips its target on a cell. Your goal is to make it grip hard enough that, at a fixed dose, 9 out of every 10 targets are filled.',
+    plainWhy:
+      'A drug that grips its target tightly works at a lower, safer dose — that means fewer side effects and a better chance of helping. Tuning that grip is one of the first things drug designers optimise.',
+    plainHow:
+      'A tighter grip means fewer molecules are needed to fill the targets. Loosen the grip and the dose barely fills any; tighten it and a modest dose fills almost all. There is a sweet spot that lands you at exactly 9 in 10.',
+    terms: [
+      {
+        term: 'receptor',
+        meaning: 'the target on a cell that a drug latches onto.',
+      },
+      {
+        term: 'grip strength (Kd)',
+        meaning:
+          'how much drug it takes to fill half the targets — a smaller number means a tighter grip.',
+      },
+      { term: 'occupancy', meaning: 'the share of targets currently filled, from none to all.' },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

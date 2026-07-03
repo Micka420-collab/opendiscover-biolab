@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **62 deterministic simulation engines** across
+The OpenDiscover BioLab ships **63 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -26,7 +26,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
-- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption)
+- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret)
 
 ---
@@ -2477,6 +2477,42 @@ One-compartment oral pharmacokinetics with first-order absorption: the Bateman p
 ```
 
 _Run it: `POST /api/lab/run { "engine": "pk-oral-absorption", "params": … }` or interactively at `/lab/pk-oral-absorption`._
+
+---
+
+### `saturation-binding` — Saturation (Receptor–Ligand) Binding
+
+The equilibrium binding of a ligand to a receptor, the measurement at the heart of pharmacology: specific binding follows the rectangular hyperbola B=Bmax·[L]/(Kd+[L]), where Bmax is the site capacity and the dissociation constant Kd is the concentration for half-maximal binding (smaller Kd = tighter). Reports the specifically bound amount and fractional occupancy [L]/(Kd+[L]) at a chosen concentration, the ligand needed for 50% occupancy (=Kd), the linear non-specific binding, and the total, plus the specific/total binding isotherms. The classic Scatchard linearisation B/[L]=(Bmax−B)/Kd has slope −1/Kd. Closed-form and deterministic.
+
+**References**
+- Scatchard, G. (1949) The attractions of proteins for small molecules and ions. Ann. N.Y. Acad. Sci. 51:660-672.
+- Hulme, E.C. & Trevethick, M.A. (2010) Ligand binding assays at equilibrium. Br. J. Pharmacol. 161:1219-1237.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `kd` | number | `5` | ≥ 0.000001, ≤ 1000000 |  |
+| `bmax` | number | `100` | ≥ 0.000001, ≤ 1000000000 |  |
+| `ligand` | number | `10` | ≥ 0, ≤ 1000000000 |  |
+| `nonspecific` | number | `0` | ≥ 0, ≤ 1000 |  |
+| `ligandMax` | number | `50` | ≥ 0.000001, ≤ 1000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "kd": 5,
+  "bmax": 100,
+  "ligand": 10,
+  "nonspecific": 0,
+  "ligandMax": 50,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "saturation-binding", "params": … }` or interactively at `/lab/saturation-binding`._
 
 
 ## 🔬 Structural

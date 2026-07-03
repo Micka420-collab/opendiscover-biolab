@@ -1483,6 +1483,26 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'saturation-binding': {
+    plainWhat:
+      'This measures how tightly a drug or signalling molecule sticks to its target on a cell, and how many of those targets get filled. You set how sticky it is and how much is floating around.',
+    plainWhy:
+      'Almost every medicine works by latching onto a target in the body. How tightly it grips — and how much you need to fill the targets — sets the right dose and whether the drug works at all, so this is a bedrock measurement in drug design.',
+    plainHow:
+      'Make the molecule stickier and watch the binding curve climb with far less of it floating around; it always levels off once every target is taken. Try raising how much is around and watch the share of filled targets rise toward full.',
+    terms: [
+      {
+        term: 'receptor',
+        meaning: 'the target on a cell that a drug or signal molecule latches onto.',
+      },
+      {
+        term: 'Kd (stickiness)',
+        meaning:
+          'the amount of molecule needed to fill half the targets — a smaller number means it sticks more tightly.',
+      },
+      { term: 'occupancy', meaning: 'the share of targets currently filled, from none to all.' },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */
