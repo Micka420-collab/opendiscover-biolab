@@ -121,6 +121,19 @@ export function extractDistributions(
   return charts;
 }
 
+/**
+ * Human-friendly metric display: group big integers with commas, trim mid-range values to a few
+ * significant figures, and switch to exponential only at the extremes. Locale is pinned to en-US
+ * so the string is stable regardless of the viewer's machine. (Display-only — not engine output.)
+ */
+export function formatMetric(v: number): string {
+  if (!Number.isFinite(v)) return String(v);
+  const a = Math.abs(v);
+  if (a !== 0 && (a >= 1e12 || a < 1e-4)) return v.toExponential(3); // extremes → sci notation
+  if (Number.isInteger(v)) return v.toLocaleString('en-US'); // e.g. 17,952 / 100,000
+  return String(Number(v.toPrecision(4))); // e.g. 285.7 / 0.4931
+}
+
 /** The reproducibility hash, click-to-copy in full — proof any viewer can replay. */
 function HashCopyButton({ hash }: { hash: string }) {
   const [copied, setCopied] = useState(false);
@@ -187,13 +200,20 @@ export function ResultView({ result: state }: { result: RunResult }) {
         {state.metrics.length > 0 && (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
             {state.metrics.map((m) => (
-              <div key={m.key} className="border border-border rounded p-3">
-                <div className="text-xs text-muted-foreground">{m.label}</div>
-                <div className="text-lg font-mono">
-                  {Number.isInteger(m.value) ? m.value : m.value.toPrecision(4)}
-                  {m.unit && <span className="text-xs text-muted-foreground ml-1">{m.unit}</span>}
+              <div
+                key={m.key}
+                className="rounded-lg border border-border bg-muted/20 p-3.5 hover:border-accent transition-colors"
+              >
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {m.label}
                 </div>
-                {m.note && <div className="text-xs text-muted-foreground mt-1">{m.note}</div>}
+                <div className="mt-1 font-mono text-2xl font-semibold tabular-nums leading-tight">
+                  {formatMetric(m.value)}
+                  {m.unit && (
+                    <span className="ml-1 text-sm font-normal text-muted-foreground">{m.unit}</span>
+                  )}
+                </div>
+                {m.note && <div className="mt-1.5 text-xs text-muted-foreground">{m.note}</div>}
               </div>
             ))}
           </div>
