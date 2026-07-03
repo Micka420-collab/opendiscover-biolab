@@ -3,6 +3,7 @@ import { HelpCardBody, HelpTip } from '@/components/ui/help-tip';
 import { helpForEngine } from '@/lib/lab/engine-help';
 import { SHARE_PARAM, decodeExperiment } from '@/lib/lab/share';
 import { describeEngine, getEngine } from '@/lib/sim';
+import { domainLabel } from '@/lib/sim/domain-labels';
 import { notFound } from 'next/navigation';
 import { Playground } from './playground';
 
@@ -56,18 +57,19 @@ export default async function EnginePage({
 
   return (
     <div className="space-y-8">
-      <header className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Badge variant="muted">{engine.domain}</Badge>
+      <header className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="muted">{domainLabel(engine.domain)}</Badge>
           <Badge variant="outline">v{engine.version}</Badge>
-          {engine.tags.map((t) => (
+          {engine.tags.slice(0, 6).map((t) => (
             <Badge key={t} variant="info">
               {t}
             </Badge>
           ))}
+          {engine.tags.length > 6 && <Badge variant="outline">+{engine.tags.length - 6}</Badge>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-3xl font-bold">{engine.title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{engine.title}</h1>
           {help && (
             <HelpTip title={engine.title}>
               <HelpCardBody card={help} />
@@ -75,20 +77,27 @@ export default async function EnginePage({
           )}
         </div>
         {help && (
-          <p className="max-w-3xl text-foreground">
-            <span className="text-muted-foreground">In plain words — </span>
-            {help.plainWhat}
-          </p>
+          <div className="max-w-3xl rounded-lg border border-accent/30 bg-accent/5 p-4">
+            <div className="mb-1 text-xs uppercase tracking-widest text-accent font-mono">
+              In plain words
+            </div>
+            <p className="text-foreground leading-relaxed">{help.plainWhat}</p>
+          </div>
         )}
-        <p className="text-muted-foreground max-w-3xl whitespace-pre-line text-sm">
+        <p className="text-muted-foreground max-w-3xl whitespace-pre-line text-sm leading-relaxed">
           {engine.description}
         </p>
         {engine.references.length > 0 && (
-          <ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
-            {engine.references.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
+          <details className="max-w-3xl text-xs text-muted-foreground">
+            <summary className="cursor-pointer hover:text-foreground transition-colors">
+              References ({engine.references.length})
+            </summary>
+            <ul className="mt-2 list-disc list-inside space-y-0.5">
+              {engine.references.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          </details>
         )}
       </header>
 
