@@ -95,7 +95,7 @@ export function run(rawParams: Partial<MicrobialGrowthParams> = {}): SimResult {
       key: 'finalPop',
       label: `Population at ${p.tEnd} h`,
       value: finalPop,
-      note: 'fraction of K reached',
+      note: 'absolute population (same units as K)',
     },
   ];
 
