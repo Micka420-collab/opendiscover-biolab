@@ -1,0 +1,19 @@
+{
+  "slug": "how-a-drug-slips-into-a-cell",
+  "title": "How a drug slips into a cell",
+  "engine": "membrane-permeation",
+  "params": {
+    "diffusionCoeff": 1e-6,
+    "partitionCoeff": 2,
+    "thickness": 1e-6,
+    "area": 1,
+    "volume": 5,
+    "concOutside": 100,
+    "concInside": 0,
+    "tEnd": 10,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Start with a substance crowded entirely on one side of a cell's thin, oily skin and none on the other, and watch what physics does about it. There is no pump here, no machinery, nothing burning energy — just the blind statistics of jostling molecules, and yet the two curves reach for each other and settle, without fail, at the exact midpoint. That is Fick's law made visible: the flux across the skin is simply proportional to the gap between the two sides, so the gap shrinks by the same fraction every moment and the whole thing decays smoothly toward the average. The pace is set almost entirely by one property of the substance — how greasy it is, how happily it dissolves into the oily skin rather than staying in water. This is not an academic curiosity: it is the reason a medicine either reaches the inside of your cells or fails to, and drug designers tune exactly this greasiness to get a molecule across. Raise the partition coefficient and the curves rush together; lower it and they crawl. Either way they always meet in the middle — physics keeps that promise."
+}

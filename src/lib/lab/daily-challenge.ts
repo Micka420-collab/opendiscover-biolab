@@ -821,6 +821,36 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 3,
     hint: 'Lifespan scales as mass^(1−b). With Kleiber’s b=0.75 that is mass^0.25 (the fourth root), so tripling lifespan needs 3⁴ = 81× the mass — about 81 kg.',
   },
+  {
+    id: 'carry-a-drug-across-a-membrane',
+    engine: 'membrane-permeation',
+    title: 'Carry a drug across a membrane',
+    brief:
+      'A drug only works if it can slip across the greasy membrane wrapping every cell, and how fast it crosses is set by its lipophilicity — how happily it dissolves into that oily layer. Tune the partition coefficient so the two sides half-equilibrate in exactly half a second: greasy enough to cross briskly, not so greasy it never lets go.',
+    baseParams: {
+      diffusionCoeff: 1e-6,
+      thickness: 1e-6,
+      area: 1,
+      volume: 1,
+      concOutside: 100,
+      concInside: 0,
+      tEnd: 5,
+    },
+    knob: {
+      param: 'partitionCoeff',
+      label: 'Partition coefficient K (lipophilicity)',
+      min: 0.1,
+      max: 5,
+      step: 0.01,
+      default: 1,
+    },
+    metricKey: 'halfEquilibrationTime',
+    metricLabel: 'Half-equilibration time',
+    unit: 's',
+    goal: 'target',
+    target: 0.5,
+    hint: 'The two sides close half their gap every ln2/(2·P) seconds, and with these settings the permeability P equals K. A half-time of 0.5 s needs 2·K = ln2/0.5, i.e. K ≈ 0.69 — a moderately lipophilic drug.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

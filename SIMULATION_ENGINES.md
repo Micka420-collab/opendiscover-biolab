@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **69 deterministic simulation engines** across
+The OpenDiscover BioLab ships **70 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
@@ -1965,7 +1965,7 @@ _Run it: `POST /api/lab/run { "engine": "diffusion", "params": … }` or interac
 
 ### `enzyme-thermal` — Enzyme Temperature Optimum (Arrhenius × denaturation)
 
-An enzyme's bell-shaped activity-versus-temperature curve, from two opposing effects: chemistry speeds up with heat (Arrhenius, e^(−Ea/RT)) while the enzyme unfolds and dies once it gets too hot (two-state denaturation with folded fraction 1/(1+e^(−ΔG/RT)), ΔG=ΔHd(1−T/Tm)). Their product peaks at the optimal temperature T_opt, which sits BELOW the melting temperature Tm because unfolding erodes activity before half the protein has melted. Reports T_opt, Tm, the relative activity at a chosen temperature, the Q10 (fold rate increase per 10°C), and the margin Tm−T_opt, plus the peak-normalised activity curve. Closed-form and deterministic.
+An enzyme's bell-shaped activity-versus-temperature curve, from two opposing effects: chemistry speeds up with heat (Arrhenius, e^(−Ea/RT)) while the enzyme unfolds and dies once it gets too hot (two-state denaturation with folded fraction 1/(1+e^(−ΔG/RT)), ΔG=ΔHd(1−T/Tm)). Their product peaks at the optimal temperature T_opt, which in the usual regime (ΔHd ≳ 2·Ea) sits below the melting temperature Tm because unfolding erodes activity before half the protein has melted. Reports T_opt, Tm, the relative activity at a chosen temperature, the Q10 (fold rate increase per 10°C), and the margin Tm−T_opt, plus the peak-normalised activity curve. Closed-form and deterministic.
 
 **References**
 - Arrhenius, S. (1889) Über die Reaktionsgeschwindigkeit bei der Inversion von Rohrzucker durch Säuren. Z. Phys. Chem. 4:226-248.
@@ -2182,6 +2182,48 @@ Exponential first-order decay N(t)=N₀·e^(−λt)=N₀·(1/2)^(t/t½): the uni
 ```
 
 _Run it: `POST /api/lab/run { "engine": "radioactive-decay", "params": … }` or interactively at `/lab/radioactive-decay`._
+
+---
+
+### `membrane-permeation` — Membrane Permeation (Fick's Law)
+
+How a molecule crosses a cell membrane, from Fick's first law: the flux J=P·(C₁−C₂) is proportional to the concentration difference, with permeability P=D·K/L set by how fast the solute diffuses inside the membrane (D), how readily it dissolves into the oily bilayer (the partition coefficient K, i.e. lipophilicity) and the membrane thickness L. For two equal-volume compartments the concentration difference relaxes exponentially, ΔC(t)=ΔC₀·e^(−kt) with k=2·P·A/V, until both sides meet at the average. Reports the permeability, initial flux, equilibration rate and half-time, the final inside concentration, and the two concentration-vs-time curves. Closed-form and deterministic.
+
+**References**
+- Fick, A. (1855) Über Diffusion. Ann. Phys. 170:59-86.
+- Missner, A. & Pohl, P. (2009) 110 years of the Meyer–Overton rule. ChemPhysChem 10:1405-1414.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `diffusionCoeff` | number | `0.000001` | ≥ 1e-15, ≤ 1 |  |
+| `partitionCoeff` | number | `1` | ≥ 0.000001, ≤ 1000000 |  |
+| `thickness` | number | `0.000001` | ≥ 1e-9, ≤ 1 |  |
+| `area` | number | `1` | ≥ 1e-9, ≤ 1000000 |  |
+| `volume` | number | `1` | ≥ 1e-9, ≤ 1000000 |  |
+| `concOutside` | number | `100` | ≥ 0, ≤ 1000000000 |  |
+| `concInside` | number | `0` | ≥ 0, ≤ 1000000000 |  |
+| `tEnd` | number | `100` | ≥ 0.000001, ≤ 1000000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "diffusionCoeff": 0.000001,
+  "partitionCoeff": 1,
+  "thickness": 0.000001,
+  "area": 1,
+  "volume": 1,
+  "concOutside": 100,
+  "concInside": 0,
+  "tEnd": 100,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "membrane-permeation", "params": … }` or interactively at `/lab/membrane-permeation`._
 
 
 ## 🦠 Epidemiology

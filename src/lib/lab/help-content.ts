@@ -660,6 +660,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'carry-a-drug-across-a-membrane': {
+    plainWhat:
+      'Every cell is wrapped in a thin, oily skin. You are setting how greasy a drug is, which decides how fast it can seep across that skin. Your goal is to make the two sides even out at a set pace — closing half the gap in half a second.',
+    plainWhy:
+      'A medicine is useless if it cannot cross into the cells where it needs to act. Getting this greasiness just right is one of the real jobs of drug design: too little and the drug never gets in, too much and it gets stuck in the oily skin instead of passing through.',
+    plainHow:
+      'Greasier means faster crossing, so the two sides even out sooner. Turn the greasiness up and the evening-out speeds up; turn it down and it slows. Slide it until the pace matches the target — not the fastest, but the exact speed asked for.',
+    terms: [
+      {
+        term: 'membrane',
+        meaning: 'the thin, oily skin around a cell that a drug has to cross to get inside.',
+      },
+      {
+        term: 'lipophilicity',
+        meaning: 'how much a substance likes oil over water — how greasy it is.',
+      },
+      {
+        term: 'half-equilibration time',
+        meaning: 'how long it takes the two sides to close half the gap between them.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

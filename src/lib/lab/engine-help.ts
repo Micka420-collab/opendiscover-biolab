@@ -1682,6 +1682,30 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'membrane-permeation': {
+    plainWhat:
+      'Every living cell is wrapped in a thin, oily skin called a membrane. This shows how a dissolved substance seeps across that skin from a crowded side to an empty side, and how quickly the two sides even out until they hold the same amount.',
+    plainWhy:
+      'Whether a nutrient can feed a cell, or a medicine can reach the inside where it needs to work, comes down to how well it crosses this oily skin. Drug makers spend a lot of effort tuning exactly this, because a molecule that cannot get across is useless no matter how good it would be once inside.',
+    plainHow:
+      'The biggest lever is how greasy the substance is — how happily it dissolves into the oily skin. Turn that up and it crosses faster, so the two sides even out sooner; a thinner or larger skin also speeds things along, while a bigger pool of liquid on each side slows the evening-out down. Watch the two curves rush together, then meet in the middle and flatten.',
+    terms: [
+      {
+        term: 'membrane',
+        meaning: 'the thin, oily skin that wraps a cell and controls what gets in and out.',
+      },
+      {
+        term: 'permeability',
+        meaning:
+          'how easily a substance passes through the skin — high means it slips across quickly.',
+      },
+      {
+        term: 'partition coefficient',
+        meaning:
+          'how much a substance prefers the oily skin over water; the greasier it is, the faster it crosses.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

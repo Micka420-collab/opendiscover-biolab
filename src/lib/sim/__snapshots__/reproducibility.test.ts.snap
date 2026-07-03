@@ -374,6 +374,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Peptide PEPTIDE (7 residues): neutral mass 799.3600 Da, [M+2H]2+ = 400.6873; 12 fragment ions predicted.",
   },
+  "membrane-permeation": {
+    "metrics": {
+      "equilibriumConc": 50,
+      "halfEquilibrationTime": 0.346574,
+      "initialFlux": 100,
+      "insideConcAtEnd": 50,
+      "permeability": 1,
+      "rateConstant": 2,
+    },
+    "summary": "Membrane permeation: P=1.00 cm/s (D·K/L) → initial flux 100; the two sides close half their gap every 0.347 s, meeting at 50. At 100 s the inside sits at 50.00.",
+  },
   "metabolic-pathway": {
     "metrics": {
       "bottleneckStepIndex": 1,
