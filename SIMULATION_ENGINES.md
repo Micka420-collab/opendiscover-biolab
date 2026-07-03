@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **72 deterministic simulation engines** across
+The OpenDiscover BioLab ships **73 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -22,7 +22,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
-- **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling)
+- **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling) · [`photosynthesis-light`](#photosynthesis-light)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
@@ -1700,6 +1700,42 @@ How body size sets the pace of life. An animal's whole-body metabolic rate scale
 ```
 
 _Run it: `POST /api/lab/run { "engine": "allometric-scaling", "params": … }` or interactively at `/lab/allometric-scaling`._
+
+---
+
+### `photosynthesis-light` — Photosynthesis Light Response
+
+How a leaf's carbon uptake depends on light. Gross photosynthesis follows a saturating rectangular hyperbola P=P_max·I/(I+K_m); subtracting the plant's dark respiration R_d gives the NET rate, which is negative in the dark, crosses zero at the light compensation point I_c=R_d·K_m/(P_max−R_d), and plateaus at P_max−R_d in bright light. Reports the gross and net rate at a chosen light, the light-saturated net rate, the compensation point (guarded to 0 when the plant can never break even), and the initial quantum yield, plus the gross and net light-response curves. This is the basis of net primary productivity — how ecosystems capture carbon. Closed-form and deterministic.
+
+**References**
+- Thornley, J.H.M. (1976) Mathematical Models in Plant Physiology.
+- Lambers, H., Chapin, F.S. & Pons, T.L. (2008) Plant Physiological Ecology, 2nd ed.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `maxRate` | number | `20` | ≥ 0.000001, ≤ 1000000 |  |
+| `halfSatLight` | number | `200` | ≥ 0.000001, ≤ 1000000000 |  |
+| `respiration` | number | `2` | ≥ 0, ≤ 1000000 |  |
+| `light` | number | `400` | ≥ 0, ≤ 1000000000 |  |
+| `lightMax` | number | `1000` | ≥ 0.000001, ≤ 1000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "maxRate": 20,
+  "halfSatLight": 200,
+  "respiration": 2,
+  "light": 400,
+  "lightMax": 1000,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "photosynthesis-light", "params": … }` or interactively at `/lab/photosynthesis-light`._
 
 
 ## 🏭 Bioprocess

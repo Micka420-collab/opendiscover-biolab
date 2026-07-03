@@ -483,6 +483,17 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "PCR on a 120 nt template yields a 100 bp product (GC 51%); primer Tm 53.8/51.8 °C.",
   },
+  "photosynthesis-light": {
+    "metrics": {
+      "canBreakEven": 1,
+      "grossRateAtLight": 13.3333,
+      "initialQuantumYield": 0.1,
+      "lightCompensationPoint": 22.2222,
+      "lightSaturatedNet": 18,
+      "netRateAtLight": 11.3333,
+    },
+    "summary": "Photosynthesis light response: net 11.3 µmol/m²/s at light 400 (gross 13.3 − respiration 2). Breaks even at 22.2 light; the bright-light ceiling is 18.0.",
+  },
   "phylogenetics": {
     "metrics": {
       "taxaCount": 4,

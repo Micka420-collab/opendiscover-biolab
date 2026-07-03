@@ -896,6 +896,29 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'Gompertz growth decelerates as the tumour fills up, so the fraction reached climbs with the growth constant b but with diminishing returns. From a 1% seed, hitting half of capacity by t=10 needs b ≈ 0.19.',
   },
+  {
+    id: 'break-even-light-for-a-shade-plant',
+    engine: 'photosynthesis-light',
+    title: "Find a shade plant's break-even light",
+    brief:
+      'A plant fixes carbon in the light but burns it day and night by respiring. Below a certain brightness it loses more than it makes and slowly starves. Dial the light to the exact compensation point — where net photosynthesis is zero and the plant just breaks even.',
+    baseParams: { maxRate: 20, halfSatLight: 200, respiration: 2, lightMax: 400 },
+    knob: {
+      param: 'light',
+      label: 'Light intensity',
+      min: 0,
+      max: 200,
+      step: 0.5,
+      default: 100,
+      unit: 'µmol/m²/s',
+    },
+    metricKey: 'netRateAtLight',
+    metricLabel: 'Net photosynthesis',
+    unit: 'µmol/m²/s',
+    goal: 'target',
+    target: 0,
+    hint: 'Net photosynthesis rises steadily with light and crosses zero at the compensation point I = R_d·K_m/(P_max − R_d). With these values that is 2·200/(20−2) ≈ 22 µmol/m²/s.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

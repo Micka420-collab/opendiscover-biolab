@@ -1,0 +1,16 @@
+{
+  "slug": "the-light-a-plant-needs-to-break-even",
+  "title": "The light a plant needs to break even",
+  "engine": "photosynthesis-light",
+  "params": {
+    "maxRate": 20,
+    "halfSatLight": 200,
+    "respiration": 2,
+    "light": 400,
+    "lightMax": 1000,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A leaf in sunlight looks like a pure engine of growth, but it is really running two ledgers at once. On one side it photosynthesises, pulling carbon out of the air and banking it as sugar — fast at first, then levelling off as the machinery maxes out, the same saturating curve that describes an enzyme working flat out. On the other side it respires, quietly burning some of that sugar around the clock to stay alive, in the dark as much as in the day. What the plant actually gains is the difference, and the difference is what this chart draws: a lower net curve that starts BELOW zero. In darkness the plant is spending carbon it cannot replace. Only once the light climbs past a particular threshold — the compensation point, where the net curve crosses zero — does the leaf start to come out ahead. This single number quietly shapes the living world. It is why the floor of a dense forest is bare while the canopy above is lush, why some plants are built for shade and others for open ground, and why the amount of carbon that forests and phytoplankton can lock away depends, in the end, on light reaching a leaf. Slide the light and watch the two ledgers diverge — and find the exact brightness where a plant stops starving and starts to grow."
+}

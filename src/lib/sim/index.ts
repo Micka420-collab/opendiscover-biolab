@@ -40,6 +40,7 @@ import { spec as levinsMetapopulation } from './ecology/levins-metapopulation';
 import { spec as logisticMap } from './ecology/logistic-map';
 import { spec as lotkaVolterra } from './ecology/lotka-volterra';
 import { spec as nicholsonBailey } from './ecology/nicholson-bailey';
+import { spec as photosynthesisLight } from './ecology/photosynthesis-light';
 import { spec as replicatorDynamics } from './ecology/replicator-dynamics';
 import { spec as rockPaperScissors } from './ecology/rock-paper-scissors';
 import { spec as rosenzweigMacArthur } from './ecology/rosenzweig-macarthur';
@@ -131,6 +132,7 @@ export const engines: AnyEngine[] = [
   levinsMetapopulation,
   replicatorDynamics,
   allometricScaling,
+  photosynthesisLight,
   bioreactor,
   microbialGrowth,
   oxygenTransfer,

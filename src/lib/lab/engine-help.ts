@@ -1753,6 +1753,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'photosynthesis-light': {
+    plainWhat:
+      'This shows how much food (sugar) a leaf makes from sunlight as the light gets brighter. Photosynthesis climbs quickly at first, then levels off once the leaf is working as fast as it can. But the plant also burns some of that food to stay alive, day and night, so what it really gains is what it makes minus what it burns.',
+    plainWhy:
+      "This is how plants — and, in the end, almost all life — capture the sun's energy and pull carbon out of the air. The key idea is the break-even light: below it a plant burns more than it makes and slowly starves, which is why nothing grows in deep shade, and why how much carbon forests and oceans can soak up depends on light reaching the leaves.",
+    plainHow:
+      'Slide the light up and watch two curves: the total food made, which rises and then flattens, and the net gain after the plant feeds itself, which starts BELOW zero in the dark. Find where the net curve crosses zero — that break-even brightness is the least light the plant needs just to survive.',
+    terms: [
+      {
+        term: 'photosynthesis',
+        meaning:
+          "how a plant turns light, water and air into food (sugar), storing the sun's energy.",
+      },
+      {
+        term: 'respiration',
+        meaning: 'the food a plant burns just to stay alive, all the time, even in the dark.',
+      },
+      {
+        term: 'compensation point',
+        meaning: 'the break-even light where a plant makes exactly as much food as it burns.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

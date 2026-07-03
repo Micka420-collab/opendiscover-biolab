@@ -729,6 +729,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'break-even-light-for-a-shade-plant': {
+    plainWhat:
+      'A plant makes food when there is light but burns food all the time just to stay alive. You are setting the brightness, and your goal is to find the exact light where it makes precisely as much as it burns — its break-even point.',
+    plainWhy:
+      "Below this break-even light a plant is running at a loss and slowly starves, which is why almost nothing grows on a deep forest floor. It also sets how much carbon plants can pull from the air, so it matters for forests, crops and the whole planet's climate.",
+    plainHow:
+      'In the dark the plant is losing food, so its net gain is below zero. As you turn the light up, the net gain climbs steadily and eventually crosses zero. That crossing point — not too dark, not yet bright — is the break-even light you are looking for.',
+    terms: [
+      {
+        term: 'respiration',
+        meaning: 'the food a plant burns just to stay alive, day and night.',
+      },
+      {
+        term: 'net photosynthesis',
+        meaning: 'the food a plant makes minus the food it burns — negative in the dark.',
+      },
+      {
+        term: 'compensation point',
+        meaning: 'the break-even light where a plant makes exactly as much food as it burns.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */
