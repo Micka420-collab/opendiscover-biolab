@@ -1,0 +1,17 @@
+{
+  "slug": "why-enzymes-have-a-favourite-temperature",
+  "title": "Why enzymes have a favourite temperature",
+  "engine": "enzyme-thermal",
+  "params": {
+    "activationEnergy": 50,
+    "denaturationEnthalpy": 400,
+    "meltingTemp": 55,
+    "temperatureC": 37,
+    "tMinC": 0,
+    "tMaxC": 90,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Warm a chemical reaction and it goes faster — that is just chemistry, and it is why a fever feels the way it does and why milk spoils quicker on the counter than in the fridge. But an enzyme is not just a reaction; it is a folded protein machine, and proteins come undone when they get too hot. Multiply those two opposing effects — speeding up as it warms, dying as it melts — and you get this lopsided bell: activity climbs steeply, peaks, then falls off a cliff. The peak is the enzyme's optimal temperature, and here is the subtle part the curve makes obvious: that optimum sits noticeably BELOW the melting temperature, because unfolding starts nibbling at the activity well before half the protein has actually melted. It is why your own enzymes are tuned for 37°C, why the DNA-copying enzyme behind every PCR test was borrowed from a microbe living in a boiling hot spring, and why detergent makers hunt for enzymes that keep working in a hot wash. Slide the melting temperature and watch the whole bell — optimum and all — march up or down the thermometer."
+}

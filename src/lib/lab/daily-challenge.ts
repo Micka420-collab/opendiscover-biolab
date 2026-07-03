@@ -755,6 +755,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.25,
     hint: 'Each 5730-year half-life halves the carbon-14 left. A quarter remaining is two halvings, so about 11,460 years.',
   },
+  {
+    id: 'enzyme-for-60c',
+    engine: 'enzyme-thermal',
+    title: 'Engineer an enzyme for 60°C',
+    brief:
+      'A hot industrial process runs at 60°C. Tune how much heat your enzyme can take (its melting temperature) so its bell-shaped activity peaks right at 60°C — pushing its relative activity there as high as it will go.',
+    baseParams: { activationEnergy: 50, denaturationEnthalpy: 400, temperatureC: 60 },
+    knob: {
+      param: 'meltingTemp',
+      label: 'Melting temperature Tm',
+      min: 40,
+      max: 90,
+      step: 0.5,
+      default: 55,
+      unit: '°C',
+    },
+    metricKey: 'relativeActivityAtT',
+    metricLabel: 'Relative activity at 60°C',
+    goal: 'maximize',
+    par: 0.98,
+    hint: 'Relative activity at 60°C peaks when the enzyme’s optimum lands on 60°C. Too low a melting temperature and it is already unfolding at 60°C; too high and 60°C sits below its best. Raise Tm until the optimum reaches 60°C.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

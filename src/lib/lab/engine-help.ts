@@ -1614,6 +1614,28 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'enzyme-thermal': {
+    plainWhat:
+      "Every enzyme — a tiny protein machine that speeds up a chemical job in your body — works best at a particular temperature. This draws that bell-shaped curve: too cold and it's sluggish, too hot and it falls apart, with a sweet spot in the middle.",
+    plainWhy:
+      "It's why your body holds itself at about 37°C, why a high fever is dangerous, and why the enzymes in laundry detergent or in boiling hot-spring microbes are specially built to survive heat. Knowing the sweet spot lets scientists design enzymes that work where they are needed.",
+    plainHow:
+      'Warm things up and the enzyme speeds up — until it gets so hot the protein unravels and activity crashes. Try raising the melting temperature (how much heat it can take) and watch the whole sweet spot slide to a higher temperature.',
+    terms: [
+      {
+        term: 'enzyme',
+        meaning: 'a protein that speeds up a chemical reaction in a living thing.',
+      },
+      {
+        term: 'denature',
+        meaning: 'when heat makes a protein unravel and stop working.',
+      },
+      {
+        term: 'optimal temperature',
+        meaning: 'the sweet spot where the enzyme works fastest.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

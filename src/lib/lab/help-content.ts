@@ -592,6 +592,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'enzyme-for-60c': {
+    plainWhat:
+      "You're engineering an enzyme to do its best work in a hot 60°C process. Tune how much heat the enzyme can take (its melting temperature) so its sweet spot lands right on 60°C.",
+    plainWhy:
+      'Industrial processes — making biofuel, food, or medicine — often run hot to go faster and stay clean. An enzyme tuned to thrive at that heat, instead of falling apart, is worth a fortune to biotech.',
+    plainHow:
+      "If the enzyme melts too easily, it's already falling apart at 60°C and works poorly. If it's far too tough, 60°C is below its best. Raise its heat tolerance until its sweet spot sits exactly on 60°C.",
+    terms: [
+      {
+        term: 'enzyme',
+        meaning: 'a protein that speeds up a chemical reaction in a living thing.',
+      },
+      {
+        term: 'melting temperature',
+        meaning: 'how much heat the enzyme can take before it unravels and stops working.',
+      },
+      {
+        term: 'optimal temperature',
+        meaning: 'the sweet spot where the enzyme works fastest.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

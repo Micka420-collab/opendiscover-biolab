@@ -179,6 +179,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Michaelis–Menten: Vmax=10.0, Km=5.00 → apparent Vmax=10.0, half-saturation at [S]=5.00.",
   },
+  "enzyme-thermal": {
+    "metrics": {
+      "meltingTemp": 55,
+      "optimalTemp": 50.75,
+      "q10": 1.83241,
+      "relativeActivityAtT": 0.503098,
+      "thermalMargin": 4.25,
+    },
+    "summary": "Enzyme activity peaks at T_opt=50.8°C (Tm=55°C, so 4.3°C below melting); at 37°C it runs at 50% of peak, with Q10≈1.83.",
+  },
   "ewens-sampling": {
     "metrics": {
       "effectiveAlleles": 2,

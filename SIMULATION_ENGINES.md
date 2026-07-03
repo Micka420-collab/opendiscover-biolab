@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **66 deterministic simulation engines** across
+The OpenDiscover BioLab ships **67 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -24,7 +24,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics)
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
-- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay)
+- **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
 - **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
@@ -1892,6 +1892,44 @@ How fast molecules wander by thermal motion: the Stokes–Einstein relation D=kB
 ```
 
 _Run it: `POST /api/lab/run { "engine": "diffusion", "params": … }` or interactively at `/lab/diffusion`._
+
+---
+
+### `enzyme-thermal` — Enzyme Temperature Optimum (Arrhenius × denaturation)
+
+An enzyme's bell-shaped activity-versus-temperature curve, from two opposing effects: chemistry speeds up with heat (Arrhenius, e^(−Ea/RT)) while the enzyme unfolds and dies once it gets too hot (two-state denaturation with folded fraction 1/(1+e^(−ΔG/RT)), ΔG=ΔHd(1−T/Tm)). Their product peaks at the optimal temperature T_opt, which sits BELOW the melting temperature Tm because unfolding erodes activity before half the protein has melted. Reports T_opt, Tm, the relative activity at a chosen temperature, the Q10 (fold rate increase per 10°C), and the margin Tm−T_opt, plus the peak-normalised activity curve. Closed-form and deterministic.
+
+**References**
+- Arrhenius, S. (1889) Über die Reaktionsgeschwindigkeit bei der Inversion von Rohrzucker durch Säuren. Z. Phys. Chem. 4:226-248.
+- Daniel, R.M. & Danson, M.J. (2010) A new understanding of how temperature affects enzyme activity. Trends Biochem. Sci. 35:584-591.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `activationEnergy` | number | `50` | ≥ 1, ≤ 400 |  |
+| `denaturationEnthalpy` | number | `400` | ≥ 10, ≤ 3000 |  |
+| `meltingTemp` | number | `55` | ≥ 0, ≤ 120 |  |
+| `temperatureC` | number | `37` | ≥ -20, ≤ 150 |  |
+| `tMinC` | number | `0` | ≥ -20, ≤ 150 |  |
+| `tMaxC` | number | `90` | ≥ -20, ≤ 150 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "activationEnergy": 50,
+  "denaturationEnthalpy": 400,
+  "meltingTemp": 55,
+  "temperatureC": 37,
+  "tMinC": 0,
+  "tMaxC": 90,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "enzyme-thermal", "params": … }` or interactively at `/lab/enzyme-thermal`._
 
 ---
 
