@@ -34,8 +34,28 @@ interface Best {
 }
 
 function formatValue(value: number, unit?: string): string {
-  const num = Number.isInteger(value) ? String(value) : value.toPrecision(4);
+  const a = Math.abs(value);
+  let num: string;
+  if (!Number.isFinite(value)) num = String(value);
+  else if (a !== 0 && (a >= 1e12 || a < 1e-4)) num = value.toExponential(3);
+  else if (Number.isInteger(value)) num = value.toLocaleString('en-US');
+  else num = String(Number(value.toPrecision(4)));
   return unit ? `${num} ${unit}` : num;
+}
+
+/** How close an attempt sits to the bar, phrased per goal — the play feedback. */
+function gapText(challenge: Challenge, value: number): string {
+  if (challenge.goal === 'target') {
+    const t = challenge.target ?? 0;
+    return Math.abs(t) > 1e-9
+      ? `${(Math.abs((value - t) / t) * 100).toFixed(1)}% off the target`
+      : `${formatValue(Math.abs(value - t), challenge.unit)} off the target`;
+  }
+  const par = challenge.par ?? 0;
+  const gap = challenge.goal === 'maximize' ? value - par : par - value;
+  return gap >= 0
+    ? `clearing the bar by ${formatValue(Math.abs(gap), challenge.unit)}`
+    : `${formatValue(Math.abs(gap), challenge.unit)} to go`;
 }
 
 export function ChallengeClient({ challenge, date }: { challenge: Challenge; date: string }) {
@@ -218,12 +238,19 @@ export function ChallengeClient({ challenge, date }: { challenge: Challenge; dat
       {attempt && (
         <Card className={attempt.met ? 'border-accent/60 bg-accent/5' : undefined}>
           <CardContent className="pt-6 space-y-2">
-            <div className="text-sm text-muted-foreground">{challenge.metricLabel}</div>
-            <div className="text-3xl font-mono">{formatValue(attempt.value, challenge.unit)}</div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-sm text-muted-foreground">{challenge.metricLabel}</div>
+              <span className="font-mono text-xs text-muted-foreground">
+                {gapText(challenge, attempt.value)}
+              </span>
+            </div>
+            <div className="text-3xl font-mono font-semibold tabular-nums">
+              {formatValue(attempt.value, challenge.unit)}
+            </div>
             <div className="text-sm">
               {attempt.met ? (
                 <span className="text-accent">
-                  ✅ Target cleared — nice. Share it and try to do better.
+                  🎉 Cleared — nice one. Share it, or nudge the dial to beat your own best.
                 </span>
               ) : (
                 <span className="text-muted-foreground">
