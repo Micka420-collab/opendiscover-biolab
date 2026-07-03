@@ -963,6 +963,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0.5,
     hint: 'By Bayes, PPV = sens·p / (sens·p + (1−spec)(1−p)). It climbs with prevalence and hits 50% when the true cases just balance the false positives — near a prevalence of 4.8% for this test.',
   },
+  {
+    id: 'find-the-safe-effective-dose',
+    engine: 'therapeutic-window',
+    title: 'Find the safe, effective dose',
+    brief:
+      'A drug helps at higher doses but harms at higher doses too — so the best dose is a sweet spot, not the maximum. Tune the dose to give the most patients a real benefit: helped by the drug and not poisoned by it.',
+    baseParams: { ed50: 10, td50: 100, hillEfficacy: 1, hillToxicity: 1, doseMax: 300 },
+    knob: {
+      param: 'dose',
+      label: 'Dose',
+      min: 1,
+      max: 150,
+      step: 1,
+      default: 15,
+    },
+    metricKey: 'netBenefitAtDose',
+    metricLabel: 'Patients helped and not harmed',
+    goal: 'maximize',
+    par: 0.57,
+    hint: 'Too low and the drug barely works; too high and toxicity takes over. Net benefit peaks near the geometric mean of the effective and toxic doses, √(ED50·TD50) = √(10·100) ≈ 32.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

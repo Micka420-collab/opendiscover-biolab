@@ -734,6 +734,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Haldane substrate inhibition: growth peaks at S_opt=10.00 g/L with µ_opt=0.667 1/h (83% of the µmax ceiling); half-peak window 0.72–139.28 g/L.",
   },
+  "therapeutic-window": {
+    "metrics": {
+      "efficacyAtDose": 0.75,
+      "marginAtDose": 0.519231,
+      "netBenefitAtDose": 0.576923,
+      "therapeuticIndex": 10,
+      "toxicityAtDose": 0.230769,
+    },
+    "summary": "Therapeutic index 10.0 (TD50 100 / ED50 10). At dose 30: 75.0% helped, 23.1% harmed → net benefit 57.7%. Net benefit peaks at an intermediate dose, not the highest.",
+  },
   "two-state-folding": {
     "metrics": {
       "deltaG25": 11.0124,

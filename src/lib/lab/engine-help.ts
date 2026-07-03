@@ -1822,6 +1822,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'therapeutic-window': {
+    plainWhat:
+      'This shows the trade-off at the heart of every medicine. A drug helps more as the dose goes up — but past a point it also starts to poison. It draws two curves, one for how many people the drug helps and one for how many it harms, and the safe, useful doses live in the gap between them.',
+    plainWhy:
+      'This gap is the difference between a medicine and a poison — they are often the same substance at different doses. A wide gap means a drug is forgiving and easy to use; a narrow one (like the blood-thinner warfarin) means a tiny bit too much is dangerous, which is why some drugs need constant blood tests. It is one of the first things drug developers measure.',
+    plainHow:
+      'Slide the dose and watch both curves climb. The lesson is that more is not better: push the dose too high and the harm curve catches up with the help curve. The best dose is a sweet spot in the middle — high enough to work, low enough to stay safe — and a bigger gap between the two curves makes that sweet spot easier to hit.',
+    terms: [
+      {
+        term: 'dose–response curve',
+        meaning: 'how the share of people affected by a drug rises as the dose increases.',
+      },
+      {
+        term: 'therapeutic index',
+        meaning:
+          'how many times the helpful dose you can give before harm sets in — bigger is safer.',
+      },
+      {
+        term: 'therapeutic window',
+        meaning: 'the range of doses that help most people while harming few.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

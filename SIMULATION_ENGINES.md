@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **75 deterministic simulation engines** across
+The OpenDiscover BioLab ships **76 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -26,7 +26,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 - **🏭 Bioprocess** — [`bioreactor`](#bioreactor) · [`microbial-growth`](#microbial-growth) · [`oxygen-transfer`](#oxygen-transfer) · [`substrate-inhibition`](#substrate-inhibition)
 - **🧪 Biochemistry** — [`beer-lambert`](#beer-lambert) · [`acid-base-titration`](#acid-base-titration) · [`diffusion`](#diffusion) · [`enzyme-thermal`](#enzyme-thermal) · [`van-deemter`](#van-deemter) · [`osmotic-pressure`](#osmotic-pressure) · [`oxygen-hemoglobin`](#oxygen-hemoglobin) · [`gibbs-equilibrium`](#gibbs-equilibrium) · [`radioactive-decay`](#radioactive-decay) · [`membrane-permeation`](#membrane-permeation) · [`poiseuille-flow`](#poiseuille-flow)
 - **🦠 Epidemiology** — [`compartmental`](#compartmental) · [`diagnostic-accuracy`](#diagnostic-accuracy) · [`sis`](#sis) · [`sir-endemic`](#sir-endemic) · [`reed-frost`](#reed-frost) · [`vaccination`](#vaccination)
-- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding)
+- **💊 Drug discovery** — [`admet`](#admet) · [`docking`](#docking) · [`dose-response`](#dose-response) · [`pk-two-compartment`](#pk-two-compartment) · [`pk-oral-absorption`](#pk-oral-absorption) · [`saturation-binding`](#saturation-binding) · [`therapeutic-window`](#therapeutic-window)
 - **🔬 Structural** — [`rna-fold`](#rna-fold) · [`worm-like-chain`](#worm-like-chain) · [`dna-melting`](#dna-melting) · [`fret`](#fret) · [`stern-volmer`](#stern-volmer)
 
 ---
@@ -2903,6 +2903,43 @@ The equilibrium binding of a ligand to a receptor, the measurement at the heart 
 ```
 
 _Run it: `POST /api/lab/run { "engine": "saturation-binding", "params": … }` or interactively at `/lab/saturation-binding`._
+
+---
+
+### `therapeutic-window` — Therapeutic Window (Safety Margin)
+
+The safety gap between the dose of a drug that helps and the dose that harms. Efficacy and toxicity are each Hill dose–response sigmoids, efficacy(D)=1/(1+(ED50/D)^hE) and toxicity(D)=1/(1+(TD50/D)^hT); the therapeutic index TD50/ED50 measures how far apart they sit. Reports the therapeutic index, efficacy and toxicity at a chosen dose, the net benefit (helped and not harmed) and the raw margin, plus both dose–response curves so the window between them is visible. Because toxicity eventually catches up with efficacy, net benefit peaks at an intermediate dose — more is not better. Closed-form and deterministic; ratio-form Hill keeps every value finite.
+
+**References**
+- Muller, P.Y. & Milton, M.N. (2012) The therapeutic index in drug development. Nat. Rev. Drug Discov. 11:751-761.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `ed50` | number | `10` | ≥ 0.000001, ≤ 1000000000 |  |
+| `td50` | number | `100` | ≥ 0.000001, ≤ 1000000000 |  |
+| `hillEfficacy` | number | `1` | ≥ 0.1, ≤ 10 |  |
+| `hillToxicity` | number | `1` | ≥ 0.1, ≤ 10 |  |
+| `dose` | number | `30` | ≥ 0, ≤ 1000000000000 |  |
+| `doseMax` | number | `300` | ≥ 0.000001, ≤ 1000000000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "ed50": 10,
+  "td50": 100,
+  "hillEfficacy": 1,
+  "hillToxicity": 1,
+  "dose": 30,
+  "doseMax": 300,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "therapeutic-window", "params": … }` or interactively at `/lab/therapeutic-window`._
 
 
 ## 🔬 Structural

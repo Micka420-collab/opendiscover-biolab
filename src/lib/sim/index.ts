@@ -33,6 +33,7 @@ import { spec as doseResponse } from './drug/dose-response';
 import { spec as pkOralAbsorption } from './drug/pk-oral-absorption';
 import { spec as pkTwoCompartment } from './drug/pk-two-compartment';
 import { spec as saturationBinding } from './drug/saturation-binding';
+import { spec as therapeuticWindow } from './drug/therapeutic-window';
 import { spec as enzymeKinetics } from './dynamics/enzyme-kinetics';
 import { spec as allometricScaling } from './ecology/allometric-scaling';
 import { spec as chemostatCompetition } from './ecology/chemostat-competition';
@@ -163,6 +164,7 @@ export const engines: AnyEngine[] = [
   pkTwoCompartment,
   pkOralAbsorption,
   saturationBinding,
+  therapeuticWindow,
   rnaFold,
   wormLikeChain,
   dnaMelting,

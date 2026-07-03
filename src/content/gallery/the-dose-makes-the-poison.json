@@ -1,0 +1,17 @@
+{
+  "slug": "the-dose-makes-the-poison",
+  "title": "The dose makes the poison",
+  "engine": "therapeutic-window",
+  "params": {
+    "ed50": 10,
+    "td50": 100,
+    "hillEfficacy": 1,
+    "hillToxicity": 1,
+    "dose": 30,
+    "doseMax": 300,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Five hundred years ago the physician Paracelsus wrote that the dose makes the poison — that nothing is inherently a medicine or a toxin, only the amount decides. This chart is that idea drawn out. Every drug has two dose–response curves: a left-hand one for the fraction of patients it helps, and a right-hand one for the fraction it harms, and both climb toward everyone as the dose rises. What makes a substance a usable medicine is not that it never harms, but that its harm curve sits comfortably to the RIGHT of its help curve — a gap called the therapeutic window. The wider that gap, summarised by the therapeutic index (the toxic dose divided by the effective dose), the more forgiving the drug. Here the two are tenfold apart, a comfortable margin. But look at what it means for choosing a dose: push too low and the drug barely works; push too high and the harm curve catches up and cancels the benefit. The number of people who are helped AND not harmed peaks at an intermediate dose — for equal-steepness curves, right at the geometric mean of the two half-doses. This is why 'take more to feel better' is such dangerous folk wisdom, why narrow-window drugs like warfarin and lithium demand regular blood tests, and why the humble task of picking a dose is one of the most consequential decisions in all of medicine. Slide the dose and watch the sweet spot appear between too little and too much."
+}

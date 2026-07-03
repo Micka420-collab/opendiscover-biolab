@@ -796,6 +796,28 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'find-the-safe-effective-dose': {
+    plainWhat:
+      'A drug helps at higher doses — but harms at higher doses too. You are setting the dose to give the most people a real benefit: helped by the drug without being poisoned by it. The best dose is a sweet spot, not the maximum.',
+    plainWhy:
+      'This trade-off is the whole art of prescribing. The same substance can be a medicine or a poison depending on the dose, and getting it right is why doses are so carefully chosen and, for risky drugs, monitored with blood tests. Understanding it demystifies why "take more" is often dangerous advice.',
+    plainHow:
+      'Too little and the drug barely works, so few are helped. Too much and it starts poisoning people, cancelling out the benefit. Between those extremes the number helped-and-not-harmed rises to a peak — nudge the dose toward that middle sweet spot.',
+    terms: [
+      {
+        term: 'dose',
+        meaning: 'how much of the drug is given — the single dial that sets both help and harm.',
+      },
+      {
+        term: 'net benefit',
+        meaning: 'the share of people the drug helps without also harming them.',
+      },
+      {
+        term: 'sweet spot',
+        meaning: 'the middle dose that helps the most people while poisoning the fewest.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */
