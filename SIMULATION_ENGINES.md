@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **76 deterministic simulation engines** across
+The OpenDiscover BioLab ships **77 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -18,7 +18,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 ## Catalog
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
-- **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
+- **🧬 Protein biophysics** — [`properties`](#properties) · [`protein-charge`](#protein-charge) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
 - **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential) · [`cable-length-constant`](#cable-length-constant)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
@@ -241,6 +241,43 @@ ProtParam-style analysis of a protein from its amino-acid sequence: average mole
 ```
 
 _Run it: `POST /api/lab/run { "engine": "properties", "params": … }` or interactively at `/lab/properties`._
+
+---
+
+### `protein-charge` — Protein Charge & Isoelectric Point
+
+How a protein's net electric charge varies with pH, and the isoelectric point (pI) where it is exactly zero. Each ionizable group — acidic Asp/Glu and the C-terminus, basic His/Lys/Arg and the N-terminus — contributes a Henderson–Hasselbalch charge, and their sum Z(pH)=Σ_basic n/(1+10^(pH−pKa)) − Σ_acidic n/(1+10^(pKa−pH)) falls smoothly with pH, crossing zero at the pI. At its pI a protein carries no net charge, so it stops moving in an electric field and is least soluble — the basis of isoelectric focusing, ion-exchange chromatography, and protein precipitation. Reports the net charge at a chosen pH, the pI (by deterministic bisection), the charge at pH 7, and the charge-vs-pH titration curve. Closed-form and deterministic; every term is finite.
+
+**References**
+- Kozlowski, L.P. (2016) IPC — isoelectric point calculator. Biol. Direct 11:55.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `asp` | integer | `5` | ≥ 0, ≤ 100000 |  |
+| `glu` | integer | `5` | ≥ 0, ≤ 100000 |  |
+| `his` | integer | `2` | ≥ 0, ≤ 100000 |  |
+| `lys` | integer | `4` | ≥ 0, ≤ 100000 |  |
+| `arg` | integer | `3` | ≥ 0, ≤ 100000 |  |
+| `reportPH` | number | `7` | ≥ 0, ≤ 14 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "asp": 5,
+  "glu": 5,
+  "his": 2,
+  "lys": 4,
+  "arg": 3,
+  "reportPH": 7,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "protein-charge", "params": … }` or interactively at `/lab/protein-charge`._
 
 ---
 

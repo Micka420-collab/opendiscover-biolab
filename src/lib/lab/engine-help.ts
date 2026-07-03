@@ -1845,6 +1845,30 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'protein-charge': {
+    plainWhat:
+      'A protein is covered in tiny chemical groups that can carry a positive or negative electric charge, and whether each one is charged depends on how acidic its surroundings are. This adds them all up to show the protein’s overall charge as the acidity changes, and finds the special acidity where the pluses and minuses cancel out exactly.',
+    plainWhy:
+      'That break-even acidity — the isoelectric point — is where a protein carries no net charge, stops drifting in an electric field, and is at its least soluble, so it tends to clump and drop out of solution. Scientists use this every day to sort and purify proteins by charge, and it is the same effect that curdles milk into cheese. It also decides how a protein behaves at the pH inside our bodies.',
+    plainHow:
+      'Add more acidic building blocks and the whole curve shifts so the protein turns negative more easily; add more basic ones and it stays positive longer. Slide the acidity and watch the net charge fall from positive, through zero, to negative — the point where it crosses zero is the isoelectric point.',
+    terms: [
+      {
+        term: 'pH',
+        meaning: 'how acidic or basic the surroundings are — low is acidic, high is basic.',
+      },
+      {
+        term: 'net charge',
+        meaning:
+          'the protein’s overall electric charge once all its pluses and minuses are added up.',
+      },
+      {
+        term: 'isoelectric point',
+        meaning:
+          'the acidity at which a protein’s net charge is exactly zero — least soluble, does not move in a field.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

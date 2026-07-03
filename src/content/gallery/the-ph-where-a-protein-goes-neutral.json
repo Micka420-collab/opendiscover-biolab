@@ -1,0 +1,17 @@
+{
+  "slug": "the-ph-where-a-protein-goes-neutral",
+  "title": "The pH where a protein goes neutral",
+  "engine": "protein-charge",
+  "params": {
+    "asp": 5,
+    "glu": 5,
+    "his": 2,
+    "lys": 4,
+    "arg": 3,
+    "reportPH": 7,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "A protein is not a single fixed charge but a running tally, and the tally is settled by the acidity of the water around it. Scattered across its surface are chemical groups that behave like tiny switches: acidic ones (from aspartate and glutamate) flip negative as the surroundings turn basic, while basic ones (from lysine, arginine, histidine) hold a positive charge until the pH climbs past them. Add every switch together at each acidity and you get this curve — net charge sliding smoothly from strongly positive in acid, down through a single crossing point, to strongly negative in base. That crossing point has a name and an outsized importance: the isoelectric point, the one pH where the pluses and minuses exactly cancel. There, a protein carries no net charge, so it no longer drifts in an electric field and, with nothing to keep its molecules repelling one another, it becomes least soluble and tends to clump and fall out of solution. This is not a laboratory abstraction. It is how scientists separate and purify thousands of proteins by charge, how isoelectric focusing spreads a whole cell's worth of proteins into a fingerprint, and it is the very effect that curdles warm acidified milk into the curds of cheese. Change the mix of acidic and basic building blocks and watch the whole curve slide left or right — every protein carries its own isoelectric point, a number as characteristic as a name."
+}

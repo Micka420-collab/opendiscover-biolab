@@ -984,6 +984,27 @@ export const CHALLENGE_POOL: Challenge[] = [
     par: 0.57,
     hint: 'Too low and the drug barely works; too high and toxicity takes over. Net benefit peaks near the geometric mean of the effective and toxic doses, √(ED50·TD50) = √(10·100) ≈ 32.',
   },
+  {
+    id: 'find-the-isoelectric-point',
+    engine: 'protein-charge',
+    title: 'Find a protein’s isoelectric point',
+    brief:
+      'A protein’s net electric charge shifts as the acidity (pH) around it changes — positive in acid, negative in base. Somewhere in between it is exactly neutral: its isoelectric point, where it stops moving in an electric field and is least soluble. Tune the pH to bring the net charge to zero.',
+    baseParams: { asp: 5, glu: 5, his: 2, lys: 4, arg: 3, outputPoints: 200 },
+    knob: {
+      param: 'reportPH',
+      label: 'pH',
+      min: 2,
+      max: 12,
+      step: 0.02,
+      default: 7,
+    },
+    metricKey: 'netChargeAtPH',
+    metricLabel: 'Net charge',
+    goal: 'target',
+    target: 0,
+    hint: 'Net charge falls steadily as pH rises and crosses zero at the isoelectric point. For this acidic protein (more Asp/Glu than Lys/Arg) the pI sits low — around pH 4.9.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

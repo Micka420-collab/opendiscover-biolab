@@ -74,6 +74,7 @@ import { spec as wrightFisher } from './popgen/wright-fisher';
 import { spec as hpFolding } from './protein/hp-folding';
 import { spec as massSpec } from './protein/mass-spec';
 import { spec as proteinProperties } from './protein/properties';
+import { spec as proteinCharge } from './protein/protein-charge';
 import { spec as secondaryStructure } from './protein/secondary-structure';
 import { spec as twoStateFolding } from './protein/two-state-folding';
 import { spec as dnaMelting } from './structural/dna-melting';
@@ -100,6 +101,7 @@ export const engines: AnyEngine[] = [
   crispr,
   alignment,
   proteinProperties,
+  proteinCharge,
   secondaryStructure,
   hpFolding,
   massSpec,

@@ -818,6 +818,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'find-the-isoelectric-point': {
+    plainWhat:
+      'A protein’s overall electric charge changes with how acidic its surroundings are — positive in acid, negative in base. You are setting the acidity to find the exact point in between where the pluses and minuses cancel and the net charge is zero.',
+    plainWhy:
+      'At that break-even acidity a protein stops moving in an electric field and clumps together, so it is how labs sort and purify proteins — and the same effect that turns milk into cheese. It is one of the most useful fingerprints of a protein.',
+    plainHow:
+      'In acid the protein is positively charged; in base it is negative. As you raise the acidity number (pH), the charge falls steadily through zero. Slide it until the net charge reads zero — that crossing point is the isoelectric point.',
+    terms: [
+      {
+        term: 'pH',
+        meaning: 'how acidic or basic the surroundings are — low is acidic, high is basic.',
+      },
+      {
+        term: 'net charge',
+        meaning:
+          'the protein’s overall electric charge once all its pluses and minuses are added up.',
+      },
+      {
+        term: 'isoelectric point',
+        meaning: 'the acidity at which a protein carries no net charge at all.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */

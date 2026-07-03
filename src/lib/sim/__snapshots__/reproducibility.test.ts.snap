@@ -571,6 +571,16 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "40-residue protein: 4777.5 Da, pI 10.62, GRAVY -0.16, instability 34.4 (stable).",
   },
+  "protein-charge": {
+    "metrics": {
+      "acidicGroups": 11,
+      "basicGroups": 10,
+      "chargeAtPH7": -2.60149,
+      "isoelectricPoint": 4.93863,
+      "netChargeAtPH": -2.60149,
+    },
+    "summary": "Net charge -2.60 at pH 7; the protein is neutral at its isoelectric point pI 4.94 (acidic protein). At physiological pH 7 it carries -2.60.",
+  },
   "radioactive-decay": {
     "metrics": {
       "decayConstant": 0.000120968,
