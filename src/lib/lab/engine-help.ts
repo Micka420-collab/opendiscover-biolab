@@ -1776,6 +1776,29 @@ export const ENGINE_HELP: Record<string, HelpCard> = {
       },
     ],
   },
+  'cable-length-constant': {
+    plainWhat:
+      'Nerve cells send electrical signals along thin fibres. This shows how a signal, injected at one spot, fades as it travels along the fibre — because a little electricity leaks out through the wall the whole way along. It works out how far the signal reaches and draws it dying away with distance.',
+    plainWhy:
+      'This fading is the reason nerves are built the way they are. A pure passive signal cannot travel far before it disappears, so real nerves boost it again and again along the way, and wrap long fibres in a fatty insulation (myelin) to slow the leak. When that insulation is damaged — as in multiple sclerosis — signals fade too soon and the body misfires. It also explains why thick nerve fibres carry signals further and faster than thin ones.',
+    plainHow:
+      'Make the fibre fatter, or better insulated, and the signal reaches further before fading; make the inside more resistant to flow and it fades sooner. Watch the curve: it always starts full strength and falls away smoothly, and the "length constant" marks the distance where only about a third of the signal is left.',
+    terms: [
+      {
+        term: 'length constant',
+        meaning:
+          'the distance over which the signal fades to about a third of its starting strength.',
+      },
+      {
+        term: 'membrane resistance',
+        meaning: 'how well the fibre wall holds the electricity in instead of letting it leak out.',
+      },
+      {
+        term: 'passive spread',
+        meaning: 'a signal coasting along on its own, with nothing boosting it — so it only fades.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for an engine, or null if none exists yet. */

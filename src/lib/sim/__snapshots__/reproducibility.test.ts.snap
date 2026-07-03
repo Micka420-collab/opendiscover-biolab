@@ -89,6 +89,15 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
     },
     "summary": "Aa Bb × Aa Bb → 4 phenotype(s) in 9:3:3:1; most common "Round, Yellow" (56.3%).",
   },
+  "cable-length-constant": {
+    "metrics": {
+      "effectiveReach": 3256.35,
+      "halfDecayDistance": 490.129,
+      "lengthConstant": 707.107,
+      "voltageFractionAtDistance": 0.493069,
+    },
+    "summary": "Passive cable: λ=707 µm for a 2 µm fibre. Voltage falls to 49.3% by 500 µm, halves every 490 µm, and is essentially gone (1%) beyond 3.26e+3 µm.",
+  },
   "chemostat-competition": {
     "metrics": {
       "finalBiomass1": 4.66667,

@@ -919,6 +919,28 @@ export const CHALLENGE_POOL: Challenge[] = [
     target: 0,
     hint: 'Net photosynthesis rises steadily with light and crosses zero at the compensation point I = R_d·K_m/(P_max − R_d). With these values that is 2·200/(20−2) ≈ 22 µmol/m²/s.',
   },
+  {
+    id: 'signal-that-reaches-the-soma',
+    engine: 'cable-length-constant',
+    title: 'Build a dendrite that reaches the cell body',
+    brief:
+      'A synapse fires 500 µm out on a dendrite, but the voltage leaks away as it travels toward the cell body. Fatter fibres leak less and carry the signal further. Thicken the dendrite until exactly half of the original voltage still survives when it arrives.',
+    baseParams: { membraneResistance: 10000, axialResistivity: 100, distance: 500 },
+    knob: {
+      param: 'diameter',
+      label: 'Dendrite diameter',
+      min: 0.2,
+      max: 10,
+      step: 0.05,
+      default: 1,
+      unit: 'µm',
+    },
+    metricKey: 'voltageFractionAtDistance',
+    metricLabel: 'Voltage surviving at 500 µm',
+    goal: 'target',
+    target: 0.5,
+    hint: 'The signal survives as e^(−x/λ) with λ=√(d·R_m/(4·R_i)), so a fatter fibre (bigger λ) delivers more. Half surviving at 500 µm needs λ ≈ 721 µm — a diameter of about 2.1 µm.',
+  },
 ];
 
 /** 32-bit FNV-1a hash of a string — deterministic, no dependencies. */

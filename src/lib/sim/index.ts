@@ -55,6 +55,7 @@ import { cloningSpec as cloning } from './molbio/cloning';
 import { spec as crispr } from './molbio/crispr';
 import { spec as pcr } from './molbio/pcr';
 import { spec as sequence } from './molbio/sequence';
+import { spec as cableLengthConstant } from './neuro/cable-length-constant';
 import { spec as fitzHughNagumo } from './neuro/fitzhugh-nagumo';
 import { spec as hodgkinHuxley } from './neuro/hodgkin-huxley';
 import { spec as izhikevich } from './neuro/izhikevich';
@@ -106,6 +107,7 @@ export const engines: AnyEngine[] = [
   wilsonCowan,
   izhikevich,
   restingPotential,
+  cableLengthConstant,
   enzymeKinetics,
   grn,
   gillespie,

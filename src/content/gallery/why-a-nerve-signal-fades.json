@@ -1,0 +1,16 @@
+{
+  "slug": "why-a-nerve-signal-fades",
+  "title": "Why a nerve signal fades with distance",
+  "engine": "cable-length-constant",
+  "params": {
+    "diameter": 2,
+    "membraneResistance": 10000,
+    "axialResistivity": 100,
+    "distance": 500,
+    "distanceMax": 3000,
+    "outputPoints": 200
+  },
+  "author": "OpenDiscover",
+  "credit": "https://github.com/Micka420-collab/opendiscover-biolab",
+  "blurb": "Inject a voltage at one point on a thin neural fibre and it does not glide along untouched — it bleeds away. Current leaks out through the membrane the whole length of the journey, so the signal decays smoothly with distance, and this curve captures exactly how. The decay is exponential, governed by a single number the biophysicists call the length constant: the distance over which the signal drops to about a third of where it began. Fatter fibres, or better-insulated ones, have a longer length constant and carry the signal further; a thinner, leakier fibre snuffs it out in a fraction of the distance. But notice what exponential decay really means — no matter how good the cable, the signal keeps losing the same fraction every step, so it can never coast across a whole neuron on its own. That single fact dictates how nervous systems are built. Axons do not spread signals passively; they regenerate them over and over as travelling action potentials, and they wrap long fibres in myelin, a fatty insulation that slashes the leak and lets the signal skip between gaps. When disease strips that insulation away — as multiple sclerosis does — the length constant collapses, signals die before they arrive, and the body misfires. Change the diameter or the insulation here and watch the reach stretch or shrink: the humble geometry of a wire, setting the limits of thought and movement."
+}

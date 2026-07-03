@@ -2,7 +2,7 @@
 
 # Simulation Engines
 
-The OpenDiscover BioLab ships **73 deterministic simulation engines** across
+The OpenDiscover BioLab ships **74 deterministic simulation engines** across
 11 domains of computational biology. Every engine is a *pure function* — no clock,
 no network, no unseeded randomness — validated against known analytical or textbook values. The
 same parameters always produce the same result and the same content hash, on every machine.
@@ -19,7 +19,7 @@ Each engine is registered in `src/lib/sim/index.ts` and conforms to the `EngineS
 
 - **🧫 Molecular biology** — [`sequence`](#sequence) · [`pcr`](#pcr) · [`cloning`](#cloning) · [`crispr`](#crispr) · [`alignment`](#alignment)
 - **🧬 Protein biophysics** — [`properties`](#properties) · [`secondary-structure`](#secondary-structure) · [`hp-folding`](#hp-folding) · [`mass-spec`](#mass-spec) · [`two-state-folding`](#two-state-folding)
-- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential)
+- **🧠 Neuroscience** — [`hodgkin-huxley`](#hodgkin-huxley) · [`fitzhugh-nagumo`](#fitzhugh-nagumo) · [`wilson-cowan`](#wilson-cowan) · [`izhikevich`](#izhikevich) · [`resting-potential`](#resting-potential) · [`cable-length-constant`](#cable-length-constant)
 - **⚙️ Systems biology** — [`enzyme-kinetics`](#enzyme-kinetics) · [`grn`](#grn) · [`gillespie`](#gillespie) · [`gompertz-tumor`](#gompertz-tumor) · [`kuramoto`](#kuramoto) · [`branching-growth`](#branching-growth) · [`fba`](#fba) · [`metabolic-pathway`](#metabolic-pathway)
 - **🌱 Population genetics** — [`wright-fisher`](#wright-fisher) · [`phylogenetics`](#phylogenetics) · [`hardy-weinberg`](#hardy-weinberg) · [`moran-process`](#moran-process) · [`luria-delbruck`](#luria-delbruck) · [`ewens-sampling`](#ewens-sampling) · [`coalescent`](#coalescent) · [`recombination-map`](#recombination-map) · [`breeding`](#breeding)
 - **🐺 Ecology** — [`lotka-volterra`](#lotka-volterra) · [`logistic-map`](#logistic-map) · [`rosenzweig-macarthur`](#rosenzweig-macarthur) · [`rock-paper-scissors`](#rock-paper-scissors) · [`nicholson-bailey`](#nicholson-bailey) · [`chemostat-competition`](#chemostat-competition) · [`levins-metapopulation`](#levins-metapopulation) · [`replicator-dynamics`](#replicator-dynamics) · [`allometric-scaling`](#allometric-scaling) · [`photosynthesis-light`](#photosynthesis-light)
@@ -600,6 +600,42 @@ The steady resting voltage of a cell membrane from ion gradients and permeabilit
 ```
 
 _Run it: `POST /api/lab/run { "engine": "resting-potential", "params": … }` or interactively at `/lab/resting-potential`._
+
+---
+
+### `cable-length-constant` — Neural Cable (Length Constant)
+
+How far a steady electrical signal spreads down a passive neural fibre before it fades. Treating a dendrite or axon as a leaky cable, an injected voltage decays exponentially V(x)=V₀·e^(−x/λ) with length constant λ=√(d·R_m/(4·R_i)): fatter, better-insulated fibres (larger diameter d or membrane resistance R_m, smaller axial resistivity R_i) carry the signal further. Reports the length constant, the voltage fraction surviving at a chosen distance, the half-decay distance (λ·ln2) and the effective reach (distance to 1%), plus the voltage-vs-distance decay curve. Shows why long neurons need active, regenerating action potentials and myelin rather than passive spread. Diameter in µm, converted internally. Closed-form and deterministic.
+
+**References**
+- Rall, W. (1959) Branching dendritic trees and motoneuron membrane resistivity. Exp. Neurol. 1:491-527.
+- Dayan, P. & Abbott, L.F. (2001) Theoretical Neuroscience, ch. 6.
+
+**Parameters**
+
+| Param | Type | Default | Range | Description |
+|---|---|---|---|---|
+| `diameter` | number | `2` | ≥ 0.1, ≤ 1000 |  |
+| `membraneResistance` | number | `10000` | ≥ 1, ≤ 1000000 |  |
+| `axialResistivity` | number | `100` | ≥ 1, ≤ 100000 |  |
+| `distance` | number | `500` | ≥ 0, ≤ 10000000 |  |
+| `distanceMax` | number | `3000` | ≥ 0.001, ≤ 10000000 |  |
+| `outputPoints` | integer | `200` | ≥ 4, ≤ 4000 |  |
+
+**Example**
+
+```json
+{
+  "diameter": 2,
+  "membraneResistance": 10000,
+  "axialResistivity": 100,
+  "distance": 500,
+  "distanceMax": 3000,
+  "outputPoints": 200
+}
+```
+
+_Run it: `POST /api/lab/run { "engine": "cable-length-constant", "params": … }` or interactively at `/lab/cable-length-constant`._
 
 
 ## ⚙️ Systems biology

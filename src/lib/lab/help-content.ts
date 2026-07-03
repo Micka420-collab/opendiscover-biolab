@@ -751,6 +751,29 @@ export const HELP_CARDS: Record<string, HelpCard> = {
       },
     ],
   },
+  'signal-that-reaches-the-soma': {
+    plainWhat:
+      'A nerve signal starts partway out on a branch and fades as it travels toward the cell body, because electricity leaks out along the way. You are thickening the branch — which slows the leak — until exactly half of the signal still survives when it arrives.',
+    plainWhy:
+      'This is why real nerves boost their signals along the route and wrap long fibres in fatty insulation: on their own, signals just fade out. Thicker, better-insulated fibres carry them further, which is why nerve damage that strips that insulation causes weakness and numbness.',
+    plainHow:
+      'A fatter branch leaks less, so more of the signal survives the trip. Thicken it gradually and watch the surviving fraction climb from a trickle toward full strength — stop when exactly half is left when the signal reaches the cell body.',
+    terms: [
+      {
+        term: 'dendrite',
+        meaning: 'a branch of a nerve cell that carries incoming signals toward the cell body.',
+      },
+      {
+        term: 'length constant',
+        meaning:
+          'the distance over which a signal fades to about a third of its starting strength.',
+      },
+      {
+        term: 'voltage',
+        meaning: 'the electrical strength of the signal — what fades as it travels.',
+      },
+    ],
+  },
 };
 
 /** The plain-language help card for a challenge, or null if none exists yet. */
