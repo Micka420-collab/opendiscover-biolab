@@ -86,6 +86,14 @@ with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed
       (`sim/core/param-fields.ts`, `describeEngine().fields`) and Vega-Lite result charts
       (`lib/lab/charts.ts` + shared `components/charts/vega-lite-embed.tsx`). 16 new tests.
       `/lab/campaigns` live viewer is still open — tracked below.
+      **Seed field usability**: the near-universal `seed: z.union([z.number(), z.string()])`
+      param (present on every seeded engine, including all newer ones — `luria-delbruck`,
+      `moran-process`, `kuramoto`, etc.) used to fall back to a raw JSON textarea (`describeParamFields`
+      couldn't map a union to a control), forcing users to type `"my-seed"` with quotes instead of
+      just `my-seed`. `param-fields.ts` now special-cases the exact `number | string` union shape as
+      a plain text field — verified live end-to-end: `/lab/luria-delbruck` renders a real `<input
+      type="text">`, and `POST /api/lab/run` accepts a bare unquoted seed string and returns a valid
+      result. Any other union shape still correctly falls back to `json`.
 - [ ] **Lab campaigns live viewer** — `/lab/campaigns` page streaming a running autonomous
       campaign's notebook (builds on the durable Inngest campaign below)
 - [x] **SIMULATION_ENGINES.md** — full catalog GENERATED from the registry

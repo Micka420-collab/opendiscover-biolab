@@ -85,7 +85,7 @@ Deterministic in-silico PCR on a known linear template. Locates forward/reverse 
 | `tmTarget` | number | `58` | ≥ 30, ≤ 90 |  |
 | `tmMethod` | enum(wallace \| gc \| nn \| auto) | `auto` |  |  |
 | `maxMismatches` | integer | `0` | ≥ 0, ≤ 5 |  |
-| `seed` | json | `pcr` |  |  |
+| `seed` | string | `pcr` |  |  |
 
 **Example**
 
@@ -192,7 +192,7 @@ Designs SpCas9 (5'-NGG-3') or Cas12a (5'-TTTV-3') guide RNAs against a target DN
 | `enzyme` | enum(SpCas9 \| Cas12a) | `SpCas9` |  |  |
 | `genome` | string | — |  |  |
 | `maxMismatch` | integer | `3` | ≥ 0, ≤ 6 |  |
-| `seed` | json | `crispr` |  |  |
+| `seed` | string | `crispr` |  |  |
 
 **Example**
 
@@ -355,7 +355,7 @@ Two-dimensional square-lattice HP (hydrophobic-polar) protein folding — the cl
 | `sequence` | string | **required** |  | Protein sequence over the {H, P} alphabet |
 | `steps` | integer | `30000` | ≥ 0, ≤ 5000000 |  |
 | `temperature` | number | `2` | ≥ 0 |  |
-| `seed` | json | `42` |  |  |
+| `seed` | string | `42` |  |  |
 
 **Example**
 
@@ -733,7 +733,7 @@ Single-substrate enzyme kinetics: Michaelis–Menten velocity, competitive / non
 | `gridPoints` | integer | `100` | ≥ 0 |  |
 | `progressPoints` | integer | `120` | ≥ 0 |  |
 | `noiseCv` | number | `0` | ≥ 0 |  |
-| `seed` | json | `enzyme-kinetics` |  |  |
+| `seed` | string | `enzyme-kinetics` |  |  |
 
 **Example**
 
@@ -779,7 +779,7 @@ Deterministic ODE simulator for transcription-factor networks using Hill activat
 | `tMax` | number | `100` | ≥ 0 |  |
 | `outputPoints` | integer | `2000` | ≥ 0 |  |
 | `tol` | number | `1e-7` | ≥ 0 |  |
-| `seed` | json | `grn` |  |  |
+| `seed` | string | `grn` |  |  |
 | `initialNoise` | number | `0` | ≥ 0 |  |
 
 **Example**
@@ -811,7 +811,7 @@ Exact stochastic simulation of the chemical master equation via Gillespie’s di
 | `presetParams` | json | — |  |  |
 | `model` | json | — |  |  |
 | `tMax` | number | `50` | ≥ 0 |  |
-| `seed` | json | `42` |  |  |
+| `seed` | string | `42` |  |  |
 | `burnInFraction` | number | `0.2` | ≥ 0, ≤ 0.9 |  |
 | `maxSteps` | integer | `2000000` | ≥ 0 |  |
 | `maxSeriesPoints` | integer | `500` | ≥ 0 |  |
@@ -888,7 +888,7 @@ A population of coupled phase oscillators (fireflies, pacemaker cells, neurons) 
 | `tEnd` | number | `40` | ≥ 0, ≤ 10000 |  |
 | `steps` | integer | `2000` | ≥ 0, ≤ 200000 |  |
 | `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
-| `seed` | json | `kuramoto` |  |  |
+| `seed` | string | `kuramoto` |  |  |
 
 **Example**
 
@@ -926,7 +926,7 @@ Simulates a proliferating cell lineage as a Galton-Watson branching process: eac
 | `generations` | integer | `20` | ≥ 1, ≤ 200 |  |
 | `replicates` | integer | `300` | ≥ 1, ≤ 2000 |  |
 | `maxPopulationCap` | integer | `200000` | ≥ 10 |  |
-| `seed` | json | `branching-growth` |  |  |
+| `seed` | string | `branching-growth` |  |  |
 
 **Example**
 
@@ -1076,7 +1076,7 @@ Stochastic Wright-Fisher model of a biallelic locus in a finite diploid populati
 | `replicates` | integer | — | ≥ 0 | Number of independent replicate populations (default 200). |
 | `selection` | json | — |  | Genotype fitnesses; omitted ⇒ neutral (wAA=wAa=waa=1). |
 | `mutation` | json | — |  | Mutation rates; omitted ⇒ no mutation. |
-| `seed` | json | — |  | PRNG seed for reproducibility (default 1). |
+| `seed` | string | — |  | PRNG seed for reproducibility (default 1). |
 
 **Example**
 
@@ -1194,7 +1194,7 @@ A finite population of N individuals where mutants (relative fitness r) and wild
 | `replicates` | integer | `500` | ≥ 0, ≤ 50000 |  |
 | `maxSteps` | integer | `2000000` | ≥ 0, ≤ 50000000 |  |
 | `outputPoints` | integer | `400` | ≥ 0, ≤ 2000 |  |
-| `seed` | json | `moran` |  |  |
+| `seed` | string | `moran` |  |  |
 
 **Example**
 
@@ -1231,7 +1231,7 @@ The 1943 fluctuation test that proved mutations arise at random during growth, b
 | `finalSize` | number | `100000000` | ≥ 0 |  |
 | `initialSize` | number | `1` | ≥ 0 |  |
 | `cultures` | integer | `2000` | ≥ 2, ≤ 200000 |  |
-| `seed` | json | `luria-delbruck` |  |  |
+| `seed` | string | `luria-delbruck` |  |  |
 
 **Example**
 
@@ -1392,7 +1392,7 @@ Cross two diploid parents across independent gene loci and get the full offsprin
 | `parentB` | json | **required** |  |  |
 | `offspringCount` | integer | `12` | ≥ 0, ≤ 1000 |  |
 | `mutationRate` | number | `0` | ≥ 0, ≤ 1 |  |
-| `seed` | json | `breeding` |  |  |
+| `seed` | string | `breeding` |  |  |
 
 **Example**
 
@@ -2532,7 +2532,7 @@ Deterministic SIR / SEIR / SIRD transmission models with standard (frequency-dep
 | `tMax` | number | `160` | ≥ 0 |  |
 | `outputPoints` | integer | `400` | ≥ 0 |  |
 | `reportingRate` | number | `0` | ≥ 0, ≤ 1 |  |
-| `seed` | json | `compartmental` |  |  |
+| `seed` | string | `compartmental` |  |  |
 
 **Example**
 

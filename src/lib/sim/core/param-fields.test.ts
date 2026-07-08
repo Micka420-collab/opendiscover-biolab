@@ -49,11 +49,10 @@ describe('describeParamFields', () => {
     expect(field).toMatchObject({ kind: 'string', optional: false, default: undefined });
   });
 
-  it('falls back to `json` for arrays, objects, and unions it cannot render as a control', () => {
+  it('falls back to `json` for arrays and objects it cannot render as a control', () => {
     const schema = z.object({
       tags: z.array(z.number()).default([1, 2, 3]),
       nested: z.object({ a: z.number() }).optional(),
-      seed: z.union([z.number(), z.string()]).default('run-1'),
     });
     const fields = describeParamFields(schema);
     expect(fields).toEqual([
@@ -73,15 +72,35 @@ describe('describeParamFields', () => {
         kind: 'json',
         default: undefined,
       },
-      {
-        name: 'seed',
-        label: 'Seed',
-        description: undefined,
-        optional: true,
-        kind: 'json',
-        default: 'run-1',
-      },
     ]);
+  });
+
+  it('renders the common `z.union([z.number(), z.string()])` seed pattern as a text field, not JSON', () => {
+    // This is the exact shape used by every seeded engine's `seed` param
+    // (e.g. `breeding`, `pcr`, `luria-delbruck`, `moran-process`, `kuramoto`).
+    // A raw JSON textarea forced users to type `"my-seed"` (with quotes) for a
+    // string seed instead of just `my-seed` — this renders it as a plain text
+    // input, which round-trips through the union just fine (a string is
+    // always a valid member of `z.union([z.number(), z.string()])`).
+    const schema = z.object({ seed: z.union([z.number(), z.string()]).default('run-1') });
+    const [field] = describeParamFields(schema);
+    expect(field).toMatchObject({ kind: 'string', default: 'run-1', optional: true });
+  });
+
+  it('stringifies a numeric union default so it still fits the `string` field kind', () => {
+    const schema = z.object({ seed: z.union([z.number(), z.string()]).default(42) });
+    const [field] = describeParamFields(schema);
+    expect(field).toMatchObject({ kind: 'string', default: '42' });
+  });
+
+  it('still falls back to `json` for a union that is not exactly number|string', () => {
+    const schema = z.object({
+      mode: z.union([z.literal('a'), z.literal('b'), z.literal('c')]).default('a'),
+      flexible: z.union([z.number(), z.boolean()]).optional(),
+    });
+    const fields = describeParamFields(schema);
+    expect(fields[0].kind).toBe('json');
+    expect(fields[1].kind).toBe('json');
   });
 
   it('humanizes camelCase names into label-cased words', () => {

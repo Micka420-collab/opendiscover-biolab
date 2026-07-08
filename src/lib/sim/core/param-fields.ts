@@ -155,6 +155,25 @@ function toField(name: string, fieldSchema: ZodInternal): ParamField {
         kind: 'string',
         default: hasDefault ? (defaultValue as string) : undefined,
       };
+    case 'ZodUnion': {
+      // The common `seed: z.union([z.number(), z.string()])` pattern (used by
+      // every seeded engine) is renderable as a plain text input: whatever the
+      // user types is submitted as a string, which is itself a valid member of
+      // the union, so it round-trips through the schema without a JSON
+      // textarea. Any other union shape still falls through to `json` below.
+      const options = (inner._def.options as ZodInternal[] | undefined) ?? [];
+      const typeNames = options.map((o) => o._def.typeName);
+      const isNumberOrString =
+        options.length === 2 && typeNames.includes('ZodNumber') && typeNames.includes('ZodString');
+      if (isNumberOrString) {
+        return {
+          ...base,
+          kind: 'string',
+          default: hasDefault ? String(defaultValue) : undefined,
+        };
+      }
+      return { ...base, kind: 'json', default: hasDefault ? defaultValue : undefined };
+    }
     default:
       return { ...base, kind: 'json', default: hasDefault ? defaultValue : undefined };
   }
