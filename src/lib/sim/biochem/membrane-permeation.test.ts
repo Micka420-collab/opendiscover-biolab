@@ -7,7 +7,13 @@ const metric = (r: ReturnType<typeof run>, key: string) =>
 describe('membrane-permeation (Fick)', () => {
   it('permeability is D·K/L and flux is P·ΔC', () => {
     expect(permeability(1e-6, 1, 1e-6)).toBeCloseTo(1, 12);
-    const r = run({ diffusionCoeff: 1e-6, partitionCoeff: 1, thickness: 1e-6, concOutside: 100, concInside: 0 });
+    const r = run({
+      diffusionCoeff: 1e-6,
+      partitionCoeff: 1,
+      thickness: 1e-6,
+      concOutside: 100,
+      concInside: 0,
+    });
     expect(metric(r, 'permeability')).toBeCloseTo(1, 12);
     expect(metric(r, 'initialFlux')).toBeCloseTo(100, 9); // P·(100−0)
     expect(metric(r, 'rateConstant')).toBeCloseTo(2, 12); // 2·P·A/V
@@ -35,13 +41,22 @@ describe('membrane-permeation (Fick)', () => {
     const low = run({ partitionCoeff: 0.1 });
     const high = run({ partitionCoeff: 100 });
     expect(metric(high, 'permeability')).toBeGreaterThan(metric(low, 'permeability'));
-    expect(metric(high, 'halfEquilibrationTime')).toBeLessThan(metric(low, 'halfEquilibrationTime'));
+    expect(metric(high, 'halfEquilibrationTime')).toBeLessThan(
+      metric(low, 'halfEquilibrationTime'),
+    );
   });
 
   it('rejects denormal inputs and stays finite at the schema bounds', () => {
     expect(() => run({ thickness: 5e-324 })).toThrow();
     expect(() => run({ partitionCoeff: 5e-324 })).toThrow();
-    const r = run({ diffusionCoeff: 1, partitionCoeff: 1e6, thickness: 1e-9, area: 1e6, volume: 1e-9, tEnd: 1e12 });
+    const r = run({
+      diffusionCoeff: 1,
+      partitionCoeff: 1e6,
+      thickness: 1e-9,
+      area: 1e6,
+      volume: 1e-9,
+      tEnd: 1e12,
+    });
     for (const m of r.metrics) expect(Number.isFinite(m.value)).toBe(true);
     for (const y of r.series?.[0]?.y.inside ?? []) expect(Number.isFinite(y)).toBe(true);
   });
