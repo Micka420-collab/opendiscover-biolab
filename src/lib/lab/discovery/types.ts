@@ -58,6 +58,17 @@ export interface Quest {
   fixedParams: Record<string, number>;
   /** How many probes the player gets before they should commit to a claim. */
   probeBudget: number;
+  /**
+   * Which engine metric a probe reveals (the continuous signal the player
+   * reasons about) and the thresholds that bucket it into a coarse low/mid/high
+   * band — never the exact regime.
+   */
+  probeSignal: {
+    metric: string;
+    label: string;
+    lowThreshold: number;
+    highThreshold: number;
+  };
   /** Map an engine result to its canonical regime. */
   classify: (result: SimResult) => Regime;
   /** The documented regimes for this quest (anything else is novel). */
@@ -80,8 +91,8 @@ export interface ProbeResult {
   signalKey: string;
   signalLabel: string;
   signalValue: number;
-  /** Coarse qualitative read: is the system periodic, chaotic, or on the edge? */
-  hint: 'periodic' | 'chaotic' | 'marginal';
+  /** Coarse read of where the signal sits: below `lowThreshold`, above `highThreshold`, or between. */
+  band: 'low' | 'mid' | 'high';
 }
 
 /** The verdict when a player commits to a discovery claim. */

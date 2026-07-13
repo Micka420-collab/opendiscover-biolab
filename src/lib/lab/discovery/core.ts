@@ -30,16 +30,11 @@ const metricValue = (result: { metrics: { key: string; value: number }[] }, key:
 export function probe(quest: Quest, axisValues: Record<string, number>): ProbeResult {
   const params = questParams(quest, axisValues);
   const result = runEngine(quest.engine, params);
-  const lyapunov = metricValue(result, 'lyapunovExponent');
-  const hint: ProbeResult['hint'] =
-    lyapunov > 0.01 ? 'chaotic' : lyapunov < -0.01 ? 'periodic' : 'marginal';
-  return {
-    params,
-    signalKey: 'lyapunovExponent',
-    signalLabel: 'Lyapunov exponent λ',
-    signalValue: lyapunov,
-    hint,
-  };
+  const { metric, label, lowThreshold, highThreshold } = quest.probeSignal;
+  const value = metricValue(result, metric);
+  const band: ProbeResult['band'] =
+    value < lowThreshold ? 'low' : value > highThreshold ? 'high' : 'mid';
+  return { params, signalKey: metric, signalLabel: label, signalValue: value, band };
 }
 
 /** Classify a set of axis values into its regime (runs the engine). */

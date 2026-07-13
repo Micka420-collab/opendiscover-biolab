@@ -101,6 +101,12 @@ export const logisticRoadToChaos: Quest = {
   axes: [{ key: 'r', label: 'Growth rate r', min: 0, max: 4, base: 3.5, step: 0.001 }],
   fixedParams: { x0: 0.2, transient: 5000, analysisIterations: 8000 },
   probeBudget: 12,
+  probeSignal: {
+    metric: 'lyapunovExponent',
+    label: 'Lyapunov exponent λ',
+    lowThreshold: -0.01, // λ < 0 ⇒ periodic (calm)
+    highThreshold: 0.01, // λ > 0 ⇒ chaotic
+  },
   classify: classifyLogistic,
   knownCatalog: KNOWN_CATALOG,
   targets: ['period-3-window', 'period-8', 'full-chaos'],

@@ -34,15 +34,15 @@ describe('discovery — logistic Road to Chaos classification', () => {
 });
 
 describe('discovery — probe reveals only a coarse signal', () => {
-  it('a chaotic r reads "chaotic" with a positive Lyapunov exponent', () => {
+  it('a chaotic r reads a "high" band with a positive Lyapunov exponent', () => {
     const p = probe(quest, { r: 3.9 });
-    expect(p.hint).toBe('chaotic');
+    expect(p.band).toBe('high');
     expect(p.signalValue).toBeGreaterThan(0);
   });
 
-  it('a stable r reads "periodic" with a negative Lyapunov exponent', () => {
+  it('a stable r reads a "low" band with a negative Lyapunov exponent', () => {
     const p = probe(quest, { r: 2.5 });
-    expect(p.hint).toBe('periodic');
+    expect(p.band).toBe('low');
     expect(p.signalValue).toBeLessThan(0);
   });
 

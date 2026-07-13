@@ -6,11 +6,9 @@ import { DiscoverClient } from './discover-client';
 export const metadata = { title: 'Discovery Mode — OpenDiscover BioLab' };
 
 export default function DiscoverPage() {
-  // One flagship quest for now; the classify function is dropped so the quest is
-  // safe to hand to a client component (classification runs server-side).
-  const quest = listQuests()[0];
-  const { classify: _classify, ...view } = quest;
-  const questView = view as QuestView;
+  // Strip each quest's classify function so the quests are safe to hand to a
+  // client component (classification runs server-side, in the discovery API).
+  const questViews: QuestView[] = listQuests().map(({ classify: _classify, ...view }) => view);
 
   return (
     <div className="space-y-8">
@@ -21,20 +19,20 @@ export default function DiscoverPage() {
           </Link>{' '}
           / Discovery Mode
         </div>
-        <h1 className="text-3xl font-bold">🧭 {questView.title}</h1>
+        <h1 className="text-3xl font-bold">🧭 Discovery Mode</h1>
         <p className="text-muted-foreground max-w-2xl">
-          A real discovery game: the response is hidden, your probes are limited, and every claim is
-          checked against the documented record — so you learn whether what you found is a known
-          phenomenon or a genuinely novel regime. Powered by the deterministic{' '}
-          <code>{questView.engine}</code> engine; every find carries a reproducible proof hash.
+          A real discovery game across the deterministic engines: the response is hidden, your
+          probes are limited, and every claim is checked against the documented record — so you
+          learn whether what you found is a known phenomenon (with its citation) or a genuinely
+          novel regime. Every find carries a reproducible proof hash.
         </p>
       </header>
 
-      <DiscoverClient quest={questView} />
+      <DiscoverClient quests={questViews} />
 
       <footer className="text-xs text-muted-foreground border-t border-border pt-4">
-        Probes and claims are computed by <code>POST /api/discover</code> against the real engine —
-        no database, fully reproducible.
+        Probes and claims are computed by <code>POST /api/discover</code> against the real engines —
+        no database, fully reproducible. Your logbook is saved in this browser.
       </footer>
     </div>
   );
