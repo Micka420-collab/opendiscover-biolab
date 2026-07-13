@@ -3,10 +3,15 @@
  * (the same registry drives the API and UI, as the engine registry does).
  */
 import { generatedQuests } from './quests/all-generated';
+import { fitzhughNagumoExcitabilityMap } from './quests/fitzhugh-nagumo-excitability-map';
 import { logisticRoadToChaos } from './quests/logistic-road-to-chaos';
 import type { Quest } from './types';
 
-export const quests: Quest[] = [logisticRoadToChaos, ...generatedQuests];
+export const quests: Quest[] = [
+  logisticRoadToChaos,
+  fitzhughNagumoExcitabilityMap,
+  ...generatedQuests,
+];
 
 const bySlug = new Map<string, Quest>(quests.map((q) => [q.slug, q]));
 

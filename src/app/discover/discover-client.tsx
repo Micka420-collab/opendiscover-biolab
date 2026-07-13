@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { ClaimVerdict, ProbeResult, QuestView } from '@/lib/lab/discovery';
+import type { ClaimVerdict, ProbeResult, QuestAxis, QuestView } from '@/lib/lab/discovery';
 import { useEffect, useMemo, useState } from 'react';
 
 interface Reading extends ProbeResult {
@@ -34,6 +34,8 @@ function tier(rarity: number, isNovel: boolean): { label: string; cls: string } 
   return { label: 'Common', cls: 'text-muted-foreground' };
 }
 
+const pct = (v: number, axis: QuestAxis) => ((v - axis.min) / (axis.max - axis.min)) * 100;
+
 function loadLogbook(): Logbook {
   if (typeof window === 'undefined') return {};
   try {
@@ -46,21 +48,21 @@ function loadLogbook(): Logbook {
 export function DiscoverClient({ quests }: { quests: QuestView[] }) {
   const [questIdx, setQuestIdx] = useState(0);
   const quest = quests[questIdx];
-  const axis = quest.axes[0];
+  const is2D = quest.axes.length === 2;
 
-  const [value, setValue] = useState(axis.base);
+  const [values, setValues] = useState<Record<string, number>>(() =>
+    Object.fromEntries(quest.axes.map((a) => [a.key, a.base])),
+  );
   const [readings, setReadings] = useState<Reading[]>([]);
   const [verdict, setVerdict] = useState<ClaimVerdict | null>(null);
   const [busy, setBusy] = useState<null | 'probe' | 'claim'>(null);
   const [error, setError] = useState<string | null>(null);
   const [logbook, setLogbook] = useState<Logbook>({});
 
-  // Load the persisted logbook once, on the client.
   useEffect(() => setLogbook(loadLogbook()), []);
-  // Reset the in-round state when switching quests.
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset only on quest change
   useEffect(() => {
-    setValue(quest.axes[0].base);
+    setValues(Object.fromEntries(quest.axes.map((a) => [a.key, a.base])));
     setReadings([]);
     setVerdict(null);
     setError(null);
@@ -76,6 +78,8 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
     quest.knownCatalog.find((k) => k.id === id)?.name ??
     id.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
+  const setAxis = (key: string, v: number) => setValues((prev) => ({ ...prev, [key]: v }));
+
   async function call(action: 'probe' | 'claim') {
     setBusy(action);
     setError(null);
@@ -86,7 +90,7 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
         body: JSON.stringify({
           quest: quest.slug,
           action,
-          axisValues: { [axis.key]: value },
+          axisValues: values,
           probesUsed: readings.length,
         }),
       });
@@ -107,7 +111,6 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
             rarity: v.rarity,
           };
           const forQuest = { ...(prev[quest.slug] ?? {}) };
-          // Keep the best score for a regime already found.
           if (!forQuest[v.regime.id] || forQuest[v.regime.id].score < v.score) {
             forQuest[v.regime.id] = entry;
           }
@@ -125,9 +128,10 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
     }
   }
 
+  const posLabel = quest.axes.map((a) => `${a.key}=${values[a.key].toFixed(3)}`).join(', ');
+
   return (
     <div className="space-y-6">
-      {/* Quest picker */}
       {quests.length > 1 && (
         <label className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">Expedition:</span>
@@ -139,6 +143,7 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
             {quests.map((q, i) => (
               <option key={q.slug} value={i}>
                 {q.title}
+                {q.axes.length === 2 ? ' · 2D' : ''}
               </option>
             ))}
           </select>
@@ -150,7 +155,6 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
         <p className="text-sm text-muted-foreground max-w-3xl mt-1">{quest.brief}</p>
       </div>
 
-      {/* Objectives */}
       <div className="flex flex-wrap gap-2">
         {quest.targets.map((t) => (
           <Badge key={t} variant={foundIds.has(t) ? 'success' : 'outline'}>
@@ -162,7 +166,7 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
 
       <Card>
         <CardHeader className="flex-row items-center justify-between gap-2 flex-wrap">
-          <CardTitle className="text-base">Field map — {axis.label}</CardTitle>
+          <CardTitle className="text-base">Field map{is2D ? ' (2D)' : ''}</CardTitle>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span>
               Probes: <span className="font-mono text-foreground">{probesLeft}</span>
@@ -179,52 +183,42 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div>
-            <div className="relative h-12 rounded-md border border-border bg-muted/20">
-              {readings.map((rd) => {
-                const r = rd.params[axis.key] ?? 0;
-                const left = ((r - axis.min) / (axis.max - axis.min)) * 100;
-                return (
-                  <span
-                    key={rd.key}
-                    title={`${axis.label}=${r.toFixed(3)} · ${rd.signalLabel}=${rd.signalValue.toFixed(3)} (${rd.band})`}
-                    className={`absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full ${BAND_COLOR[rd.band]}`}
-                    style={{ left: `${left}%` }}
-                  />
-                );
-              })}
-              <span
-                className="absolute top-0 h-full w-px bg-accent"
-                style={{ left: `${((value - axis.min) / (axis.max - axis.min)) * 100}%` }}
-              />
-            </div>
-            <div className="mt-1 flex justify-between text-[10px] text-muted-foreground font-mono">
-              <span>{axis.min}</span>
-              <span>{axis.max}</span>
-            </div>
-          </div>
-
-          <label className="block space-y-1">
-            <span className="text-xs text-muted-foreground">
-              {axis.label}: <span className="font-mono text-foreground">{value.toFixed(3)}</span>
-            </span>
-            <input
-              type="range"
-              min={axis.min}
-              max={axis.max}
-              step={axis.step}
-              value={value}
-              onChange={(e) => setValue(Number(e.target.value))}
-              className="w-full accent-[hsl(142_71%_45%)]"
+          {is2D ? (
+            <TwoDMap
+              xAxis={quest.axes[0]}
+              yAxis={quest.axes[1]}
+              values={values}
+              readings={readings}
+              onPick={(x, y) => setValues({ [quest.axes[0].key]: x, [quest.axes[1].key]: y })}
             />
-          </label>
+          ) : (
+            <OneDMap axis={quest.axes[0]} value={values[quest.axes[0].key]} readings={readings} />
+          )}
+
+          {quest.axes.map((a) => (
+            <label key={a.key} className="block space-y-1">
+              <span className="text-xs text-muted-foreground">
+                {a.label}:{' '}
+                <span className="font-mono text-foreground">{values[a.key].toFixed(3)}</span>
+              </span>
+              <input
+                type="range"
+                min={a.min}
+                max={a.max}
+                step={a.step}
+                value={values[a.key]}
+                onChange={(e) => setAxis(a.key, Number(e.target.value))}
+                className="w-full accent-[hsl(142_71%_45%)]"
+              />
+            </label>
+          ))}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => call('probe')} disabled={busy !== null || probesLeft <= 0}>
               {busy === 'probe' ? 'Probing…' : `🔬 Probe (${probesLeft} left)`}
             </Button>
             <Button variant="outline" onClick={() => call('claim')} disabled={busy !== null}>
-              {busy === 'claim' ? 'Claiming…' : `📌 Claim at ${axis.key}=${value.toFixed(3)}`}
+              {busy === 'claim' ? 'Claiming…' : `📌 Claim at ${posLabel}`}
             </Button>
             {probesLeft <= 0 && (
               <span className="text-xs text-amber-400">Out of probes — commit to a claim.</span>
@@ -319,6 +313,116 @@ export function DiscoverClient({ quests }: { quests: QuestView[] }) {
           first.
         </p>
       </section>
+    </div>
+  );
+}
+
+function OneDMap({
+  axis,
+  value,
+  readings,
+}: {
+  axis: QuestAxis;
+  value: number;
+  readings: Reading[];
+}) {
+  return (
+    <div>
+      <div className="relative h-12 rounded-md border border-border bg-muted/20">
+        {readings.map((rd) => (
+          <span
+            key={rd.key}
+            title={`${axis.label}=${(rd.params[axis.key] ?? 0).toFixed(3)} · ${rd.signalLabel}=${rd.signalValue.toFixed(3)} (${rd.band})`}
+            className={`absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full ${BAND_COLOR[rd.band]}`}
+            style={{ left: `${pct(rd.params[axis.key] ?? 0, axis)}%` }}
+          />
+        ))}
+        <span
+          className="absolute top-0 h-full w-px bg-accent"
+          style={{ left: `${pct(value, axis)}%` }}
+        />
+      </div>
+      <div className="mt-1 flex justify-between text-[10px] text-muted-foreground font-mono">
+        <span>
+          {axis.label} = {axis.min}
+        </span>
+        <span>{axis.max}</span>
+      </div>
+    </div>
+  );
+}
+
+function TwoDMap({
+  xAxis,
+  yAxis,
+  values,
+  readings,
+  onPick,
+}: {
+  xAxis: QuestAxis;
+  yAxis: QuestAxis;
+  values: Record<string, number>;
+  readings: Reading[];
+  onPick: (x: number, y: number) => void;
+}) {
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const fx = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const fy = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+    const x = xAxis.min + fx * (xAxis.max - xAxis.min);
+    const y = yAxis.min + (1 - fy) * (yAxis.max - yAxis.min); // invert: top = max
+    onPick(Number(x.toFixed(4)), Number(y.toFixed(4)));
+  }
+
+  const xv = values[xAxis.key];
+  const yv = values[yAxis.key];
+
+  return (
+    <div className="flex gap-2">
+      <div className="flex flex-col items-center justify-center">
+        <span className="text-[10px] text-muted-foreground font-mono [writing-mode:vertical-rl] rotate-180">
+          {yAxis.label}
+        </span>
+      </div>
+      <div className="flex-1">
+        <button
+          type="button"
+          onClick={handleClick}
+          aria-label={`Pick ${xAxis.label} and ${yAxis.label} on the field map`}
+          className="relative block w-full aspect-[2/1] rounded-md border border-border bg-muted/20 cursor-crosshair"
+        >
+          {readings.map((rd) => (
+            <span
+              key={rd.key}
+              title={`${xAxis.key}=${(rd.params[xAxis.key] ?? 0).toFixed(3)}, ${yAxis.key}=${(rd.params[yAxis.key] ?? 0).toFixed(3)} · ${rd.signalLabel}=${rd.signalValue.toFixed(3)}`}
+              className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full ${BAND_COLOR[rd.band]}`}
+              style={{
+                left: `${pct(rd.params[xAxis.key] ?? 0, xAxis)}%`,
+                top: `${100 - pct(rd.params[yAxis.key] ?? 0, yAxis)}%`,
+              }}
+            />
+          ))}
+          {/* crosshair at current selection */}
+          <span
+            className="absolute top-0 h-full w-px bg-accent/70"
+            style={{ left: `${pct(xv, xAxis)}%` }}
+          />
+          <span
+            className="absolute left-0 w-full h-px bg-accent/70"
+            style={{ top: `${100 - pct(yv, yAxis)}%` }}
+          />
+        </button>
+        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground font-mono">
+          <span>
+            {xAxis.label} = {xAxis.min}
+          </span>
+          <span>{xAxis.max}</span>
+        </div>
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          Click the map to place your probe, or use the sliders. Dots are past probes (color =
+          signal band); the crosshair is where you'll probe or claim next.
+        </p>
+      </div>
     </div>
   );
 }
