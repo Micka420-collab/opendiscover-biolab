@@ -4,7 +4,7 @@
 
 ### An autonomous in-silico biotechnology laboratory — that anyone can play
 
-**77 deterministic simulation engines + AI scientist agents + a watchable citizen-science game + plain-language help on every dial — in one reproducible, open platform.**
+**80 deterministic simulation engines + AI scientist agents + a watchable citizen-science game + plain-language help on every dial — in one reproducible, open platform.**
 
 [![CI](https://github.com/Micka420-collab/opendiscover-biolab/actions/workflows/ci.yml/badge.svg)](https://github.com/Micka420-collab/opendiscover-biolab/actions)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
@@ -26,7 +26,7 @@
 
 OpenDiscover BioLab is a **virtual biotechnology laboratory** you can run in a browser, play like a game, and drive with AI. It has four layers that build on each other:
 
-1. **A library of 77 deterministic simulation engines** covering the breadth of computational biology — molecular biology, protein biophysics, systems biology, population genetics, neuroscience, ecology, bioprocess engineering, biochemistry, epidemiology, drug discovery, and structural biology. Every engine is a *pure function*: no clock, no network, no unseeded randomness. Same inputs → same outputs → same content hash, on every machine.
+1. **A library of 80 deterministic simulation engines** covering the breadth of computational biology — molecular biology, protein biophysics, systems biology, population genetics, neuroscience, ecology, bioprocess engineering, biochemistry, epidemiology, drug discovery, and structural biology. Every engine is a *pure function*: no clock, no network, no unseeded randomness. Same inputs → same outputs → same content hash, on every machine.
 
 2. **A game anyone can play — and watch.** [**AURORA**](./src/app/aurora) turns the deterministic lab into a spectator-friendly discovery game: tune one dial to find a hidden answer on a fully-visible fitness landscape, lock it in with a real re-run of the engine, and light a beacon on a shared globe. Every engine also has a one-a-day [challenge](#play-share--stream), and every complex dial has a **plain-language "?" card** that explains — with no biology or maths background — what it is, why it matters, and what to try. Science made approachable, so *anyone* can take part.
 
@@ -158,7 +158,7 @@ Each engine ships with a Zod-validated parameter schema, a worked example, liter
 | | `allometric-scaling` | Kleiber's law: metabolic rate ∝ mass^¾, lifespan & heart-rate scaling, ~billion heartbeats |
 | | `photosynthesis-light` | Leaf light response: gross/net photosynthesis, light compensation point, net primary productivity |
 
-> Full catalog (all 77 engines) with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
+> Full catalog (all 80 engines) with parameters and references: [`SIMULATION_ENGINES.md`](./SIMULATION_ENGINES.md).
 > Run any engine interactively — a param form generated from its Zod schema, Vega-Lite result
 > charts, no account needed — at `/lab`.
 
@@ -270,14 +270,15 @@ The engines have **zero runtime dependencies** on secrets — you can `import` a
 Honesty about what has and hasn't been run for real:
 
 **Verified, hands-on:**
-- All 77 engines + the lab + AURORA game layer: **1300+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job). Every engine is guarded by a reproducibility snapshot (pins each example's metric values), a schema-robustness sweep (no NaN/Infinity for any valid extreme input), and a determinism guard (no `Math.random`/`Date`/locale-dependent formatting in engine source). The AURORA pure libs are tested against the *real* engines — the auto-tuner clears the bar for every pooled challenge, so the game is provably winnable.
+- All 80 engines + the lab + AURORA game layer: **1340+ tests pass**, checked against known analytical/textbook values, run in CI with zero secrets (`engines` job). Every engine is guarded by a reproducibility snapshot (pins each example's metric values), a schema-robustness sweep (no NaN/Infinity for any valid extreme input), and a determinism guard (no `Math.random`/`Date`/locale-dependent formatting in engine source). The AURORA pure libs are tested against the *real* engines — the auto-tuner clears the bar for every pooled challenge, so the game is provably winnable.
 - `pnpm build` succeeds — a real Next.js production build, with **no database and no secrets configured** (CI's `build` job runs it with a placeholder, unreachable `DATABASE_URL` to prove this). API routes that read live data are explicitly `dynamic = 'force-dynamic'` so they're never executed at build time.
 - `pnpm dev` + real HTTP requests against the running server confirm `/lab`, `/lab/breeding`, and `/lab/[engine]` render actual content, and `POST /api/lab/run` returns correct, live-computed results (e.g. a `breeding` cross returning the exact 3:1 Mendelian ratio).
 - `pnpm typecheck` and `pnpm lint` (Biome) are both clean.
 
 **Not verified (needs infrastructure this repo doesn't provision):**
 - The discovery pipeline, peer review, DOI minting, auth, and the autonomous `runCampaign` scientist agent all need a real Postgres + pgvector instance and a Vercel AI Gateway key — neither is running against this codebase yet. The code compiles and is typed against real schemas, but its runtime behavior with live data is unverified.
-- No load testing, no security audit, no production deployment yet.
+- No load testing, no security audit.
+- **Hosted deployment:** the Vercel project is being (re)established. The deterministic layer — the Lab, AURORA, and the daily challenge — runs entirely client-side and needs no secrets, so it works on any Vercel deploy of this repo; the discovery-pipeline / auth routes stay dark until their environment variables (see [`.env.example`](./.env.example)) are set on the project. Until the hosted URL above is confirmed live, run it locally with the quick start below.
 
 **Scientific accuracy — models, not lab results.** Every engine reproduces the textbook/analytical case it's tested against, but several use documented simplifications rather than state-of-the-art methods: see each engine's `references` and the caveats noted in its test file (e.g. the ADMET logP is a crude atom-contribution estimate, not a calibrated model; CRISPR on/off-target scoring is a documented heuristic, not the trained Doench/CFD models; HP lattice folding is a teaching model, not a real force field). Treat outputs as illustrative, not as a substitute for wet-lab or peer-reviewed computational results.
 

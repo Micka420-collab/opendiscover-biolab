@@ -5,6 +5,41 @@
 This is the live queue the autonomous heartbeat works through. Each item must land
 with `pnpm typecheck`, `pnpm test`, and `pnpm lint` all green, then be committed + pushed.
 
+### Reality check (updated 2026-07-13)
+
+This document had drifted well behind the code. Current, verified state:
+
+- **80 simulation engines** across 11 domains (biochemistry, population genetics, ecology,
+  systems biology, drug discovery, protein biophysics, neuroscience, molecular biology,
+  epidemiology, structural biology, bioprocess) — not the "18/25" the older checkpoints below
+  mention. **113 test files, 1340+ tests, all green**; `tsc`, `pnpm test`, and `pnpm lint` all
+  clean; CI green on all three jobs (`engines`, `build`, `ci`).
+- **The lab + game layer is built and works client-side, secret-free:** `/lab` catalog,
+  `/lab/[engine]` generic playground (Zod-schema param form + Vega-Lite charts), `/lab/breeding`
+  game, AURORA (`/aurora` + OBS overlay), daily `/challenge`, `/gallery`, `/tv`, share/remix
+  permalinks, OG cards, the MCP server, and `SIMULATION_ENGINES.md` (auto-generated).
+- **The original "discovery engine" is code-complete but runtime-unverified:** Better Auth
+  (magic-link + guest + GitHub OAuth), the Drizzle schema, `/discoveries` + Discovery Card
+  renderer + peer-review UI, the public `/api/v1` API, the admin review queue, and a full Inngest
+  pipeline (`process-submission`, `peer-review`, `canary-replicate`, `recheck-corroboration`,
+  `notify-discovery`, `mint-doi`) plus three cron jobs all exist and typecheck — but none has been
+  exercised against a live Postgres+pgvector / AI Gateway, so the older Phase 0–1 checkboxes below
+  stay unchecked on purpose (they gate on runtime verification, not on code existing).
+- **Hosted deployment: not live.** There is currently **no Vercel project** for this repo (the
+  `opendiscover-biolab.vercel.app` URL in the README is the intended target, not a working deploy).
+  Re-establishing it is the top open item — see "Deployment" below.
+
+### Deployment (top open item)
+
+- [ ] **Restore the Vercel deployment.** No Vercel project exists yet. Import the GitHub repo in the
+      Vercel dashboard (project name `opendiscover-biolab` so the README URL resolves), set the env
+      vars from `.env.example` (DATABASE_URL, BETTER_AUTH_SECRET, UPSTASH_REDIS_*, AI Gateway key,
+      GitHub OAuth, RESEND/ZENODO/NCBI keys, CRON_SECRET), and deploy. The build already passes with
+      only a placeholder `DATABASE_URL` (CI's `build` job proves it), so the deterministic Lab +
+      AURORA + challenge come up even before the secrets are filled in; the DB/auth/discovery routes
+      light up once the env vars are set. Git-connected import also gives auto-deploy on every push,
+      so the hosted app can't silently rot again.
+
 ### Done
 - [x] Deterministic simulation core (PRNG, ODE RK4/RK45, linalg) — 14 tests
 - [x] 18 simulation engines across 7 domains — 422 tests, all vs known values
