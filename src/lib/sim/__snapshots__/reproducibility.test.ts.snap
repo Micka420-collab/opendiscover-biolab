@@ -600,13 +600,13 @@ exports[`engine reproducibility harness > pins every engine example to a stable 
   },
   "protein-charge": {
     "metrics": {
-      "acidicGroups": 11,
+      "acidicGroups": 17,
       "basicGroups": 10,
-      "chargeAtPH7": -2.60149,
-      "isoelectricPoint": 4.93863,
-      "netChargeAtPH": -2.60149,
+      "chargeAtPH7": -2.70011,
+      "isoelectricPoint": 4.93824,
+      "netChargeAtPH": -2.70011,
     },
-    "summary": "Net charge -2.60 at pH 7; the protein is neutral at its isoelectric point pI 4.94 (acidic protein). At physiological pH 7 it carries -2.60.",
+    "summary": "Net charge -2.70 at pH 7; the protein is neutral at its isoelectric point pI 4.94 (acidic protein). At physiological pH 7 it carries -2.70.",
   },
   "radioactive-decay": {
     "metrics": {

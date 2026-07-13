@@ -4,7 +4,8 @@ import { isoelectricPoint, netCharge, run, spec } from './protein-charge';
 const metric = (r: ReturnType<typeof run>, key: string) =>
   r.metrics.find((m) => m.key === key)?.value ?? Number.NaN;
 
-const SAMPLE = { asp: 5, glu: 5, his: 2, lys: 4, arg: 3 };
+// No Cys/Tyr, so these assertions match the classic 7-group model exactly.
+const SAMPLE = { asp: 5, glu: 5, cys: 0, tyr: 0, his: 2, lys: 4, arg: 3 };
 
 describe('protein-charge (isoelectric point)', () => {
   it('net charge falls monotonically with pH (positive when acidic, negative when basic pH)', () => {
@@ -27,8 +28,8 @@ describe('protein-charge (isoelectric point)', () => {
   });
 
   it('more acidic residues lower the pI; more basic residues raise it', () => {
-    const acidic = isoelectricPoint({ asp: 20, glu: 20, his: 0, lys: 0, arg: 0 });
-    const basic = isoelectricPoint({ asp: 0, glu: 0, his: 0, lys: 20, arg: 20 });
+    const acidic = isoelectricPoint({ asp: 20, glu: 20, cys: 0, tyr: 0, his: 0, lys: 0, arg: 0 });
+    const basic = isoelectricPoint({ asp: 0, glu: 0, cys: 0, tyr: 0, his: 0, lys: 20, arg: 20 });
     expect(acidic).toBeLessThan(5);
     expect(basic).toBeGreaterThan(9);
     expect(basic).toBeGreaterThan(acidic);
@@ -41,10 +42,11 @@ describe('protein-charge (isoelectric point)', () => {
   });
 
   it('a protein with only termini still has a valid pI between the two terminal pKa', () => {
-    const pI = isoelectricPoint({ asp: 0, glu: 0, his: 0, lys: 0, arg: 0 });
+    const termini = { asp: 0, glu: 0, cys: 0, tyr: 0, his: 0, lys: 0, arg: 0 };
+    const pI = isoelectricPoint(termini);
     expect(pI).toBeGreaterThan(3.55);
     expect(pI).toBeLessThan(8.0);
-    expect(Math.abs(netCharge(pI, { asp: 0, glu: 0, his: 0, lys: 0, arg: 0 }))).toBeLessThan(1e-6);
+    expect(Math.abs(netCharge(pI, termini))).toBeLessThan(1e-6);
   });
 
   it('the charge curve crosses zero at the pI shown on the plot', () => {
@@ -68,6 +70,8 @@ describe('protein-charge (isoelectric point)', () => {
     const r = run({
       asp: 100000,
       glu: 100000,
+      cys: 100000,
+      tyr: 100000,
       his: 100000,
       lys: 100000,
       arg: 100000,
@@ -84,5 +88,61 @@ describe('protein-charge (isoelectric point)', () => {
     expect(run({})).toEqual(run({}));
     expect(spec.slug).toBe('protein-charge');
     expect(spec.domain).toBe('protein');
+  });
+});
+
+describe('protein-charge — cysteine & tyrosine ionizable side chains', () => {
+  // Cys (thiol, pKa 8.3) and Tyr (phenol, pKa 10.1) are acidic groups. At pH
+  // exactly equal to a group's pKa, Henderson–Hasselbalch says it is exactly
+  // half-ionized, so adding ONE such residue must shift the net charge by
+  // exactly −0.5 at that pH. This is an exact mathematical identity (not a
+  // fitted value) and fails on the old 7-group model, which ignored Cys/Tyr
+  // entirely (the shift would have been 0).
+  it('one Cys shifts the net charge by exactly −0.5 at pH = 8.3', () => {
+    const withCys = netCharge(8.3, { ...SAMPLE, cys: 1 });
+    const without = netCharge(8.3, { ...SAMPLE, cys: 0 });
+    expect(withCys - without).toBeCloseTo(-0.5, 10);
+  });
+
+  it('one Tyr shifts the net charge by exactly −0.5 at pH = 10.1', () => {
+    const withTyr = netCharge(10.1, { ...SAMPLE, tyr: 1 });
+    const without = netCharge(10.1, { ...SAMPLE, tyr: 0 });
+    expect(withTyr - without).toBeCloseTo(-0.5, 10);
+  });
+
+  it('Cys/Tyr are acidic: adding them substantially lowers a basic protein’s pI', () => {
+    // A basic protein (pI well above the Cys/Tyr pKa) is where these groups
+    // actually matter. Values independently derived by bisecting the
+    // Henderson–Hasselbalch net-charge function (see scratchpad verification).
+    const basic = { asp: 1, glu: 1, cys: 0, tyr: 0, his: 1, lys: 8, arg: 6 };
+    expect(isoelectricPoint(basic)).toBeCloseTo(12.5218, 3);
+    expect(isoelectricPoint({ ...basic, cys: 3, tyr: 5 })).toBeCloseTo(10.5546, 3);
+    // The drop is large and unambiguous (≈ 2 pH units), not a rounding artefact.
+    expect(isoelectricPoint({ ...basic, cys: 3, tyr: 5 })).toBeLessThan(
+      isoelectricPoint(basic) - 1.5,
+    );
+  });
+
+  it('the acidicGroups metric counts Cys and Tyr (Asp + Glu + Cys + Tyr + C-terminus)', () => {
+    const r = run({ asp: 5, glu: 5, cys: 2, tyr: 4, his: 2, lys: 4, arg: 3 });
+    expect(metric(r, 'acidicGroups')).toBe(5 + 5 + 2 + 4 + 1); // 17
+    expect(metric(r, 'basicGroups')).toBe(2 + 4 + 3 + 1); // 10, unchanged
+  });
+
+  it('the documented example (2 Cys, 4 Tyr) reports its exact independently-derived pI', () => {
+    const r = run(spec.example);
+    expect(metric(r, 'isoelectricPoint')).toBeCloseTo(4.938243862863546, 6);
+  });
+
+  it('a purely Cys/Tyr acidic load still yields a monotone curve and a valid pI', () => {
+    const c = { asp: 0, glu: 0, cys: 6, tyr: 6, his: 0, lys: 0, arg: 0 };
+    let prev = Number.POSITIVE_INFINITY;
+    for (let pH = 0; pH <= 14; pH += 0.25) {
+      const z = netCharge(pH, c);
+      expect(z).toBeLessThanOrEqual(prev + 1e-12);
+      prev = z;
+    }
+    const pI = isoelectricPoint(c);
+    expect(Math.abs(netCharge(pI, c))).toBeLessThan(1e-6);
   });
 });

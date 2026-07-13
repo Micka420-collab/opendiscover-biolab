@@ -278,10 +278,11 @@ _Run it: `POST /api/lab/run { "engine": "properties", "params": … }` or intera
 
 ### `protein-charge` — Protein Charge & Isoelectric Point
 
-How a protein's net electric charge varies with pH, and the isoelectric point (pI) where it is exactly zero. Each ionizable group — acidic Asp/Glu and the C-terminus, basic His/Lys/Arg and the N-terminus — contributes a Henderson–Hasselbalch charge, and their sum Z(pH)=Σ_basic n/(1+10^(pH−pKa)) − Σ_acidic n/(1+10^(pKa−pH)) falls smoothly with pH, crossing zero at the pI. At its pI a protein carries no net charge, so it stops moving in an electric field and is least soluble — the basis of isoelectric focusing, ion-exchange chromatography, and protein precipitation. Reports the net charge at a chosen pH, the pI (by deterministic bisection), the charge at pH 7, and the charge-vs-pH titration curve. Closed-form and deterministic; every term is finite.
+How a protein's net electric charge varies with pH, and the isoelectric point (pI) where it is exactly zero. Each ionizable group — acidic Asp/Glu, the cysteine thiol and the tyrosine phenol, and the C-terminus; basic His/Lys/Arg and the N-terminus — contributes a Henderson–Hasselbalch charge, and their sum Z(pH)=Σ_basic n/(1+10^(pH−pKa)) − Σ_acidic n/(1+10^(pKa−pH)) falls smoothly with pH, crossing zero at the pI. At its pI a protein carries no net charge, so it stops moving in an electric field and is least soluble — the basis of isoelectric focusing, ion-exchange chromatography, and protein precipitation. Reports the net charge at a chosen pH, the pI (by deterministic bisection), the charge at pH 7, and the charge-vs-pH titration curve. Closed-form and deterministic; every term is finite. pKa values are representative textbook figures, so absolute pI matches a reference calculator to a few tenths of a pH unit — trends and comparisons are exact.
 
 **References**
 - Kozlowski, L.P. (2016) IPC — isoelectric point calculator. Biol. Direct 11:55.
+- Nelson & Cox, Lehninger Principles of Biochemistry — side-chain pKa table (Cys ≈ 8.3, Tyr ≈ 10.1).
 
 **Parameters**
 
@@ -289,6 +290,8 @@ How a protein's net electric charge varies with pH, and the isoelectric point (p
 |---|---|---|---|---|
 | `asp` | integer | `5` | ≥ 0, ≤ 100000 |  |
 | `glu` | integer | `5` | ≥ 0, ≤ 100000 |  |
+| `cys` | integer | `1` | ≥ 0, ≤ 100000 |  |
+| `tyr` | integer | `3` | ≥ 0, ≤ 100000 |  |
 | `his` | integer | `2` | ≥ 0, ≤ 100000 |  |
 | `lys` | integer | `4` | ≥ 0, ≤ 100000 |  |
 | `arg` | integer | `3` | ≥ 0, ≤ 100000 |  |
@@ -301,6 +304,8 @@ How a protein's net electric charge varies with pH, and the isoelectric point (p
 {
   "asp": 5,
   "glu": 5,
+  "cys": 2,
+  "tyr": 4,
   "his": 2,
   "lys": 4,
   "arg": 3,

@@ -2,11 +2,11 @@
  * Protein charge & isoelectric point — how a protein's net electric charge changes with the pH
  * around it, and the special pH (its isoelectric point, pI) where the charge is exactly zero.
  *
- * A protein carries charged chemical groups: acidic side chains (aspartate, glutamate) and the
- * C-terminus give up a proton and go negative as pH rises, while basic side chains (histidine,
- * lysine, arginine) and the N-terminus hold a proton and stay positive until pH climbs past
- * their pKa. Each group's charge follows Henderson–Hasselbalch; summing them gives the net
- * charge as a function of pH:
+ * A protein carries charged chemical groups: acidic side chains (aspartate, glutamate, the
+ * cysteine thiol and the tyrosine phenol) and the C-terminus give up a proton and go negative as
+ * pH rises, while basic side chains (histidine, lysine, arginine) and the N-terminus hold a proton
+ * and stay positive until pH climbs past their pKa. Each group's charge follows
+ * Henderson–Hasselbalch; summing them gives the net charge as a function of pH:
  *
  *     Z(pH) = Σ_basic  n/(1 + 10^(pH − pKa))  −  Σ_acidic  n/(1 + 10^(pKa − pH)).
  *
@@ -24,6 +24,7 @@
  * References:
  *   - Henderson, L.J. (1908); Hasselbalch, K.A. (1917).
  *   - Kozlowski, L.P. (2016) IPC — isoelectric point calculator. Biol. Direct 11:55.
+ *   - Nelson & Cox, Lehninger Principles of Biochemistry — side-chain pKa table.
  */
 
 import { z } from 'zod';
@@ -38,11 +39,19 @@ const POS_GROUPS = [
   { key: 'arg', pKa: 12.5 },
 ] as const;
 
-/** Acidic groups carry −1 when deprotonated (above their pKa). */
+/**
+ * Acidic groups carry −1 when deprotonated (above their pKa). Includes the two
+ * side chains that ionize only at high pH — the cysteine thiol (~8.3) and the
+ * tyrosine phenol (~10.1) — which any complete pI/titration model needs (they are
+ * present in the cited IPC calculator); omitting them overestimates the pI of
+ * cysteine/tyrosine-rich proteins. pKa values are representative textbook figures.
+ */
 const NEG_GROUPS = [
   { key: 'cterm', pKa: 3.55, fixed: 1 },
   { key: 'asp', pKa: 3.9 },
   { key: 'glu', pKa: 4.07 },
+  { key: 'cys', pKa: 8.3 },
+  { key: 'tyr', pKa: 10.1 },
 ] as const;
 
 export const paramsSchema = z
@@ -51,6 +60,10 @@ export const paramsSchema = z
     asp: z.number().int().min(0).max(100000).default(5),
     /** Glutamate residues (acidic). */
     glu: z.number().int().min(0).max(100000).default(5),
+    /** Cysteine residues (weakly acidic thiol, pKa ≈ 8.3). */
+    cys: z.number().int().min(0).max(100000).default(1),
+    /** Tyrosine residues (weakly acidic phenol, pKa ≈ 10.1). */
+    tyr: z.number().int().min(0).max(100000).default(3),
     /** Histidine residues (weakly basic). */
     his: z.number().int().min(0).max(100000).default(2),
     /** Lysine residues (basic). */
@@ -65,7 +78,7 @@ export const paramsSchema = z
   .strict();
 
 export type ProteinChargeParams = z.infer<typeof paramsSchema>;
-type Counts = Pick<ProteinChargeParams, 'asp' | 'glu' | 'his' | 'lys' | 'arg'>;
+type Counts = Pick<ProteinChargeParams, 'asp' | 'glu' | 'cys' | 'tyr' | 'his' | 'lys' | 'arg'>;
 
 /** Net charge Z(pH) = Σ basic protonated − Σ acidic deprotonated (Henderson–Hasselbalch). */
 export function netCharge(pH: number, c: Counts): number {
@@ -98,12 +111,20 @@ export function isoelectricPoint(c: Counts): number {
 
 export function run(rawParams: Partial<ProteinChargeParams> = {}): SimResult {
   const p = paramsSchema.parse(rawParams);
-  const counts: Counts = { asp: p.asp, glu: p.glu, his: p.his, lys: p.lys, arg: p.arg };
+  const counts: Counts = {
+    asp: p.asp,
+    glu: p.glu,
+    cys: p.cys,
+    tyr: p.tyr,
+    his: p.his,
+    lys: p.lys,
+    arg: p.arg,
+  };
 
   const chargeAtPH = netCharge(p.reportPH, counts);
   const pI = isoelectricPoint(counts);
   const chargeAt7 = netCharge(7, counts);
-  const acidicGroups = p.asp + p.glu + 1; // + C-terminus
+  const acidicGroups = p.asp + p.glu + p.cys + p.tyr + 1; // + C-terminus
   const basicGroups = p.his + p.lys + p.arg + 1; // + N-terminus
 
   const metrics: Metric[] = [
@@ -129,7 +150,7 @@ export function run(rawParams: Partial<ProteinChargeParams> = {}): SimResult {
       key: 'acidicGroups',
       label: 'Acidic groups',
       value: acidicGroups,
-      note: 'Asp + Glu + C-terminus',
+      note: 'Asp + Glu + Cys + Tyr + C-terminus',
     },
     {
       key: 'basicGroups',
@@ -173,11 +194,23 @@ export const spec: EngineSpec<ProteinChargeParams> = {
   domain: 'protein',
   version: '1.0.0',
   description:
-    "How a protein's net electric charge varies with pH, and the isoelectric point (pI) where it is exactly zero. Each ionizable group — acidic Asp/Glu and the C-terminus, basic His/Lys/Arg and the N-terminus — contributes a Henderson–Hasselbalch charge, and their sum Z(pH)=Σ_basic n/(1+10^(pH−pKa)) − Σ_acidic n/(1+10^(pKa−pH)) falls smoothly with pH, crossing zero at the pI. At its pI a protein carries no net charge, so it stops moving in an electric field and is least soluble — the basis of isoelectric focusing, ion-exchange chromatography, and protein precipitation. Reports the net charge at a chosen pH, the pI (by deterministic bisection), the charge at pH 7, and the charge-vs-pH titration curve. Closed-form and deterministic; every term is finite.",
-  references: ['Kozlowski, L.P. (2016) IPC — isoelectric point calculator. Biol. Direct 11:55.'],
+    "How a protein's net electric charge varies with pH, and the isoelectric point (pI) where it is exactly zero. Each ionizable group — acidic Asp/Glu, the cysteine thiol and the tyrosine phenol, and the C-terminus; basic His/Lys/Arg and the N-terminus — contributes a Henderson–Hasselbalch charge, and their sum Z(pH)=Σ_basic n/(1+10^(pH−pKa)) − Σ_acidic n/(1+10^(pKa−pH)) falls smoothly with pH, crossing zero at the pI. At its pI a protein carries no net charge, so it stops moving in an electric field and is least soluble — the basis of isoelectric focusing, ion-exchange chromatography, and protein precipitation. Reports the net charge at a chosen pH, the pI (by deterministic bisection), the charge at pH 7, and the charge-vs-pH titration curve. Closed-form and deterministic; every term is finite. pKa values are representative textbook figures, so absolute pI matches a reference calculator to a few tenths of a pH unit — trends and comparisons are exact.",
+  references: [
+    'Kozlowski, L.P. (2016) IPC — isoelectric point calculator. Biol. Direct 11:55.',
+    'Nelson & Cox, Lehninger Principles of Biochemistry — side-chain pKa table (Cys ≈ 8.3, Tyr ≈ 10.1).',
+  ],
   paramsSchema: paramsSchema as z.ZodType<ProteinChargeParams>,
   run,
-  example: paramsSchema.parse({ asp: 5, glu: 5, his: 2, lys: 4, arg: 3, reportPH: 7 }),
+  example: paramsSchema.parse({
+    asp: 5,
+    glu: 5,
+    cys: 2,
+    tyr: 4,
+    his: 2,
+    lys: 4,
+    arg: 3,
+    reportPH: 7,
+  }),
   tags: ['protein', 'charge', 'isoelectric-point', 'pI', 'titration', 'henderson-hasselbalch'],
 };
 
