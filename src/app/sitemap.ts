@@ -8,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/lab',
     '/lab/breeding',
+    '/aurora',
+    '/cross',
     '/challenge',
     '/gallery',
     '/tv',

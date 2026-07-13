@@ -124,6 +124,56 @@ export default async function HomePage() {
         </Card>
       </section>
 
+      {/* ── CrossLab game highlight ──────────────────────────────────────── */}
+      <section>
+        <Card className="transition-colors hover:border-accent">
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-8 p-2 md:p-4">
+            <div className="space-y-4">
+              <div className="text-xs uppercase tracking-widest text-accent font-mono">
+                🧬 CrossLab — genetics you can guess
+              </div>
+              <h2 className="text-3xl font-bold leading-tight">
+                Two parents in. Predict the babies.
+              </h2>
+              <p className="text-muted-foreground max-w-xl">
+                The most beginner-friendly way into real biology. You&apos;re shown two organisms —
+                pea plants, dragons, snapdragons — and you{' '}
+                <span className="text-foreground">predict what their offspring will look like</span>
+                . Then the deterministic{' '}
+                <Link href="/lab/breeding" className="text-accent hover:underline">
+                  breeding
+                </Link>{' '}
+                engine reveals the truth: a Punnett square, the real odds, and a litter of actual
+                babies. Mendel&apos;s genetics, turned into a guessing game the whole chat can play
+                along with.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Button asChild>
+                  <Link href="/cross">🧬 Play CrossLab</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/cross?mode=endless">Endless mode</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-3 content-start">
+              <MiniPoint icon="🔮" title="Hypothesis first">
+                Call the most common look — then bet its exact share for bonus points. The reveal
+                shows you exactly why.
+              </MiniPoint>
+              <MiniPoint icon="🍼" title="See the litter">
+                Every round ends with a set of real, seeded offspring popping in — the abstract
+                ratio made concrete.
+              </MiniPoint>
+              <MiniPoint icon="🌱" title="No background needed">
+                Dominant, recessive, Punnett square — each term has a plain-language
+                &ldquo;?&rdquo;. Watch two brown mice have a white pup.
+              </MiniPoint>
+            </div>
+          </div>
+        </Card>
+      </section>
+
       {/* ── Domain breadth ───────────────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="space-y-2">

@@ -43,6 +43,7 @@ export const metadata: Metadata = {
 const NAV: { href: string; label: string; highlight?: boolean }[] = [
   { href: '/lab', label: 'Lab' },
   { href: '/aurora', label: 'Play', highlight: true },
+  { href: '/cross', label: 'CrossLab' },
   { href: '/challenge', label: 'Challenge' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/tv', label: 'TV' },
@@ -53,6 +54,7 @@ const NAV: { href: string; label: string; highlight?: boolean }[] = [
 const FOOTER_EXPLORE: { href: string; label: string }[] = [
   { href: '/lab', label: 'The Lab' },
   { href: '/aurora', label: 'Play AURORA' },
+  { href: '/cross', label: 'CrossLab — genetics game' },
   { href: '/challenge', label: 'Daily challenge' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/tv', label: 'Lab TV' },
