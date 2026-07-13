@@ -66,6 +66,13 @@ export interface Quest {
   targets: string[];
 }
 
+/**
+ * The serializable view of a quest — everything except the `classify` function,
+ * which can't cross the Server→Client component boundary. This is what the game
+ * UI receives; classification happens server-side in the discovery API.
+ */
+export type QuestView = Omit<Quest, 'classify'>;
+
 /** The limited feedback one probe reveals — NOT the exact regime. */
 export interface ProbeResult {
   params: Record<string, number>;

@@ -24,5 +24,6 @@ export type {
   ProbeResult,
   Quest,
   QuestAxis,
+  QuestView,
   Regime,
 } from './types';

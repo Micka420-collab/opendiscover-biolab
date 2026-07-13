@@ -49,6 +49,7 @@ type FooterKey = keyof Dictionary['footer'];
 const NAV: { href: string; key: NavKey; highlight?: boolean }[] = [
   { href: '/lab', key: 'lab' },
   { href: '/aurora', key: 'play', highlight: true },
+  { href: '/discover', key: 'discover' },
   { href: '/challenge', key: 'challenge' },
   { href: '/gallery', key: 'gallery' },
   { href: '/tv', key: 'tv' },

@@ -5,6 +5,7 @@ export const de: Dictionary = {
     lab: 'Labor',
     play: 'Spielen',
     challenge: 'Challenge',
+    discover: 'Entdecken',
     gallery: 'Galerie',
     tv: 'TV',
     discoveries: 'Entdeckungen',

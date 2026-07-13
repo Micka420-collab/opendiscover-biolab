@@ -11,6 +11,7 @@ export const en = {
     lab: 'Lab',
     play: 'Play',
     challenge: 'Challenge',
+    discover: 'Discover',
     gallery: 'Gallery',
     tv: 'TV',
     discoveries: 'Discoveries',
