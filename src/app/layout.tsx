@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'OpenDiscover BioLab — deterministic in-silico biology lab you can play',
   description:
-    'An open-source virtual biotechnology lab you run in the browser — no account, no database. 77 deterministic simulation engines where every run reproduces byte-for-byte and is a shareable, remixable link, plus AURORA: a watchable citizen-science game and plain-language help on every dial. Built for scientists, creators, and streamers.',
+    'An open-source virtual biotechnology lab you run in the browser — no account, no database. 80 deterministic simulation engines where every run reproduces byte-for-byte and is a shareable, remixable link, plus AURORA: a watchable citizen-science game and plain-language help on every dial. Built for scientists, creators, and streamers.',
   keywords: [
     'in-silico biology',
     'bioinformatics',
@@ -29,14 +29,14 @@ export const metadata: Metadata = {
     siteName: 'OpenDiscover BioLab',
     title: 'OpenDiscover BioLab — biology you can play, reproduce byte-for-byte',
     description:
-      'A deterministic in-silico biology lab in your browser — 77 engines, plain-language help, and AURORA: a watch-and-play citizen-science game. No account. Every run is a shareable, remixable link.',
+      'A deterministic in-silico biology lab in your browser — 80 engines, plain-language help, and AURORA: a watch-and-play citizen-science game. No account. Every run is a shareable, remixable link.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
     title: 'OpenDiscover BioLab',
     description:
-      '77 deterministic biology engines + a watchable citizen-science game, in your browser. Every run reproduces byte-for-byte and is a shareable link.',
+      '80 deterministic biology engines + a watchable citizen-science game, in your browser. Every run reproduces byte-for-byte and is a shareable link.',
   },
 };
 
@@ -124,7 +124,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span className="text-muted-foreground">/biolab</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm">
-                A deterministic in-silico biology lab you can play. 77 engines, plain-language help,
+                A deterministic in-silico biology lab you can play. 80 engines, plain-language help,
                 and a watchable citizen-science game — every run reproduces byte-for-byte.
               </p>
               <a
