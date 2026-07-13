@@ -1,0 +1,5 @@
+# Never upload local secrets or local tooling state to Vercel.
+.env
+.env.local
+.env.*.local
+.claude/

@@ -34,3 +34,6 @@ test-results
 .vscode/*
 !.vscode/extensions.json
 prisma/migrations/.dev.db
+
+.vercel
+.env*

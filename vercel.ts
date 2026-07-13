@@ -15,25 +15,16 @@ import { type VercelConfig, routes } from '@vercel/config/v1';
  *   pipeline before they cost us LLM dollars.
  * - Aggressive caching on static + dataset proxies.
  */
+// NOTE: Rolling Releases and BotID (bot protection) are configured in the
+// Vercel dashboard / project settings, not in this file — the deploy-time
+// config schema rejects them as top-level keys. Keep the intent here for
+// reference: stage the discovery-pipeline endpoints (/api/submissions,
+// /api/inngest) at 5% → 25% → 100%, and enforce BotID on /api/submissions
+// and /api/auth/*.
 export const config: VercelConfig = {
   framework: 'nextjs',
   buildCommand: 'pnpm run build',
   regions: ['fra1', 'iad1'],
-
-  rollingReleases: {
-    enabled: true,
-    paths: ['/api/submissions', '/api/inngest'],
-    stages: [
-      { percentage: 5, duration: '10m' },
-      { percentage: 25, duration: '20m' },
-      { percentage: 100 },
-    ],
-  },
-
-  botProtection: {
-    paths: ['/api/submissions', '/api/auth/*'],
-    mode: 'enforce',
-  },
 
   headers: [
     routes.cacheControl('/static/(.*)', {
