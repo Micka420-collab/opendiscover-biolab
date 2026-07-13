@@ -1,9 +1,11 @@
+import { getMessages } from '@/i18n/server';
 import { getAppSession, isGuestSession } from '@/lib/auth';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
 export async function NavAuth() {
   const session = await getAppSession({ headers: await headers() });
+  const dict = await getMessages();
 
   if (!session?.user) {
     return (
@@ -11,7 +13,7 @@ export async function NavAuth() {
         href="/auth/sign-in"
         className="px-3 py-1.5 rounded-md bg-accent text-accent-foreground hover:opacity-90"
       >
-        Sign in
+        {dict.nav.signIn}
       </Link>
     );
   }
@@ -35,7 +37,7 @@ export async function NavAuth() {
       </Link>
       <form action={guest ? '/api/auth/guest/sign-out' : '/api/auth/sign-out'} method="POST">
         <button type="submit" className="text-xs text-muted-foreground hover:text-foreground">
-          Sign out
+          {dict.nav.signOut}
         </button>
       </form>
     </div>

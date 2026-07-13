@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getMessages } from '@/i18n/server';
 import { getAppSession, isGuestSession } from '@/lib/auth';
 import { db, schema } from '@/lib/db';
 import { avg, count, desc, eq } from 'drizzle-orm';
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   const session = await getAppSession({ headers: await headers() });
   if (!session) redirect('/auth/sign-in');
 
+  const dict = (await getMessages()).dashboard;
   const userId = session.user.id;
 
   type SubmissionRow = {
@@ -117,14 +119,16 @@ export default async function DashboardPage() {
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">@{handle}</h1>
-          <Badge variant={reputationVariant(reputation)}>rep {reputation.toFixed(2)}</Badge>
+          <Badge variant={reputationVariant(reputation)}>
+            {dict.rep} {reputation.toFixed(2)}
+          </Badge>
         </div>
         {!guest ? (
           <Link
             href="/admin/review-queue"
             className="text-xs text-muted-foreground hover:text-foreground underline"
           >
-            Review queue →
+            {dict.reviewQueue}
           </Link>
         ) : null}
       </header>
@@ -132,19 +136,25 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-5">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Submissions</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+              {dict.submissions}
+            </p>
             <p className="mt-1 text-3xl font-bold">{totalSubmissions}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Discoveries</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+              {dict.discoveries}
+            </p>
             <p className="mt-1 text-3xl font-bold">{discoveryRows.length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Avg novelty</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+              {dict.avgNovelty}
+            </p>
             <p className="mt-1 text-3xl font-bold">{avgNovelty}</p>
           </CardContent>
         </Card>
@@ -152,22 +162,22 @@ export default async function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent submissions</CardTitle>
+          <CardTitle>{dict.recentSubmissions}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {submissions.length === 0 ? (
-            <p className="px-5 pb-5 text-sm text-muted-foreground">No submissions yet.</p>
+            <p className="px-5 pb-5 text-sm text-muted-foreground">{dict.noSubmissions}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs text-muted-foreground">
-                    <th className="px-5 py-3 text-left font-medium">Protocol</th>
-                    <th className="px-5 py-3 text-left font-medium">Slice key</th>
-                    <th className="px-5 py-3 text-left font-medium">Status</th>
-                    <th className="px-5 py-3 text-left font-medium">Novelty</th>
-                    <th className="px-5 py-3 text-left font-medium">Date</th>
-                    <th className="px-5 py-3 text-left font-medium">Tracker</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colProtocol}</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colSliceKey}</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colStatus}</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colNovelty}</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colDate}</th>
+                    <th className="px-5 py-3 text-left font-medium">{dict.colTracker}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,7 +206,7 @@ export default async function DashboardPage() {
                           href={`/dashboard/submissions/${s.id}`}
                           className="text-accent hover:underline"
                         >
-                          Track →
+                          {dict.track}
                         </Link>
                       </td>
                     </tr>
@@ -210,7 +220,7 @@ export default async function DashboardPage() {
 
       {discoveryRows.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold">Your discoveries</h2>
+          <h2 className="text-lg font-semibold">{dict.yourDiscoveries}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {discoveryRows.map((d) => (
               <Link key={d.id} href={`/discoveries/${d.id}`}>
@@ -227,7 +237,7 @@ export default async function DashboardPage() {
                         {d.status.replace(/_/g, ' ')}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        novelty {d.noveltyScore.toFixed(3)}
+                        {dict.novelty} {d.noveltyScore.toFixed(3)}
                       </span>
                     </div>
                     <p className="font-medium line-clamp-2">{d.title}</p>

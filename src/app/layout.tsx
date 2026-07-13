@@ -1,5 +1,8 @@
 import './globals.css';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import { NavAuth } from '@/components/layout/nav-auth';
+import type { Dictionary } from '@/i18n/dictionary';
+import { getLocale, getMessages } from '@/i18n/server';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -40,47 +43,55 @@ export const metadata: Metadata = {
   },
 };
 
-const NAV: { href: string; label: string; highlight?: boolean }[] = [
-  { href: '/lab', label: 'Lab' },
-  { href: '/aurora', label: 'Play', highlight: true },
-  { href: '/challenge', label: 'Challenge' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/tv', label: 'TV' },
-  { href: '/discoveries', label: 'Discoveries' },
-  { href: '/about', label: 'About' },
+type NavKey = keyof Dictionary['nav'];
+type FooterKey = keyof Dictionary['footer'];
+
+const NAV: { href: string; key: NavKey; highlight?: boolean }[] = [
+  { href: '/lab', key: 'lab' },
+  { href: '/aurora', key: 'play', highlight: true },
+  { href: '/challenge', key: 'challenge' },
+  { href: '/gallery', key: 'gallery' },
+  { href: '/tv', key: 'tv' },
+  { href: '/discoveries', key: 'discoveries' },
+  { href: '/about', key: 'about' },
 ];
 
-const FOOTER_EXPLORE: { href: string; label: string }[] = [
-  { href: '/lab', label: 'The Lab' },
-  { href: '/aurora', label: 'Play AURORA' },
-  { href: '/challenge', label: 'Daily challenge' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/tv', label: 'Lab TV' },
+const FOOTER_EXPLORE: { href: string; key: FooterKey }[] = [
+  { href: '/lab', key: 'theLab' },
+  { href: '/aurora', key: 'playAurora' },
+  { href: '/challenge', key: 'dailyChallenge' },
+  { href: '/gallery', key: 'gallery' },
+  { href: '/tv', key: 'labTv' },
 ];
 
-const FOOTER_PROJECT: { href: string; label: string }[] = [
-  { href: '/about', label: 'About' },
-  { href: '/discoveries', label: 'Discoveries' },
+const FOOTER_PROJECT: { href: string; key: FooterKey }[] = [
+  { href: '/about', key: 'about' },
+  { href: '/discoveries', key: 'discoveries' },
 ];
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const dict = await getMessages();
   return (
-    <html lang="en" className="dark">
+    <html lang={locale} className="dark">
       <body className="min-h-screen flex flex-col">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-foreground"
         >
-          Skip to content
+          {dict.nav.skipToContent}
         </a>
 
         <header className="sticky top-0 z-40 border-b border-border bg-background">
           <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-            <Link href="/" className="flex items-center gap-2 font-mono text-sm shrink-0">
-              <span className="inline-block w-2 h-2 rounded-full bg-accent" />
-              <span className="font-semibold">OpenDiscover</span>
-              <span className="text-muted-foreground">/biolab</span>
-            </Link>
+            <div className="flex items-center gap-3 shrink-0">
+              <LanguageSwitcher current={locale} label={dict.nav.language} />
+              <Link href="/" className="flex items-center gap-2 font-mono text-sm">
+                <span className="inline-block w-2 h-2 rounded-full bg-accent" />
+                <span className="font-semibold">OpenDiscover</span>
+                <span className="text-muted-foreground">/biolab</span>
+              </Link>
+            </div>
             <nav
               className="flex items-center gap-1.5 sm:gap-2 text-sm overflow-x-auto"
               aria-label="Primary"
@@ -92,7 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href={item.href}
                     className="rounded-full border border-accent px-3 py-1 font-medium text-accent hover:bg-[hsl(142_71%_45%/0.12)] transition-colors"
                   >
-                    ▶ {item.label}
+                    ▶ {dict.nav[item.key]}
                   </Link>
                 ) : (
                   <Link
@@ -100,7 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href={item.href}
                     className="rounded-full px-2.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >
-                    {item.label}
+                    {dict.nav[item.key]}
                   </Link>
                 ),
               )}
@@ -123,32 +134,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span className="font-semibold">OpenDiscover</span>
                 <span className="text-muted-foreground">/biolab</span>
               </div>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                A deterministic in-silico biology lab you can play. 80 engines, plain-language help,
-                and a watchable citizen-science game — every run reproduces byte-for-byte.
-              </p>
+              <p className="text-sm text-muted-foreground max-w-sm">{dict.footer.tagline}</p>
               <a
                 href={repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-accent transition-colors"
               >
-                ★ Star on GitHub
+                ★ {dict.footer.star}
               </a>
             </div>
 
-            <FooterCol title="Explore" links={FOOTER_EXPLORE} />
             <FooterCol
-              title="Project"
-              links={FOOTER_PROJECT}
-              external={{ href: repoUrl, label: 'GitHub ↗' }}
+              title={dict.footer.exploreTitle}
+              links={FOOTER_EXPLORE.map((l) => ({ href: l.href, label: dict.footer[l.key] }))}
+            />
+            <FooterCol
+              title={dict.footer.projectTitle}
+              links={FOOTER_PROJECT.map((l) => ({ href: l.href, label: dict.footer[l.key] }))}
+              external={{ href: repoUrl, label: dict.footer.github }}
             />
           </div>
 
           <div className="border-t border-border">
             <div className="max-w-6xl mx-auto px-6 py-5 text-xs text-muted-foreground flex flex-wrap gap-x-4 gap-y-2 justify-between">
-              <span>Code: MIT · Data &amp; discoveries: CC-BY 4.0</span>
-              <span>In-silico results are models, not clinical or applied claims.</span>
+              <span>{dict.footer.license}</span>
+              <span>{dict.footer.disclaimer}</span>
             </div>
           </div>
         </footer>

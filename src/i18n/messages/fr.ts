@@ -1,0 +1,53 @@
+import type { Dictionary } from '../dictionary';
+
+export const fr: Dictionary = {
+  nav: {
+    lab: 'Labo',
+    play: 'Jouer',
+    challenge: 'Défi',
+    gallery: 'Galerie',
+    tv: 'TV',
+    discoveries: 'Découvertes',
+    about: 'À propos',
+    signIn: 'Se connecter',
+    signOut: 'Se déconnecter',
+    language: 'Langue',
+    skipToContent: 'Aller au contenu',
+  },
+  footer: {
+    tagline:
+      "Un laboratoire de biologie in-silico déterministe que l'on peut jouer. 80 moteurs, une aide en langage simple et un jeu de science citoyenne à regarder — chaque exécution se reproduit à l'octet près.",
+    star: 'Star sur GitHub',
+    exploreTitle: 'Explorer',
+    projectTitle: 'Projet',
+    theLab: 'Le Labo',
+    playAurora: 'Jouer à AURORA',
+    dailyChallenge: 'Défi du jour',
+    gallery: 'Galerie',
+    labTv: 'Lab TV',
+    about: 'À propos',
+    discoveries: 'Découvertes',
+    github: 'GitHub ↗',
+    license: 'Code : MIT · Données et découvertes : CC-BY 4.0',
+    disclaimer:
+      'Les résultats in-silico sont des modèles, pas des affirmations cliniques ou appliquées.',
+  },
+  dashboard: {
+    reviewQueue: 'File de relecture →',
+    submissions: 'Soumissions',
+    discoveries: 'Découvertes',
+    avgNovelty: 'Nouveauté moy.',
+    recentSubmissions: 'Soumissions récentes',
+    noSubmissions: 'Aucune soumission pour le moment.',
+    colProtocol: 'Protocole',
+    colSliceKey: 'Clé de tranche',
+    colStatus: 'Statut',
+    colNovelty: 'Nouveauté',
+    colDate: 'Date',
+    colTracker: 'Suivi',
+    track: 'Suivre →',
+    yourDiscoveries: 'Vos découvertes',
+    novelty: 'nouveauté',
+    rep: 'rép',
+  },
+};
